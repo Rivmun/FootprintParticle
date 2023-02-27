@@ -1,0 +1,14 @@
+{
+	"text.footprintparticle.option.title": "脚印粒子",
+	"text.footprintparticle.option.enableMod": "启用模组",
+	"text.footprintparticle.option.secPerPrint": "脚印生成间隔（秒）",
+	"text.footprintparticle.option.printLifetime": "粒子持续时间（秒）",
+	"text.footprintparticle.option.applyBlocks": "方块列表",
+	"text.footprintparticle.option.applyBlocks.@Tooltip": "以下方块上将生成脚印。\n格式: §9§omodid:blockid§r\n当基于方块硬度的内建过滤器无法满足要求时再使用。",
+	"text.footprintparticle.option.excludedMobs": "生物例外",
+	"text.footprintparticle.option.excludedMobs.@Tooltip": "以下生物不会生成脚印。\n格式: §9§omodid:mobid§r",
+	"text.footprintparticle.option.sizePerMob": "脚印大小",
+	"text.footprintparticle.option.sizePerMob.@Tooltip": "为某种生物设置单独的脚印大小。\n格式: §9§omodid:mobid,size§r\n大多数生物的默认大小为 0.5。\n此设置的优先级比“例外”列表低。",
+	
+	"modmenu.descriptionTranslation.footprintparticle": "一个简易的脚印粒子模组"
+}

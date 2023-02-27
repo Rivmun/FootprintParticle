@@ -1,0 +1,12 @@
+{
+	"text.footprintparticle.option.title": "Footprint Particle",
+	"text.footprintparticle.option.enableMod": "Enable?",
+	"text.footprintparticle.option.secPerPrint": "Second Per Print",
+	"text.footprintparticle.option.printLifetime": "Print Lifetime (sec)",
+	"text.footprintparticle.option.applyBlocks": "Block List",
+	"text.footprintparticle.option.applyBlocks.@Tooltip": "Blocks that footprint will appear.\nFormat: §9§omodid:blockid§r\nUse only when hardness-based inner filter cannot suit your requirements.",
+	"text.footprintparticle.option.excludedMobs": "Mob Excluded",
+	"text.footprintparticle.option.excludedMobs.@Tooltip": "Mobs in this list will not generate footprint.\nFormat: §9§omodid:mobid§r",
+	"text.footprintparticle.option.sizePerMob": "Print Size",
+	"text.footprintparticle.option.sizePerMob.@Tooltip": "Set a separate size for a mob.\nFormat: §9§omodid:mobid,size§r\nDefault is 0.5 for most mob.\nLower priority than excluded."
+}
