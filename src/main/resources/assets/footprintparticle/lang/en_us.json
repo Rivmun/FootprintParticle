@@ -5,6 +5,8 @@
 	"text.footprintparticle.option.printLifetime": "Print Lifetime (sec)",
 	"text.footprintparticle.option.applyBlocks": "Block List",
 	"text.footprintparticle.option.applyBlocks.@Tooltip": "Blocks that footprint will appear.\nFormat: §9§omodid:blockid§r\nUse only when hardness-based inner filter cannot suit your requirements.",
+	"text.footprintparticle.option.excludedBlocks": "Block Excluded",
+	"text.footprintparticle.option.excludedBlocks.@Tooltip": "Blocks that footprint will NOT appear.\nFormat: §9§omodid:blockid§r",
 	"text.footprintparticle.option.excludedMobs": "Mob Excluded",
 	"text.footprintparticle.option.excludedMobs.@Tooltip": "Mobs in this list will not generate footprint.\nFormat: §9§omodid:mobid§r",
 	"text.footprintparticle.option.sizePerMob": "Print Size",

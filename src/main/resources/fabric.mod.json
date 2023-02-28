@@ -4,16 +4,17 @@
   "version": "${version}",
 
   "name": "Footprint Particle",
-  "description": "Simple footprint particle mod.",
+  "description": "A simple mod that adds footprint for mobs (and players).",
   "authors": [
     "Rimo"
   ],
   "contact": {
-    "homepage": "",
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/footprintparticle",
+    "issues": "https://github.com/Rivmun/footprintparticle/issues",
     "sources": "https://github.com/Rivmun/footprintparticle"
   },
 
-  "license": "gpl-3.0",
+  "license": "GPL-3.0",
   "icon": "assets/footprintparticle/icon.png",
 
   "environment": "client",
@@ -38,5 +39,12 @@
   },
   "suggests": {
     "modmenu": "*"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.modrinth": "https://modrinth.com/mod/footprintparticle"
+      }
+    }
   }
 }

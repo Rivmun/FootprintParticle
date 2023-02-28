@@ -49,9 +49,16 @@ public class ConfigScreen {
     	general.addEntry(entryBuilder
     			.startStrList(Text.translatable("text.footprintparticle.option.applyBlocks")
     					,config.getApplyBlocks())
-    			.setDefaultValue(FPPConfig.DEF_BLOCKS)
+    			.setDefaultValue(FPPConfig.DEF_APPLYBLOCKS)
     			.setTooltip(Text.translatable("text.footprintparticle.option.applyBlocks.@Tooltip"))
     			.setSaveConsumer(config::setApplyBlocks)
+    			.build());
+    	general.addEntry(entryBuilder
+    			.startStrList(Text.translatable("text.footprintparticle.option.excludedBlocks")
+    					,config.getExcludedBlocks())
+    			.setDefaultValue(FPPConfig.DEF_EXCLUDEDBLOCKS)
+    			.setTooltip(Text.translatable("text.footprintparticle.option.excludedBlocks.@Tooltip"))
+    			.setSaveConsumer(config::setExcludedBlocks)
     			.build());
     	general.addEntry(entryBuilder
     			.startStrList(Text.translatable("text.footprintparticle.option.excludedMobs")
