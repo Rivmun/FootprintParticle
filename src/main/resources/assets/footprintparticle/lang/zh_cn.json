@@ -11,6 +11,10 @@
 	"text.footprintparticle.option.excludedMobs.@Tooltip": "以下生物不会生成脚印。\n格式: §9§omodid:mobid§r",
 	"text.footprintparticle.option.sizePerMob": "脚印大小",
 	"text.footprintparticle.option.sizePerMob.@Tooltip": "为某种生物设置单独的脚印大小。\n格式: §9§omodid:mobid,size§r\n大多数生物的默认大小为 0.5。\n此设置的优先级低于“例外”列表。",
+	"text.footprintparticle.option.horseLikeMobs": "马匹类生物",
+	"text.footprintparticle.option.horseLikeMobs.@Tooltip": "列表中的生物将更频繁且更定制化地生成脚印。",
+	"text.footprintparticle.option.spiderLikeMobs": "蜘蛛类生物",
+	"text.footprintparticle.option.spiderLikeMobs.@Tooltip": "列表中的生物将更频繁且更定制化地生成脚印。",
 	
 	"modmenu.descriptionTranslation.footprintparticle": "一个简单地为生物和玩家添加脚印粒子的模组。"
 }

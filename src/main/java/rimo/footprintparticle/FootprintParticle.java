@@ -10,6 +10,7 @@ import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.EntityType;
 import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Quaternion;
@@ -26,7 +27,7 @@ public class FootprintParticle extends SpriteBillboardParticle{
 		this.setSprite(spriteProvider.getSprite(random));
 
 		this.setVelocity(0, 0, 0);
-		this.angle = (float) Math.atan2(-vx, vz);		// TODO: this angle change has no effect yet.
+		//this.angle = (float) Math.atan2(-vx, vz);		// TODO: this angle change has no effect yet.
 
 		this.maxAge = (int) (FPPClient.CONFIG.getPrintLifetime() * 20);
 		this.scale = 0.5f;
@@ -41,8 +42,10 @@ public class FootprintParticle extends SpriteBillboardParticle{
 	public void tick() {
 		this.y -= 0.01f / this.maxAge;
 		this.prevPosY = this.y;
+
 		if (this.age > this.maxAge / 2)
 			this.setAlpha((float) Math.cos((((float) this.age - (float) this.maxAge / 2) / (float) this.maxAge) * Math.PI));
+
 		if (this.age++ >= this.maxAge)
 			this.markDead();
 	}
@@ -90,9 +93,12 @@ public class FootprintParticle extends SpriteBillboardParticle{
 			if (parameters instanceof FootprintParticleType footprintParameters) {
 				for (String str : FPPClient.CONFIG.getSizePerMob()) {
 					String[] str2 = str.split(",");
-					if (str2[0].contentEquals(footprintParameters.entityID) && str2[1] != null) {
+					if (str2[0].contentEquals(EntityType.getId(footprintParameters.entity.getType()).toString()) && str2[1] != null) {
 						particle.scale = Float.parseFloat(str2[1]);
 					}
+				}
+				if (footprintParameters.entity.isBaby()) {
+					particle.scale(particle.scale * 0.66f);
 				}
 			}
 			return particle;

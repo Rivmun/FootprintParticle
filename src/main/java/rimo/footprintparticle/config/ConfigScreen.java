@@ -74,6 +74,20 @@ public class ConfigScreen {
     			.setTooltip(Text.translatable("text.footprintparticle.option.sizePerMob.@Tooltip"))
     			.setSaveConsumer(config::setSizePerMob)
     			.build());
+    	general.addEntry(entryBuilder
+    			.startStrList(Text.translatable("text.footprintparticle.option.horseLikeMobs")
+    					,config.getHorseLikeMobs())
+    			.setDefaultValue(FPPConfig.DEF_FOUR_LEGS)
+    			.setTooltip(Text.translatable("text.footprintparticle.option.horseLikeMobs.@Tooltip"))
+    			.setSaveConsumer(config::setHorseLikeMobs)
+    			.build());
+    	general.addEntry(entryBuilder
+    			.startStrList(Text.translatable("text.footprintparticle.option.spiderLikeMobs")
+    					,config.getSpiderLikeMobs())
+    			.setDefaultValue(FPPConfig.DEF_EIGHT_LEGS)
+    			.setTooltip(Text.translatable("text.footprintparticle.option.spiderLikeMobs.@Tooltip"))
+    			.setSaveConsumer(config::setSpiderLikeMobs)
+    			.build());
     }
 
 }
