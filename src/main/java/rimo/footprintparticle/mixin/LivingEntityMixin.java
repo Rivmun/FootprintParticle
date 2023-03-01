@@ -49,7 +49,7 @@ public abstract class LivingEntityMixin extends Entity {
 								this.getVelocity().getX(),
 								0,
 								this.getVelocity().getZ());
-						timer = (int) (FPPClient.CONFIG.getSecPerPrint() * 20);
+						timer = this.isSprinting() ? (int) (FPPClient.CONFIG.getSecPerPrint() * 13.33f) : (int) (FPPClient.CONFIG.getSecPerPrint() * 20);
 					}
 				}
 			}
