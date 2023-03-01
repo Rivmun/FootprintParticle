@@ -13,7 +13,11 @@ public class FPPConfig implements ConfigData {
 			//
 	));
 	static final List<String> DEF_EXCLUDEDBLOCKS = new ArrayList<>(List.of(
-			//
+			"#minecraft:flower",
+			"#minecraft:crop",
+			"#minecraft:leave",
+			"#minecraft:sapling",
+			"#minecraft:replaceable_plants"
 	));
 	static final List<String> DEF_MODS = new ArrayList<>(List.of(
 			"minecraft:parrot",
@@ -31,7 +35,10 @@ public class FPPConfig implements ConfigData {
 	static final List<String> DEF_SIZE = new ArrayList<>(List.of(
 			"minecraft:chicken,0.3",
 			"minecraft:enderman,0.35",
-			"minecraft:pig,0.4"
+			"minecraft:pig,0.4",
+			"minecraft:cat,0.25",
+			"minecraft:ocelot,0.25",
+			"minecraft:wolf,0.3"
 	));
 
 	private boolean enableMod = true;
