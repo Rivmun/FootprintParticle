@@ -12,7 +12,7 @@
 	"text.footprintparticle.option.sizePerMob": "Print Size",
 	"text.footprintparticle.option.sizePerMob.@Tooltip": "Set a separate size for a mob.\nFormat: §9§omodid:mobid,size§r\nDefault is 0.5 for most mob.\nLower priority than excluded.",
 	"text.footprintparticle.option.horseLikeMobs": "Horse-like Mobs",
-	"text.footprintparticle.option.horseLikeMobs.@Tooltip": "Mobs in this list will gen footprint both front and rear.",
+	"text.footprintparticle.option.horseLikeMobs.@Tooltip": "Mobs in this list will gen footprint both front and rear.\nThey'll chenged frequency when is mounted or dismounted.",
 	"text.footprintparticle.option.spiderLikeMobs": "Spider-like Mobs",
-	"text.footprintparticle.option.spiderLikeMobs.@Tooltip": "Mobs in this list will gen footprint both left and right."
+	"text.footprintparticle.option.spiderLikeMobs.@Tooltip": "Mobs in this list will gen footprint both left and right.\nThey'll have more frequent to gen (fit its eight legs)."
 }
