@@ -49,9 +49,16 @@ public class ConfigScreen {
     	general.addEntry(entryBuilder
     			.startStrList(Text.translatable("text.footprintparticle.option.applyBlocks")
     					,config.getApplyBlocks())
-    			.setDefaultValue(FPPConfig.DEF_BLOCKS)
+    			.setDefaultValue(FPPConfig.DEF_APPLYBLOCKS)
     			.setTooltip(Text.translatable("text.footprintparticle.option.applyBlocks.@Tooltip"))
     			.setSaveConsumer(config::setApplyBlocks)
+    			.build());
+    	general.addEntry(entryBuilder
+    			.startStrList(Text.translatable("text.footprintparticle.option.excludedBlocks")
+    					,config.getExcludedBlocks())
+    			.setDefaultValue(FPPConfig.DEF_EXCLUDEDBLOCKS)
+    			.setTooltip(Text.translatable("text.footprintparticle.option.excludedBlocks.@Tooltip"))
+    			.setSaveConsumer(config::setExcludedBlocks)
     			.build());
     	general.addEntry(entryBuilder
     			.startStrList(Text.translatable("text.footprintparticle.option.excludedMobs")
@@ -66,6 +73,20 @@ public class ConfigScreen {
     			.setDefaultValue(FPPConfig.DEF_SIZE)
     			.setTooltip(Text.translatable("text.footprintparticle.option.sizePerMob.@Tooltip"))
     			.setSaveConsumer(config::setSizePerMob)
+    			.build());
+    	general.addEntry(entryBuilder
+    			.startStrList(Text.translatable("text.footprintparticle.option.horseLikeMobs")
+    					,config.getHorseLikeMobs())
+    			.setDefaultValue(FPPConfig.DEF_FOUR_LEGS)
+    			.setTooltip(Text.translatable("text.footprintparticle.option.horseLikeMobs.@Tooltip"))
+    			.setSaveConsumer(config::setHorseLikeMobs)
+    			.build());
+    	general.addEntry(entryBuilder
+    			.startStrList(Text.translatable("text.footprintparticle.option.spiderLikeMobs")
+    					,config.getSpiderLikeMobs())
+    			.setDefaultValue(FPPConfig.DEF_EIGHT_LEGS)
+    			.setTooltip(Text.translatable("text.footprintparticle.option.spiderLikeMobs.@Tooltip"))
+    			.setSaveConsumer(config::setSpiderLikeMobs)
     			.build());
     }
 

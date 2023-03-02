@@ -1,16 +1,21 @@
 package rimo.footprintparticle.mixin;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import rimo.footprintparticle.FPPClient;
+import rimo.footprintparticle.FootprintParticleType;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import rimo.footprintparticle.FPPClient;
-import rimo.footprintparticle.FootprintParticleType;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
@@ -18,25 +23,95 @@ public abstract class LivingEntityMixin extends Entity {
 		super(type, world);
 	}
 
-	private int timer;
+	private int timer = 0;
+	private boolean wasOnGround = true;
+
+	@Inject(method = "jump", at = @At("TAIL"), cancellable = true)
+	protected void jump(CallbackInfo ci) {
+		this.footprintGenerator();
+	}
 
 	@Inject(method = "tick", at = @At("TAIL"), cancellable = true)
 	public void tick(CallbackInfo ci) {
-		if (this.world.isClient && timer-- <= 0 && FPPClient.CONFIG.isEnable()) {
-			if (!FPPClient.CONFIG.getExcludedMobs().contains(EntityType.getId(this.getType()).toString()) && this.isOnGround() && !this.isSneaking()) {
-				if (this.getVelocity().getX() != 0 && this.getVelocity().getZ() != 0) {
-					var block = !this.world.getBlockState(this.getBlockPos()).isOpaque()
-							? this.world.getBlockState(new BlockPos(this.getX(), this.getY() - 1, this.getZ()))
-							: this.world.getBlockState(this.getBlockPos());
-					// Hardness info see at https://minecraft.fandom.com/zh/wiki/%E6%8C%96%E6%8E%98#%E6%96%B9%E5%9D%97%E7%A1%AC%E5%BA%A6
-					if ((Math.abs(block.getBlock().getHardness()) < 0.9f && block.isOpaque() && !block.isAir())
-							|| FPPClient.CONFIG.getApplyBlocks().contains(block.getRegistryEntry().getKey().get().getValue().toString())) {
-						FootprintParticleType footprint = FPPClient.FOOTPRINT;
-						this.world.addParticle(footprint.setData(EntityType.getId(this.getType()).toString()), this.getX(), this.getY() + 0.00625f, this.getZ(), this.getVelocity().getX(), 0, this.getVelocity().getZ());
-						timer = (int) (FPPClient.CONFIG.getSecPerPrint() * 20);
-					}
+		if (this.world.isClient && timer-- <= 0) {
+			if (!this.isSneaking()) {
+				// Either on ground moving or landing
+				if ((this.getVelocity().getX() != 0 && this.getVelocity().getZ() != 0 && this.isOnGround()) || (!wasOnGround && this.isOnGround())) {
+					this.footprintGenerator();
+				}
+				wasOnGround = this.isOnGround();
+			}
+		}
+	}
+
+	public void footprintGenerator() {
+		if (FPPClient.CONFIG.isEnable()) {
+			if (!FPPClient.CONFIG.getExcludedMobs().contains(EntityType.getId(this.getType()).toString())) {
+				timer = this.isSprinting() ? (int) (FPPClient.CONFIG.getSecPerPrint() * 13.33f) : (int) (FPPClient.CONFIG.getSecPerPrint() * 20);
+
+				// Fix pos...
+				var px = this.getX();
+				var py = this.getY() + 0.01f;
+				var pz = this.getZ();
+
+				// Horse and spider pos set on besides...
+				if (FPPClient.CONFIG.getHorseLikeMobs().contains(EntityType.getId(this.getType()).toString())) {
+					var i = Math.random() > 0.5f ? 1 : -1;		// Random sides
+					px = px + 0.75f * i * Math.sin(this.getHorizontalFacing().asRotation() / 180 * Math.PI);
+					pz = pz + 0.75f * i * Math.cos(this.getHorizontalFacing().asRotation() / 180 * Math.PI);
+					timer = (int) (this.getPrimaryPassenger() != null ? this.getPrimaryPassenger().isPlayer() ? timer * 0.5f : timer * 1.33f : timer * 1.33f);
+				}
+				if (FPPClient.CONFIG.getSpiderLikeMobs().contains(EntityType.getId(this.getType()).toString())) {
+					var i = Math.random() > 0.5f ? 1 : -1;
+					px = px + 0.9f * i * Math.cos(this.getHorizontalFacing().asRotation() / 180 * Math.PI);
+					pz = pz + 0.9f * i * Math.sin(this.getHorizontalFacing().asRotation() / 180 * Math.PI);
+					timer *= 0.66f;
+				}
+	
+				// Check block type...
+				var block = this.world.getBlockState(new BlockPos(px, py, pz));
+				var canGen = isPrintCanGen(block);
+				if (!canGen) {
+					block = this.world.getBlockState(new BlockPos(px, py - 1, pz));
+					canGen = isPrintCanGen(block);
+				} else {
+					// Fix pos for some special blocks if is in.
+					if (block.isOf(Blocks.SNOW) || block.isOf(Blocks.SOUL_SAND))
+						py += 0.125f;
+				}
+	
+				if (canGen) {
+					FootprintParticleType footprint = FPPClient.FOOTPRINT;
+					this.world.addParticle(footprint.setData((LivingEntity) (Object) this), px, py, pz, this.getVelocity().getX(), 0, this.getVelocity().getZ());
 				}
 			}
 		}
 	}
+
+	private boolean isPrintCanGen(BlockState block) {
+		var canGen = FPPClient.CONFIG.getApplyBlocks().contains(block.getRegistryEntry().getKey().get().getValue().toString());
+		if (!canGen) {
+			for (TagKey<Block> tag : block.streamTags().toList()) {
+				canGen = FPPClient.CONFIG.getApplyBlocks().contains("#" + tag.id().toString());
+				if (canGen)
+					break;
+			}
+			if (!canGen) {
+				// Hardness Filter. See on https://minecraft.fandom.com/wiki/Breaking#Blocks_by_hardness
+				canGen = Math.abs(block.getBlock().getHardness()) < 0.7f && block.isOpaque() && !block.isAir();
+				if (canGen) {
+					canGen = !FPPClient.CONFIG.getExcludedBlocks().contains(block.getRegistryEntry().getKey().get().getValue().toString());
+					if (canGen) {
+						for (TagKey<Block> tag : block.streamTags().toList()) {
+							canGen = !FPPClient.CONFIG.getExcludedBlocks().contains("#" + tag.id().toString());
+							if (!canGen)
+								break;
+						}
+					}
+				}
+			}
+		}
+		return canGen;
+	}
+
 }

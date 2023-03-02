@@ -3,10 +3,16 @@
 	"text.footprintparticle.option.enableMod": "Enable?",
 	"text.footprintparticle.option.secPerPrint": "Second Per Print",
 	"text.footprintparticle.option.printLifetime": "Print Lifetime (sec)",
-	"text.footprintparticle.option.applyBlocks": "Block List",
-	"text.footprintparticle.option.applyBlocks.@Tooltip": "Blocks that footprint will appear.\nFormat: §9§omodid:blockid§r\nUse only when hardness-based inner filter cannot suit your requirements.",
+	"text.footprintparticle.option.applyBlocks": "Block Applied",
+	"text.footprintparticle.option.applyBlocks.@Tooltip": "Blocks that footprint will appear.\nFormat: §9§omodid:blockid§r or §9§o#modid:blocktag§r\nUse only when built-in hardness-based filter\ncannot suit your requirements.",
+	"text.footprintparticle.option.excludedBlocks": "Block Excluded",
+	"text.footprintparticle.option.excludedBlocks.@Tooltip": "Blocks that footprint will NOT appear.\nFormat: §9§omodid:blockid§r or §9§o#modid:blocktag§r\nLower priority than applied.",
 	"text.footprintparticle.option.excludedMobs": "Mob Excluded",
 	"text.footprintparticle.option.excludedMobs.@Tooltip": "Mobs in this list will not generate footprint.\nFormat: §9§omodid:mobid§r",
 	"text.footprintparticle.option.sizePerMob": "Print Size",
-	"text.footprintparticle.option.sizePerMob.@Tooltip": "Set a separate size for a mob.\nFormat: §9§omodid:mobid,size§r\nDefault is 0.5 for most mob.\nLower priority than excluded."
+	"text.footprintparticle.option.sizePerMob.@Tooltip": "Set a separate size for a mob.\nFormat: §9§omodid:mobid,size§r\nDefault is 0.5 for most mob.\nLower priority than excluded.",
+	"text.footprintparticle.option.horseLikeMobs": "Horse-like Mobs",
+	"text.footprintparticle.option.horseLikeMobs.@Tooltip": "Mobs in this list will gen footprint both front and rear.\nThey'll chenged frequency when is mounted or dismounted.",
+	"text.footprintparticle.option.spiderLikeMobs": "Spider-like Mobs",
+	"text.footprintparticle.option.spiderLikeMobs.@Tooltip": "Mobs in this list will gen footprint both left and right.\nThey'll have more frequent to gen (fit its eight legs)."
 }
