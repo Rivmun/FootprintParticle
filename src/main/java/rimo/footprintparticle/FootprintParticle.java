@@ -13,9 +13,9 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.EntityType;
 import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 public class FootprintParticle extends SpriteBillboardParticle{
 	public final SpriteProvider spriteProvider;
@@ -57,13 +57,13 @@ public class FootprintParticle extends SpriteBillboardParticle{
 		float g = (float) (MathHelper.lerp(tickDelta, this.prevPosY, this.y) - vec3d.getY());
 		float h = (float) (MathHelper.lerp(tickDelta, this.prevPosZ, this.z) - vec3d.getZ());
 
-		Vec3f[] Vec3fs = new Vec3f[]{new Vec3f(-1.0f, -1.0f, 0.0f), new Vec3f(-1.0f, 1.0f, 0.0f), new Vec3f(1.0f, 1.0f, 0.0f), new Vec3f(1.0f, -1.0f, 0.0f)};
+		Vector3f[] Vec3fs = new Vector3f[]{new Vector3f(-1.0f, -1.0f, 0.0f), new Vector3f(-1.0f, 1.0f, 0.0f), new Vector3f(1.0f, 1.0f, 0.0f), new Vector3f(1.0f, -1.0f, 0.0f)};
 		float j = this.getSize(tickDelta);
 
 		for (int k = 0; k < 4; ++k) {
-			Vec3f Vec3f2 = Vec3fs[k];
-			Vec3f2.rotate(new Quaternion(0f, -0.7f, 0.7f, 0f));
-			Vec3f2.scale(j);
+			Vector3f Vec3f2 = Vec3fs[k];
+			Vec3f2.rotate(new Quaternionf(0f, -0.7f, 0.7f, 0f));
+			Vec3f2.mul(j);
 			Vec3f2.add(f, g, h);
 		}
 
@@ -73,10 +73,10 @@ public class FootprintParticle extends SpriteBillboardParticle{
 		float maxV = this.getMaxV();
 		int l = this.getBrightness(tickDelta);
 
-		vertexConsumer.vertex(Vec3fs[0].getX(), Vec3fs[0].getY(), Vec3fs[0].getZ()).texture(maxU, maxV).color(this.red, this.green, this.blue, this.alpha).light(l).next();
-		vertexConsumer.vertex(Vec3fs[1].getX(), Vec3fs[1].getY(), Vec3fs[1].getZ()).texture(maxU, minV).color(this.red, this.green, this.blue, this.alpha).light(l).next();
-		vertexConsumer.vertex(Vec3fs[2].getX(), Vec3fs[2].getY(), Vec3fs[2].getZ()).texture(minU, minV).color(this.red, this.green, this.blue, this.alpha).light(l).next();
-		vertexConsumer.vertex(Vec3fs[3].getX(), Vec3fs[3].getY(), Vec3fs[3].getZ()).texture(minU, maxV).color(this.red, this.green, this.blue, this.alpha).light(l).next();
+		vertexConsumer.vertex(Vec3fs[0].x, Vec3fs[0].y, Vec3fs[0].z).texture(maxU, maxV).color(this.red, this.green, this.blue, this.alpha).light(l).next();
+		vertexConsumer.vertex(Vec3fs[1].x, Vec3fs[1].y, Vec3fs[1].z).texture(maxU, minV).color(this.red, this.green, this.blue, this.alpha).light(l).next();
+		vertexConsumer.vertex(Vec3fs[2].x, Vec3fs[2].y, Vec3fs[2].z).texture(minU, minV).color(this.red, this.green, this.blue, this.alpha).light(l).next();
+		vertexConsumer.vertex(Vec3fs[3].x, Vec3fs[3].y, Vec3fs[3].z).texture(minU, maxV).color(this.red, this.green, this.blue, this.alpha).light(l).next();
 	}
 
 	@Environment(EnvType.CLIENT)
