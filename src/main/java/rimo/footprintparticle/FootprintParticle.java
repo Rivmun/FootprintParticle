@@ -91,15 +91,15 @@ public class FootprintParticle extends SpriteBillboardParticle{
 		public Particle createParticle(DefaultParticleType parameters, ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
 			FootprintParticle particle = new FootprintParticle(world, x, y, z, velocityX, velocityY, velocityZ, this.spriteProvider);
 			if (parameters instanceof FootprintParticleType footprintParameters) {
-				for (String str : FPPClient.CONFIG.getSizePerMob()) {
-					try {
+				try {
+					for (String str : FPPClient.CONFIG.getSizePerMob()) {
 						String[] str2 = str.split(",");
-						if (str2[0].contentEquals(EntityType.getId(footprintParameters.entity.getType()).toString()) && str2[1] != null) {
+						if (str2[0].contentEquals(EntityType.getId(footprintParameters.entity.getType()).toString())) {
 							particle.scale = Float.parseFloat(str2[1]);
 						}
-					} catch (Exception e) {
-						FPPClient.LOGGER.warn("FootprintParticle set print size failed cause by a incorrect string. Please check the config.");
 					}
+				} catch (Exception e) {
+					// Ignore...
 				}
 				if (footprintParameters.entity.isBaby()) {
 					particle.scale *= 0.66f;
