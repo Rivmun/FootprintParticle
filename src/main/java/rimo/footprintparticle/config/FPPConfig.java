@@ -12,6 +12,11 @@ public class FPPConfig implements ConfigData {
 	static final List<String> DEF_APPLYBLOCKS = new ArrayList<>(List.of(
 			"#minecraft:wool"
 	));
+	static final List<String> DEF_BLOCKHEIGHT = new ArrayList<>(List.of(
+			"minecraft:snow,0.125",
+			"minecraft:soul_sand,0.125",
+			"minecraft:mud,0.125"
+	));
 	static final List<String> DEF_EXCLUDEDBLOCKS = new ArrayList<>(List.of(
 			"minecraft:beehive",
 			"#minecraft:flower",
@@ -57,9 +62,12 @@ public class FPPConfig implements ConfigData {
 
 	private boolean enableMod = true;
 	private float secPerPrint = 0.5f;
-	private float printLifetime = 10.0f;
+	private float printLifetime = 5.0f;
+	private float printHeight = 0f;
 	private List<String> applyBlocks = DEF_APPLYBLOCKS;
+	private List<String> blockHeight = DEF_BLOCKHEIGHT;
 	private List<String> excludedBlocks = DEF_EXCLUDEDBLOCKS;
+	private boolean canGenWhenInvisible = true;
 	private List<String> excludedMobs = DEF_MODS;
 	private List<String> sizePerMob = DEF_SIZE;
 	private List<String> spiderLikeMobs = DEF_FOUR_LEGS;
@@ -68,8 +76,11 @@ public class FPPConfig implements ConfigData {
 	public boolean isEnable() {return enableMod;}
 	public float getSecPerPrint() {return secPerPrint;}
 	public float getPrintLifetime() {return printLifetime;}
+	public float getPrintHeight() {return printHeight;}
 	public List<String> getApplyBlocks() {return applyBlocks;}
+	public List<String> getBlockHeight() {return blockHeight;}
 	public List<String> getExcludedBlocks() {return excludedBlocks;}
+	public boolean getCanGenWhenInvisible() {return canGenWhenInvisible;}
 	public List<String> getExcludedMobs() {return excludedMobs;}
 	public List<String> getSizePerMob() {return sizePerMob;}
 	public List<String> getHorseLikeMobs() {return horseLikeMobs;}
@@ -78,8 +89,11 @@ public class FPPConfig implements ConfigData {
 	public void setEnableMod(boolean isEnable) {enableMod = isEnable;}
 	public void setSecPerPrint(float sec) {secPerPrint = sec;}
 	public void setPrintLifetime(float time) {printLifetime = time;}
+	public void setPrintHeight(float height) {printHeight = height;}
 	public void setApplyBlocks(List<String> list) {applyBlocks = new ArrayList<>(list);}
+	public void setBlockHeight(List<String> list) {blockHeight = new ArrayList<>(list);}
 	public void setExcludedBlocks(List<String> list) {excludedBlocks = new ArrayList<>(list);}
+	public void setCanGenWhenInvisible(boolean isEnable) {canGenWhenInvisible = isEnable;}
 	public void setExcludedMobs(List<String> list) {excludedMobs = new ArrayList<>(list);}
 	public void setSizePerMob(List<String> list) {sizePerMob = new ArrayList<>(list);}
 	public void setHorseLikeMobs(List<String> list) {horseLikeMobs = new ArrayList<>(list);}
