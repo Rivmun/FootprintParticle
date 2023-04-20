@@ -73,7 +73,7 @@ public abstract class LivingEntityMixin extends Entity {
 
 		// Check block type...
 		var pos = new BlockPos((int) px, (int) py, (int) pz);
-		var canGen = isPrintCanGen(pos);
+		var canGen = isPrintCanGen(pos) && !this.world.getBlockState(pos).isAir();
 		if (!canGen) {
 			pos = new BlockPos((int) px, (int) py - 1, (int) pz);
 			canGen = isPrintCanGen(pos) && this.world.getBlockState(pos).isOpaque() && Block.isShapeFullCube(this.world.getBlockState(pos).getCollisionShape(world, pos));
