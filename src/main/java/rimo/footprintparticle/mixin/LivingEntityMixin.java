@@ -1,7 +1,6 @@
 package rimo.footprintparticle.mixin;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -61,26 +60,27 @@ public abstract class LivingEntityMixin extends Entity {
 		// Horse and spider pos set on besides...
 		if (FPPClient.CONFIG.getHorseLikeMobs().contains(EntityType.getId(this.getType()).toString())) {
 			var i = Math.random() > 0.5f ? 1 : -1;		// Random sides
-			px = px + 0.75f * i * Math.sin(this.getHorizontalFacing().asRotation() / 180 * Math.PI);
-			pz = pz + 0.75f * i * Math.cos(this.getHorizontalFacing().asRotation() / 180 * Math.PI);
+			px = px + 0.75f * i * Math.sin(this.getRotationClient().y / 180 * Math.PI);
+			pz = pz + 0.75f * i * Math.cos(this.getRotationClient().y / 180 * Math.PI);
 			timer = (int) (this.getPrimaryPassenger() != null ? this.getPrimaryPassenger().isPlayer() ? timer * 0.5f : timer * 1.33f : timer * 1.33f);
 		}
 		if (FPPClient.CONFIG.getSpiderLikeMobs().contains(EntityType.getId(this.getType()).toString())) {
 			var i = Math.random() > 0.5f ? 1 : -1;
-			px = px + 0.9f * i * Math.cos(this.getHorizontalFacing().asRotation() / 180 * Math.PI);
-			pz = pz + 0.9f * i * Math.sin(this.getHorizontalFacing().asRotation() / 180 * Math.PI);
+			px = px + 0.9f * i * Math.cos(this.getRotationClient().y / 180 * Math.PI);
+			pz = pz + 0.9f * i * Math.sin(this.getRotationClient().y / 180 * Math.PI);
 			timer *= 0.66f;
 		}
-	
+
 		// Check block type...
-		var block = this.world.getBlockState(new BlockPos(px, py, pz));
-		var canGen = isPrintCanGen(block);
+		var pos = new BlockPos(px, py, pz);
+		var canGen = isPrintCanGen(pos);
 		if (!canGen) {
-			block = this.world.getBlockState(new BlockPos(px, py - 1, pz));
-			canGen = isPrintCanGen(block);
+			pos = new BlockPos(px, py - 1, pz);
+			canGen = isPrintCanGen(pos) && this.world.getBlockState(pos).isOpaque() && Block.isShapeFullCube(this.world.getBlockState(pos).getCollisionShape(world, pos));
 		} else {
 			// Fix height by blocks if in...
 			try {
+				var block = this.world.getBlockState(pos);
 				for (String str : FPPClient.CONFIG.getBlockHeight()) {
 					String[] str2 = str.split(",");
 					if (str2[0].charAt(0) == '#') {
@@ -99,14 +99,15 @@ public abstract class LivingEntityMixin extends Entity {
 				// Ignore...
 			}
 		}
-	
+
 		if (canGen) {
 			FootprintParticleType footprint = FPPClient.FOOTPRINT;
 			this.world.addParticle(footprint.setData((LivingEntity) (Object) this), px, py, pz, this.getVelocity().getX(), 0, this.getVelocity().getZ());
 		}
 	}
 
-	private boolean isPrintCanGen(BlockState block) {
+	private boolean isPrintCanGen(BlockPos pos) {
+		var block = this.world.getBlockState(pos);
 		var canGen = FPPClient.CONFIG.getApplyBlocks().contains(block.getRegistryEntry().getKey().get().getValue().toString());
 		if (!canGen) {
 			for (TagKey<Block> tag : block.streamTags().toList()) {
@@ -116,7 +117,7 @@ public abstract class LivingEntityMixin extends Entity {
 			}
 			if (!canGen) {
 				// Hardness Filter. See on https://minecraft.fandom.com/wiki/Breaking#Blocks_by_hardness
-				canGen = Math.abs(block.getBlock().getHardness()) < 0.7f && block.isOpaque() && !block.isAir();
+				canGen = Math.abs(block.getBlock().getHardness()) < 0.7f;
 				if (canGen) {
 					canGen = !FPPClient.CONFIG.getExcludedBlocks().contains(block.getRegistryEntry().getKey().get().getValue().toString());
 					if (canGen) {
