@@ -90,7 +90,7 @@ public abstract class LivingEntityMixin extends Entity {
 								break;
 							}
 						}
-					} else if (str2[0].contentEquals(block.getRegistryEntry().getKey().get().getValue().toString())) {
+					} else if (str2[0].contentEquals(block.getBlock().getRegistryEntry().getKey().get().getValue().toString())) {
 						py += Float.parseFloat(str2[1]);
 						break;
 					}
@@ -108,7 +108,7 @@ public abstract class LivingEntityMixin extends Entity {
 
 	private boolean isPrintCanGen(BlockPos pos) {
 		var block = this.world.getBlockState(pos);
-		var canGen = FPPClient.CONFIG.getApplyBlocks().contains(block.getRegistryEntry().getKey().get().getValue().toString());
+		var canGen = FPPClient.CONFIG.getApplyBlocks().contains(block.getBlock().getRegistryEntry().getKey().get().getValue().toString());
 		if (!canGen) {
 			for (TagKey<Block> tag : block.streamTags().toList()) {
 				canGen = FPPClient.CONFIG.getApplyBlocks().contains("#" + tag.id().toString());
@@ -119,7 +119,7 @@ public abstract class LivingEntityMixin extends Entity {
 				// Hardness Filter. See on https://minecraft.fandom.com/wiki/Breaking#Blocks_by_hardness
 				canGen = Math.abs(block.getBlock().getHardness()) < 0.7f;
 				if (canGen) {
-					canGen = !FPPClient.CONFIG.getExcludedBlocks().contains(block.getRegistryEntry().getKey().get().getValue().toString());
+					canGen = !FPPClient.CONFIG.getExcludedBlocks().contains(block.getBlock().getRegistryEntry().getKey().get().getValue().toString());
 					if (canGen) {
 						for (TagKey<Block> tag : block.streamTags().toList()) {
 							canGen = !FPPClient.CONFIG.getExcludedBlocks().contains("#" + tag.id().toString());
