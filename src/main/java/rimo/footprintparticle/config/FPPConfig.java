@@ -70,8 +70,8 @@ public class FPPConfig implements ConfigData {
 	private boolean canGenWhenInvisible = true;
 	private List<String> excludedMobs = DEF_MODS;
 	private List<String> sizePerMob = DEF_SIZE;
-	private List<String> spiderLikeMobs = DEF_FOUR_LEGS;
-	private List<String> horseLikeMobs = DEF_EIGHT_LEGS;
+	private List<String> spiderLikeMobs = DEF_EIGHT_LEGS;
+	private List<String> horseLikeMobs = DEF_FOUR_LEGS;
 
 	public boolean isEnable() {return enableMod;}
 	public float getSecPerPrint() {return secPerPrint;}
