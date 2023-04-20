@@ -43,7 +43,8 @@
   "custom": {
     "modmenu": {
       "links": {
-        "modmenu.modrinth": "https://modrinth.com/mod/footprintparticle"
+        "modmenu.modrinth": "https://modrinth.com/mod/footprintparticle",
+        "MCMOD.cn": "https://www.mcmod.cn/class/9454.html"
       }
     }
   }
