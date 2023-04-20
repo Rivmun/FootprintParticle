@@ -62,7 +62,7 @@ public abstract class LivingEntityMixin extends Entity {
 			var i = Math.random() > 0.5f ? 1 : -1;		// Random sides
 			px = px + 0.75f * i * Math.sin(this.getRotationClient().y / 180 * Math.PI);
 			pz = pz + 0.75f * i * Math.cos(this.getRotationClient().y / 180 * Math.PI);
-			timer = (int) (this.getPrimaryPassenger() != null ? this.getPrimaryPassenger().isPlayer() ? timer * 0.5f : timer * 1.33f : timer * 1.33f);
+			timer = (int) (this.getControllingPassenger() != null ? this.getControllingPassenger().isPlayer() ? timer * 0.5f : timer * 1.33f : timer * 1.33f);
 		}
 		if (FPPClient.CONFIG.getSpiderLikeMobs().contains(EntityType.getId(this.getType()).toString())) {
 			var i = Math.random() > 0.5f ? 1 : -1;
@@ -72,10 +72,10 @@ public abstract class LivingEntityMixin extends Entity {
 		}
 
 		// Check block type...
-		var pos = new BlockPos(px, py, pz);
+		var pos = new BlockPos((int) px, (int) py, (int) pz);
 		var canGen = isPrintCanGen(pos);
 		if (!canGen) {
-			pos = new BlockPos(px, py - 1, pz);
+			pos = new BlockPos((int) px, (int) py - 1, (int) pz);
 			canGen = isPrintCanGen(pos) && this.world.getBlockState(pos).isOpaque() && Block.isShapeFullCube(this.world.getBlockState(pos).getCollisionShape(world, pos));
 		} else {
 			// Fix height by blocks if in...
