@@ -12,6 +12,7 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.EntityType;
 import net.minecraft.particle.DefaultParticleType;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3d;
@@ -46,7 +47,7 @@ public class FootprintParticle extends SpriteBillboardParticle{
 		if (this.age > this.maxAge / 2)
 			this.setAlpha((float) Math.cos((((float) this.age - (float) this.maxAge / 2) / (float) this.maxAge) * Math.PI));
 
-		if (this.age++ >= this.maxAge)
+		if (this.age++ >= this.maxAge || this.world.isAir(new BlockPos(this.x, this.y - 0.02f, this.z)))
 			this.markDead();
 	}
 
