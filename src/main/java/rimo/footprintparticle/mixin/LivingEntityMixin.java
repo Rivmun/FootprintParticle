@@ -31,7 +31,7 @@ public abstract class LivingEntityMixin extends Entity {
 
 	@Inject(method = "tick", at = @At("TAIL"), cancellable = true)
 	public void tick(CallbackInfo ci) {
-		if (this.world.isClient && timer-- <= 0) {
+		if (this.getWorld().isClient && timer-- <= 0) {
 			if (!this.isSneaking()) {
 				// Either on ground moving or landing
 				if ((this.getVelocity().getX() != 0 && this.getVelocity().getZ() != 0 && this.isOnGround()) || (!wasOnGround && this.isOnGround())) {
@@ -73,14 +73,14 @@ public abstract class LivingEntityMixin extends Entity {
 
 		// Check block type...
 		var pos = new BlockPos((int) px, (int) py, (int) pz);
-		var canGen = isPrintCanGen(pos) && !this.world.getBlockState(pos).isAir();
+		var canGen = isPrintCanGen(pos) && !this.getWorld().getBlockState(pos).isAir();
 		if (!canGen) {
 			pos = new BlockPos((int) px, (int) py - 1, (int) pz);
-			canGen = isPrintCanGen(pos) && this.world.getBlockState(pos).isOpaque() && Block.isShapeFullCube(this.world.getBlockState(pos).getCollisionShape(world, pos));
+			canGen = isPrintCanGen(pos) && this.getWorld().getBlockState(pos).isOpaque() && Block.isShapeFullCube(this.getWorld().getBlockState(pos).getCollisionShape(this.getWorld(), pos));
 		} else {
 			// Fix height by blocks if in...
 			try {
-				var block = this.world.getBlockState(pos);
+				var block = this.getWorld().getBlockState(pos);
 				for (String str : FPPClient.CONFIG.getBlockHeight()) {
 					String[] str2 = str.split(",");
 					if (str2[0].charAt(0) == '#') {
@@ -102,12 +102,12 @@ public abstract class LivingEntityMixin extends Entity {
 
 		if (canGen) {
 			FootprintParticleType footprint = FPPClient.FOOTPRINT;
-			this.world.addParticle(footprint.setData((LivingEntity) (Object) this), px, py, pz, this.getVelocity().getX(), 0, this.getVelocity().getZ());
+			this.getWorld().addParticle(footprint.setData((LivingEntity) (Object) this), px, py, pz, this.getVelocity().getX(), 0, this.getVelocity().getZ());
 		}
 	}
 
 	private boolean isPrintCanGen(BlockPos pos) {
-		var block = this.world.getBlockState(pos);
+		var block = this.getWorld().getBlockState(pos);
 		var canGen = FPPClient.CONFIG.getApplyBlocks().contains(block.getRegistryEntry().getKey().get().getValue().toString());
 		if (!canGen) {
 			for (TagKey<Block> tag : block.streamTags().toList()) {
