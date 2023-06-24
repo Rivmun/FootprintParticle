@@ -15,7 +15,6 @@ import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Quaternion;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 
 public class FootprintParticle extends SpriteBillboardParticle{
@@ -28,7 +27,7 @@ public class FootprintParticle extends SpriteBillboardParticle{
 		this.setSprite(spriteProvider.getSprite(random));
 
 		this.setVelocity(0, 0, 0);
-		//this.angle = (float) Math.atan2(-vx, vz);		// TODO: this angle change has no effect yet.
+		this.angle = (float) MathHelper.atan2(vx, vz);
 
 		this.maxAge = (int) (FPPClient.CONFIG.getPrintLifetime() * 20);
 		this.scale = 0.5f;
@@ -45,7 +44,7 @@ public class FootprintParticle extends SpriteBillboardParticle{
 		this.prevPosY = this.y;
 
 		if (this.age > this.maxAge / 2)
-			this.setAlpha((float) Math.cos((((float) this.age - (float) this.maxAge / 2) / (float) this.maxAge) * Math.PI));
+			this.setAlpha(MathHelper.cos((((float) this.age - (float) this.maxAge / 2) / (float) this.maxAge) * MathHelper.PI));
 
 		if (this.age++ >= this.maxAge || this.world.isAir(new BlockPos(this.x, this.y - 0.02f, this.z)))
 			this.markDead();
@@ -53,31 +52,36 @@ public class FootprintParticle extends SpriteBillboardParticle{
 
 	@Override
 	public void buildGeometry(VertexConsumer vertexConsumer, Camera camera, float tickDelta) {
-		Vec3d vec3d = camera.getPos();
-		float f = (float) (MathHelper.lerp(tickDelta, this.prevPosX, this.x) - vec3d.getX());
-		float g = (float) (MathHelper.lerp(tickDelta, this.prevPosY, this.y) - vec3d.getY());
-		float h = (float) (MathHelper.lerp(tickDelta, this.prevPosZ, this.z) - vec3d.getZ());
-
-		Vec3f[] Vec3fs = new Vec3f[]{new Vec3f(-1.0f, -1.0f, 0.0f), new Vec3f(-1.0f, 1.0f, 0.0f), new Vec3f(1.0f, 1.0f, 0.0f), new Vec3f(1.0f, -1.0f, 0.0f)};
-		float j = this.getSize(tickDelta);
+		var camPos = camera.getPos();
+		var x = (float) (MathHelper.lerp(tickDelta, this.prevPosX, this.x) - camPos.getX());		//TODO: why cannot use vec3d here?
+		var y = (float) (MathHelper.lerp(tickDelta, this.prevPosY, this.y) - camPos.getY());
+		var z = (float) (MathHelper.lerp(tickDelta, this.prevPosZ, this.z) - camPos.getZ());
+		Vec3f[] pos = new Vec3f[]{new Vec3f(-1, 0, -1), new Vec3f(-1, 0, 1), new Vec3f(1, 0, 1), new Vec3f(1, 0, -1)};
 
 		for (int k = 0; k < 4; ++k) {
-			Vec3f Vec3f2 = Vec3fs[k];
-			Vec3f2.rotate(new Quaternion(0f, -0.7f, 0.7f, 0f));
-			Vec3f2.scale(j);
-			Vec3f2.add(f, g, h);
+			/* 
+			 * In Minecraft,
+			 * rotate a vec3f point P around a axis with θ radian (anticlockwise)
+			 * needs a vec3f(x, y, z).normalize() direct to this axis direction
+			 * then simply call P.rotate(sinθ*x, sinθ*y, sinθ*z, cosθ)
+			 * Oh, MAGIC! (👈 he is totally idiot.)
+			 * 
+			 * here we need vertex rotate around Y axis, so leave X and Z for zero.
+			 */
+			pos[k].rotate(new Quaternion(
+					0,
+					MathHelper.sin(this.angle / 2),
+					0,
+					MathHelper.cos(this.angle / 2)
+			));
+			pos[k].scale(this.getSize(tickDelta));
+			pos[k].add(x, y, z);
 		}
 
-		float minU = this.getMinU();
-		float maxU = this.getMaxU();
-		float minV = this.getMinV();
-		float maxV = this.getMaxV();
-		int l = this.getBrightness(tickDelta);
-
-		vertexConsumer.vertex(Vec3fs[0].getX(), Vec3fs[0].getY(), Vec3fs[0].getZ()).texture(maxU, maxV).color(this.red, this.green, this.blue, this.alpha).light(l).next();
-		vertexConsumer.vertex(Vec3fs[1].getX(), Vec3fs[1].getY(), Vec3fs[1].getZ()).texture(maxU, minV).color(this.red, this.green, this.blue, this.alpha).light(l).next();
-		vertexConsumer.vertex(Vec3fs[2].getX(), Vec3fs[2].getY(), Vec3fs[2].getZ()).texture(minU, minV).color(this.red, this.green, this.blue, this.alpha).light(l).next();
-		vertexConsumer.vertex(Vec3fs[3].getX(), Vec3fs[3].getY(), Vec3fs[3].getZ()).texture(minU, maxV).color(this.red, this.green, this.blue, this.alpha).light(l).next();
+		vertexConsumer.vertex(pos[0].getX(), pos[0].getY(), pos[0].getZ()).texture(this.getMaxU(), this.getMaxV()).color(this.red, this.green, this.blue, this.alpha).light(this.getBrightness(tickDelta)).next();
+		vertexConsumer.vertex(pos[1].getX(), pos[1].getY(), pos[1].getZ()).texture(this.getMaxU(), this.getMinV()).color(this.red, this.green, this.blue, this.alpha).light(this.getBrightness(tickDelta)).next();
+		vertexConsumer.vertex(pos[2].getX(), pos[2].getY(), pos[2].getZ()).texture(this.getMinU(), this.getMinV()).color(this.red, this.green, this.blue, this.alpha).light(this.getBrightness(tickDelta)).next();
+		vertexConsumer.vertex(pos[3].getX(), pos[3].getY(), pos[3].getZ()).texture(this.getMinU(), this.getMaxV()).color(this.red, this.green, this.blue, this.alpha).light(this.getBrightness(tickDelta)).next();
 	}
 
 	@Environment(EnvType.CLIENT)

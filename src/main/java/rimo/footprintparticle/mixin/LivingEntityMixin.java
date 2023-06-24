@@ -6,6 +6,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import rimo.footprintparticle.FPPClient;
 import rimo.footprintparticle.FootprintParticleType;
@@ -34,7 +35,7 @@ public abstract class LivingEntityMixin extends Entity {
 		if (this.world.isClient && timer-- <= 0) {
 			if (!this.isSneaking()) {
 				// Either on ground moving or landing
-				if ((this.getVelocity().getX() != 0 && this.getVelocity().getZ() != 0 && this.isOnGround()) || (!wasOnGround && this.isOnGround())) {
+				if (((this.getVelocity().getX() != 0 || this.getVelocity().getZ() != 0) && this.isOnGround()) || (!wasOnGround && this.isOnGround())) {
 					this.footprintGenerator();
 				}
 				wasOnGround = this.isOnGround();
@@ -60,14 +61,14 @@ public abstract class LivingEntityMixin extends Entity {
 		// Horse and spider pos set on besides...
 		if (FPPClient.CONFIG.getHorseLikeMobs().contains(EntityType.getId(this.getType()).toString())) {
 			var i = Math.random() > 0.5f ? 1 : -1;		// Random sides
-			px = px + 0.75f * i * Math.sin(this.getRotationClient().y / 180f * Math.PI);
-			pz = pz + 0.75f * i * Math.cos(this.getRotationClient().y / 180f * Math.PI);
+			px = px + 0.75f * i * MathHelper.sin(this.getRotationClient().y / 180f * MathHelper.PI);
+			pz = pz + 0.75f * i * MathHelper.cos(this.getRotationClient().y / 180f * MathHelper.PI);
 			timer = (int) (this.getPrimaryPassenger() != null ? this.getPrimaryPassenger().isPlayer() ? timer * 0.5f : timer * 1.33f : timer * 1.33f);
 		}
 		if (FPPClient.CONFIG.getSpiderLikeMobs().contains(EntityType.getId(this.getType()).toString())) {
 			var i = Math.random() > 0.5f ? 1 : -1;
-			px = px + 0.9f * i * Math.cos(this.getRotationClient().y / 180f * Math.PI);
-			pz = pz + 0.9f * i * Math.sin(this.getRotationClient().y / 180f * Math.PI);
+			px = px + 0.9f * i * MathHelper.cos(this.getRotationClient().y / 180f * MathHelper.PI);
+			pz = pz + 0.9f * i * MathHelper.sin(this.getRotationClient().y / 180f * MathHelper.PI);
 			timer *= 0.66f;
 		}
 
@@ -117,7 +118,7 @@ public abstract class LivingEntityMixin extends Entity {
 			}
 			if (!canGen) {
 				// Hardness Filter. See on https://minecraft.fandom.com/wiki/Breaking#Blocks_by_hardness
-				canGen = Math.abs(block.getBlock().getHardness()) < 0.7f;
+				canGen = MathHelper.abs(block.getBlock().getHardness()) < 0.7f;
 				if (canGen) {
 					canGen = !FPPClient.CONFIG.getExcludedBlocks().contains(block.getRegistryEntry().getKey().get().getValue().toString());
 					if (canGen) {
