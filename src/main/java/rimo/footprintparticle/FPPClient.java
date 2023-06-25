@@ -9,6 +9,10 @@ import net.minecraft.util.registry.Registry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rimo.footprintparticle.config.FPPConfig;
+import rimo.footprintparticle.particle.FootprintParticle;
+import rimo.footprintparticle.particle.FootprintParticleType;
+import rimo.footprintparticle.particle.WatermarkParticle;
+import rimo.footprintparticle.particle.WatermarkParticleType;
 
 public class FPPClient implements ClientModInitializer {
 	public static final String MODID = "footprintparticle";
@@ -17,10 +21,13 @@ public class FPPClient implements ClientModInitializer {
 	public static final FPPConfig CONFIG = CONFIGHOLDER.getConfig();
 
 	public static FootprintParticleType FOOTPRINT;
+	public static WatermarkParticleType WATERMARK;
 
 	@Override
 	public void onInitializeClient() {
 		FOOTPRINT = Registry.register(Registry.PARTICLE_TYPE, MODID + ":footprint", new FootprintParticleType(true));
+		WATERMARK = Registry.register(Registry.PARTICLE_TYPE, MODID + ":watermark", new WatermarkParticleType(true));
         ParticleFactoryRegistry.getInstance().register(FPPClient.FOOTPRINT, FootprintParticle.DefaultFactory::new);
+        ParticleFactoryRegistry.getInstance().register(FPPClient.WATERMARK, WatermarkParticle.DefaultFactory::new);
 	}
 }

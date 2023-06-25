@@ -35,10 +35,35 @@ public class ConfigScreen {
 				.setSaveConsumer(config::setEnableMod)
 				.build());
 		general.addEntry(entryBuilder
-				.startFloatField(Text.translatable("text.footprintparticle.option.secPerPrint")
-						,config.getSecPerPrint())
-				.setDefaultValue(0.5f)
-				.setSaveConsumer(config::setSecPerPrint)
+				.startIntSlider(Text.translatable("text.footprintparticle.option.secPerPrint")
+						,(int) (config.getSecPerPrint() * 10)
+						,0
+						,10)
+				.setDefaultValue(5)
+				.setTextGetter(value -> {
+					if (value == 0) {
+						return Text.of("¿");
+					} else {
+						return Text.translatable("text.footprintparticle.seconds", value / 10f);
+					}
+				})
+				.setSaveConsumer(value -> config.setSecPerPrint(value / 10f))
+				.build());
+		general.addEntry(entryBuilder
+				.startIntSlider(Text.translatable("text.footprintparticle.option.wetDuration")
+						,config.getWetDuration()
+						,0
+						,30)
+				.setDefaultValue(10)
+				.setTextGetter(value -> {
+					if (value == 0) {
+						return Text.translatable("text.footprintparticle.disabled");
+					} else {
+						return Text.translatable("text.footprintparticle.seconds", value);
+					}
+				})
+				.setTooltip(Text.translatable("text.footprintparticle.option.wetDuration.@Tooltip"))
+				.setSaveConsumer(config::setWetDuration)
 				.build());
 		general.addEntry(entryBuilder
 				.startFloatField(Text.translatable("text.footprintparticle.option.printLifetime")
@@ -47,11 +72,14 @@ public class ConfigScreen {
 				.setSaveConsumer(config::setPrintLifetime)
 				.build());
 		general.addEntry(entryBuilder
-				.startFloatField(Text.translatable("text.footprintparticle.option.printHeight")
-						,config.getPrintHeight())
+				.startIntSlider(Text.translatable("text.footprintparticle.option.printHeight")
+						,(int) (config.getPrintHeight() / 0.0625f)
+						,-8
+						,8)
+				.setDefaultValue(0)
+				.setTextGetter(value -> {return Text.translatable("text.footprintparticle.blocks", value * 0.0625f);})
 				.setTooltip(Text.translatable("text.footprintparticle.option.printHeight.@Tooltip"))
-				.setDefaultValue(0f)
-				.setSaveConsumer(config::setPrintHeight)
+				.setSaveConsumer(value -> config.setPrintHeight(value * 0.0625f))
 				.build());
 		general.addEntry(entryBuilder
 				.startStrList(Text.translatable("text.footprintparticle.option.applyBlocks")
