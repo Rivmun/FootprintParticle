@@ -24,5 +24,10 @@
 	"text.footprintparticle.option.wetDuration.@Tooltip": "Control how long the time of Watermark gen\nafter you away from water/rain.\nSet 0 to disable watermark.\nThe §lWatermark§l is gen when footprint cannot gen.\nIt's ignored block list.",
 	"text.footprintparticle.disabled": "Disabled",
 	"text.footprintparticle.seconds": "%s Second(s)",
-	"text.footprintparticle.blocks": "%s Block(s)"
+	"text.footprintparticle.blocks": "%s Block(s)",
+	"text.footprintparticle.option.footprintAlpha": "Footprint Alpha",
+	"text.footprintparticle.option.watermarkAlpha": "Watermark Alpha",
+	"text.footprintparticle.option.misc": "Extenal",
+	"text.footprintparticle.option.railSpark": "Minecart gen spark on rail",
+	"text.footprintparticle.option.boatTrail": "Boattttrail"
 }

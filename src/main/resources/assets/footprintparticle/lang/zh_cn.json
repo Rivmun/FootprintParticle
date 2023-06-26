@@ -3,7 +3,7 @@
 	"text.footprintparticle.option.enableMod": "启用模组",
 	"text.footprintparticle.option.secPerPrint": "脚印生成间隔",
 	"text.footprintparticle.option.printLifetime": "粒子持续时间",
-	"text.footprintparticle.option.printHeight": "粒子高度偏移（方块）",
+	"text.footprintparticle.option.printHeight": "粒子高度偏移",
 	"text.footprintparticle.option.printHeight.@Tooltip": "手动调整脚印的全局高度偏移，以避免开启光影时粒子生成在地面内。",
 	"text.footprintparticle.option.applyBlocks": "方块列表",
 	"text.footprintparticle.option.applyBlocks.@Tooltip": "以下方块上将生成脚印。\n格式: §9§omodid:blockid§r 或 §9§o#modid:blocktag§r\n建议在内建的硬度过滤器无法满足要求时再使用。",
@@ -25,6 +25,11 @@
 	"text.footprintparticle.disabled": "已禁用",
 	"text.footprintparticle.seconds": "%s 秒",
 	"text.footprintparticle.blocks": "%s 方块",
+	"text.footprintparticle.option.footprintAlpha": "脚印透明度",
+	"text.footprintparticle.option.watermarkAlpha": "水渍透明度",
+	"text.footprintparticle.option.misc": "额外功能",
+	"text.footprintparticle.option.railSpark": "矿车行驶时产生火花",
+	"text.footprintparticle.option.boatTrail": "船行驶时产生水花",
 	
 	"modmenu.descriptionTranslation.footprintparticle": "一个简单地为生物和玩家添加脚印粒子的模组。"
 }

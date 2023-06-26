@@ -27,7 +27,7 @@ public class FPPClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		FOOTPRINT = Registry.register(Registry.PARTICLE_TYPE, MODID + ":footprint", new FootprintParticleType(true));
 		WATERMARK = Registry.register(Registry.PARTICLE_TYPE, MODID + ":watermark", new WatermarkParticleType(true));
-        ParticleFactoryRegistry.getInstance().register(FPPClient.FOOTPRINT, FootprintParticle.DefaultFactory::new);
-        ParticleFactoryRegistry.getInstance().register(FPPClient.WATERMARK, WatermarkParticle.DefaultFactory::new);
+		ParticleFactoryRegistry.getInstance().register(FPPClient.FOOTPRINT, FootprintParticle.DefaultFactory::new);
+		ParticleFactoryRegistry.getInstance().register(FPPClient.WATERMARK, WatermarkParticle.DefaultFactory::new);
 	}
 }

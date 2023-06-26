@@ -13,7 +13,7 @@ public class WatermarkParticle extends FootprintParticle {
 
 	protected WatermarkParticle(ClientWorld clientWorld, double x, double y, double z, double vx, double vy, double vz, SpriteProvider spriteProvider) {
 		super(clientWorld, x, y, z, vx, vy, vz, spriteProvider);
-		this.setAlpha(0.5f * (FPPClient.CONFIG.getWetDuration() * 20 - (float) vy) / FPPClient.CONFIG.getWetDuration() / 20);
+		this.setAlpha(FPPClient.CONFIG.getWatermarkAlpha() * (FPPClient.CONFIG.getWetDuration() * 20 - (float) vy) / FPPClient.CONFIG.getWetDuration() / 20);
 	}
 
 	@Environment(EnvType.CLIENT)

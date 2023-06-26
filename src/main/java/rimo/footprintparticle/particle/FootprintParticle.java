@@ -29,7 +29,7 @@ public class FootprintParticle extends SpriteBillboardParticle {
 		this.setSprite(spriteProvider.getSprite(random));
 
 		this.setVelocity(0, 0, 0);
-		this.setAlpha(1f);
+		this.setAlpha(FPPClient.CONFIG.getFootprintAlpha());
 		this.angle = (float) MathHelper.atan2(vx, vz);
 		this.maxAge = (int) (FPPClient.CONFIG.getPrintLifetime() * 20);
 		this.scale = 0.5f;
@@ -71,7 +71,7 @@ public class FootprintParticle extends SpriteBillboardParticle {
 			 * In Minecraft,
 			 * rotate a vec3f point P around a axis with θ radian (anticlockwise)
 			 * needs a vec3f(x, y, z).normalize() direct to this axis direction
-			 * then simply call P.rotate(sinθ*x, sinθ*y, sinθ*z, cosθ) with half the θ
+			 * then simply call P.rotate(new Quaternion(sinθ*x, sinθ*y, sinθ*z, cosθ)) with half the θ
 			 * Oh, MAGIC! (👈 he is totally idiot.)
 			 * 
 			 * here we need vertex rotate around Y axis, so leave X and Z for zero.

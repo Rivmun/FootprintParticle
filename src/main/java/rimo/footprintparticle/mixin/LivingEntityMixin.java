@@ -36,7 +36,7 @@ public abstract class LivingEntityMixin extends Entity {
 		if (timer <= 0) {
 			if (!this.isSneaking()) {
 				// Either on ground moving or landing
-				if (((this.getVelocity().getX() != 0 || this.getVelocity().getZ() != 0) && this.isOnGround()) || (!wasOnGround && this.isOnGround())) {
+				if ((this.getVelocity().horizontalLength() != 0 && this.isOnGround()) || (!wasOnGround && this.isOnGround())) {
 					this.footprintGenerator();
 				}
 				wasOnGround = this.isOnGround();
@@ -70,14 +70,14 @@ public abstract class LivingEntityMixin extends Entity {
 		// Horse and spider pos set on besides...
 		if (FPPClient.CONFIG.getHorseLikeMobs().contains(EntityType.getId(this.getType()).toString())) {
 			var i = Math.random() > 0.5f ? 1 : -1;		// Random sides
-			px = px + 0.75f * i * MathHelper.sin(this.getRotationClient().y / 180f * MathHelper.PI);
-			pz = pz + 0.75f * i * MathHelper.cos(this.getRotationClient().y / 180f * MathHelper.PI);
+			px = px + 0.75f * i * MathHelper.sin((float) Math.toRadians(this.getRotationClient().y));
+			pz = pz + 0.75f * i * MathHelper.cos((float) Math.toRadians(this.getRotationClient().y));
 			timer = (int) (this.getPrimaryPassenger() != null ? this.getPrimaryPassenger().isPlayer() ? timer * 0.5f : timer * 1.33f : timer * 1.33f);
 		}
 		if (FPPClient.CONFIG.getSpiderLikeMobs().contains(EntityType.getId(this.getType()).toString())) {
 			var i = Math.random() > 0.5f ? 1 : -1;
-			px = px + 0.9f * i * MathHelper.cos(this.getRotationClient().y / 180f * MathHelper.PI);
-			pz = pz + 0.9f * i * MathHelper.sin(this.getRotationClient().y / 180f * MathHelper.PI);
+			px = px + 0.9f * i * MathHelper.sin((float) Math.toRadians(this.getRotationClient().y + 90));
+			pz = pz + 0.9f * i * MathHelper.cos((float) Math.toRadians(this.getRotationClient().y + 90));
 			timer *= 0.66f;
 		}
 
