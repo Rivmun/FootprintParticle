@@ -72,6 +72,11 @@ public class FPPConfig implements ConfigData {
 	private List<String> sizePerMob = DEF_SIZE;
 	private List<String> spiderLikeMobs = DEF_EIGHT_LEGS;
 	private List<String> horseLikeMobs = DEF_FOUR_LEGS;
+	private int wetDuration = 10;
+	private float watermarkAlpha = 0.4f;
+	private float footprintAlpha = 0.7f;
+	private float railFlameRange = 0.2f;
+	private boolean enableBoatTrail = true;
 
 	public boolean isEnable() {return enableMod;}
 	public float getSecPerPrint() {return secPerPrint;}
@@ -85,6 +90,11 @@ public class FPPConfig implements ConfigData {
 	public List<String> getSizePerMob() {return sizePerMob;}
 	public List<String> getHorseLikeMobs() {return horseLikeMobs;}
 	public List<String> getSpiderLikeMobs() {return spiderLikeMobs;}
+	public int getWetDuration() {return wetDuration;}
+	public float getWatermarkAlpha() {return watermarkAlpha;}
+	public float getFootprintAlpha() {return footprintAlpha;}
+	public float getRailFlameRange() {return railFlameRange;}
+	public boolean isEnableBoatTrail() {return enableBoatTrail;}
 
 	public void setEnableMod(boolean isEnable) {enableMod = isEnable;}
 	public void setSecPerPrint(float sec) {secPerPrint = sec;}
@@ -98,5 +108,10 @@ public class FPPConfig implements ConfigData {
 	public void setSizePerMob(List<String> list) {sizePerMob = new ArrayList<>(list);}
 	public void setHorseLikeMobs(List<String> list) {horseLikeMobs = new ArrayList<>(list);}
 	public void setSpiderLikeMobs(List<String> list) {spiderLikeMobs = new ArrayList<>(list);}
+	public void setWetDuration(int time) {wetDuration = time;}
+	public void setWatermarkAlpha(float watermarkAlpha) {this.watermarkAlpha = watermarkAlpha;}
+	public void setFootprintAlpha(float footprintAlpha) {this.footprintAlpha = footprintAlpha;}
+	public void setRailFlameRange(float railFlameRange) {this.railFlameRange = railFlameRange;}
+	public void setEnableBoatTrail(boolean enableBoatTrail) {this.enableBoatTrail = enableBoatTrail;}
 
 }
