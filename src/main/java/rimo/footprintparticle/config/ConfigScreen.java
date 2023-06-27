@@ -15,11 +15,13 @@ public class ConfigScreen {
 	ConfigEntryBuilder entryBuilder = builder.entryBuilder();
 
     ConfigCategory general = builder.getOrCreateCategory(Text.translatable("text.footprintparticle.option.title"));
+    ConfigCategory misc = builder.getOrCreateCategory(Text.translatable("text.footprintparticle.option.misc"));
 
 	FPPConfig config = FPPClient.CONFIGHOLDER.getConfig();
 
 	public Screen buildScreen() {
     	buildCategory();
+    	buildMiscCategory();
 
     	// Saving...
     	builder.setSavingRunnable(() -> FPPClient.CONFIGHOLDER.save());
@@ -35,10 +37,35 @@ public class ConfigScreen {
 				.setSaveConsumer(config::setEnableMod)
 				.build());
 		general.addEntry(entryBuilder
-				.startFloatField(Text.translatable("text.footprintparticle.option.secPerPrint")
-						,config.getSecPerPrint())
-				.setDefaultValue(0.5f)
-				.setSaveConsumer(config::setSecPerPrint)
+				.startIntSlider(Text.translatable("text.footprintparticle.option.wetDuration")
+						,config.getWetDuration()
+						,0
+						,30)
+				.setDefaultValue(10)
+				.setTextGetter(value -> {
+					if (value == 0) {
+						return Text.translatable("text.footprintparticle.disabled");
+					} else {
+						return Text.translatable("text.footprintparticle.seconds", value);
+					}
+				})
+				.setTooltip(Text.translatable("text.footprintparticle.option.wetDuration.@Tooltip"))
+				.setSaveConsumer(config::setWetDuration)
+				.build());
+		general.addEntry(entryBuilder
+				.startIntSlider(Text.translatable("text.footprintparticle.option.secPerPrint")
+						,(int) (config.getSecPerPrint() * 10)
+						,0
+						,10)
+				.setDefaultValue(5)
+				.setTextGetter(value -> {
+					if (value == 0) {
+						return Text.of("¿");
+					} else {
+						return Text.translatable("text.footprintparticle.seconds", value / 10f);
+					}
+				})
+				.setSaveConsumer(value -> config.setSecPerPrint(value / 10f))
 				.build());
 		general.addEntry(entryBuilder
 				.startFloatField(Text.translatable("text.footprintparticle.option.printLifetime")
@@ -47,11 +74,32 @@ public class ConfigScreen {
 				.setSaveConsumer(config::setPrintLifetime)
 				.build());
 		general.addEntry(entryBuilder
-				.startFloatField(Text.translatable("text.footprintparticle.option.printHeight")
-						,config.getPrintHeight())
+				.startIntSlider(Text.translatable("text.footprintparticle.option.footprintAlpha")
+						,(int) (config.getFootprintAlpha() * 10)
+						,1
+						,10)
+				.setDefaultValue(7)
+				.setTextGetter(value -> {return Text.of(value * 10 + "%");})
+				.setSaveConsumer(value -> {config.setFootprintAlpha(value / 10f);})
+				.build());
+		general.addEntry(entryBuilder
+				.startIntSlider(Text.translatable("text.footprintparticle.option.watermarkAlpha")
+						,(int) (config.getWatermarkAlpha() * 10)
+						,1
+						,10)
+				.setDefaultValue(4)
+				.setTextGetter(value -> {return Text.of(value * 10 + "%");})
+				.setSaveConsumer(value -> {config.setWatermarkAlpha(value / 10f);})
+				.build());
+		general.addEntry(entryBuilder
+				.startIntSlider(Text.translatable("text.footprintparticle.option.printHeight")
+						,(int) (config.getPrintHeight() / 0.0625f)
+						,-8
+						,8)
+				.setDefaultValue(0)
+				.setTextGetter(value -> {return Text.translatable("text.footprintparticle.blocks", value * 0.0625f);})
 				.setTooltip(Text.translatable("text.footprintparticle.option.printHeight.@Tooltip"))
-				.setDefaultValue(0f)
-				.setSaveConsumer(config::setPrintHeight)
+				.setSaveConsumer(value -> config.setPrintHeight(value * 0.0625f))
 				.build());
 		general.addEntry(entryBuilder
 				.startStrList(Text.translatable("text.footprintparticle.option.applyBlocks")
@@ -107,6 +155,30 @@ public class ConfigScreen {
 				.setDefaultValue(FPPConfig.DEF_EIGHT_LEGS)
 				.setTooltip(Text.translatable("text.footprintparticle.option.spiderLikeMobs.@Tooltip"))
 				.setSaveConsumer(config::setSpiderLikeMobs)
+				.build());
+	}
+
+	private void buildMiscCategory() {
+		misc.addEntry(entryBuilder
+				.startIntSlider(Text.translatable("text.footprintparticle.option.railSpark")
+						,(int) (config.getRailFlameRange() * 10)
+						,0
+						,10)
+				.setDefaultValue(2)
+				.setTextGetter(value -> {
+					if (value != 0) {
+						return Text.of(value * 10 + "%");
+					} else {
+						return Text.translatable("text.footprintparticle.disabled");
+					}
+				})
+				.setSaveConsumer(value -> config.setRailFlameRange(value / 10f))
+				.build());
+		misc.addEntry(entryBuilder
+				.startBooleanToggle(Text.translatable("text.footprintparticle.option.boatTrail")
+						,config.isEnableBoatTrail())
+				.setDefaultValue(true)
+				.setSaveConsumer(config::setEnableBoatTrail)
 				.build());
 	}
 
