@@ -1,4 +1,4 @@
-package rimo.footprintparticle.particle;
+package com.rimo.footprintparticle.particle;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.particle.DefaultParticleType;

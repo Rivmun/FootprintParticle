@@ -20,10 +20,10 @@
   "environment": "client",
   "entrypoints": {
     "client": [
-      "rimo.footprintparticle.FPPClient"
+      "com.rimo.footprintparticle.FPPClient"
     ],
     "modmenu": [ 
-      "rimo.footprintparticle.config.ModMenuIntegration"
+      "com.rimo.footprintparticle.config.ModMenuIntegration"
     ]
   },
   "mixins": [

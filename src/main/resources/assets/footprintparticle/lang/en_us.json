@@ -29,5 +29,7 @@
 	"text.footprintparticle.option.watermarkAlpha": "Watermark Alpha",
 	"text.footprintparticle.option.misc": "Extenal",
 	"text.footprintparticle.option.railSpark": "Minecart gen spark on rail",
-	"text.footprintparticle.option.boatTrail": "Boattttrail"
+	"text.footprintparticle.option.boatTrail": "Boattttrail",
+	"text.footprintparticle.option.swimPop": "Pop up when swimming",
+	"text.footprintparticle.option.snowDust": "Kick up snow (when print gen on it)"
 }
