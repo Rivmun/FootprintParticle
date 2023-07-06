@@ -1,4 +1,6 @@
-package rimo.footprintparticle.config;
+package com.rimo.footprintparticle.config;
+
+import com.rimo.footprintparticle.FPPClient;
 
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
@@ -6,7 +8,6 @@ import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
-import rimo.footprintparticle.FPPClient;
 
 public class ConfigScreen {
 	ConfigBuilder builder = ConfigBuilder.create()
@@ -35,7 +36,8 @@ public class ConfigScreen {
 						,config.isEnable())
 				.setDefaultValue(true)
 				.setSaveConsumer(config::setEnableMod)
-				.build());
+				.build()
+		);
 		general.addEntry(entryBuilder
 				.startIntSlider(Text.translatable("text.footprintparticle.option.wetDuration")
 						,config.getWetDuration()
@@ -51,7 +53,8 @@ public class ConfigScreen {
 				})
 				.setTooltip(Text.translatable("text.footprintparticle.option.wetDuration.@Tooltip"))
 				.setSaveConsumer(config::setWetDuration)
-				.build());
+				.build()
+		);
 		general.addEntry(entryBuilder
 				.startIntSlider(Text.translatable("text.footprintparticle.option.secPerPrint")
 						,(int) (config.getSecPerPrint() * 10)
@@ -66,13 +69,15 @@ public class ConfigScreen {
 					}
 				})
 				.setSaveConsumer(value -> config.setSecPerPrint(value / 10f))
-				.build());
+				.build()
+		);
 		general.addEntry(entryBuilder
 				.startFloatField(Text.translatable("text.footprintparticle.option.printLifetime")
 						,config.getPrintLifetime())
 				.setDefaultValue(5.0f)
 				.setSaveConsumer(config::setPrintLifetime)
-				.build());
+				.build()
+		);
 		general.addEntry(entryBuilder
 				.startIntSlider(Text.translatable("text.footprintparticle.option.footprintAlpha")
 						,(int) (config.getFootprintAlpha() * 10)
@@ -81,7 +86,8 @@ public class ConfigScreen {
 				.setDefaultValue(7)
 				.setTextGetter(value -> {return Text.of(value * 10 + "%");})
 				.setSaveConsumer(value -> {config.setFootprintAlpha(value / 10f);})
-				.build());
+				.build()
+		);
 		general.addEntry(entryBuilder
 				.startIntSlider(Text.translatable("text.footprintparticle.option.watermarkAlpha")
 						,(int) (config.getWatermarkAlpha() * 10)
@@ -90,7 +96,8 @@ public class ConfigScreen {
 				.setDefaultValue(4)
 				.setTextGetter(value -> {return Text.of(value * 10 + "%");})
 				.setSaveConsumer(value -> {config.setWatermarkAlpha(value / 10f);})
-				.build());
+				.build()
+		);
 		general.addEntry(entryBuilder
 				.startIntSlider(Text.translatable("text.footprintparticle.option.printHeight")
 						,(int) (config.getPrintHeight() / 0.0625f)
@@ -100,62 +107,71 @@ public class ConfigScreen {
 				.setTextGetter(value -> {return Text.translatable("text.footprintparticle.blocks", value * 0.0625f);})
 				.setTooltip(Text.translatable("text.footprintparticle.option.printHeight.@Tooltip"))
 				.setSaveConsumer(value -> config.setPrintHeight(value * 0.0625f))
-				.build());
+				.build()
+		);
 		general.addEntry(entryBuilder
 				.startStrList(Text.translatable("text.footprintparticle.option.applyBlocks")
 						,config.getApplyBlocks())
 				.setDefaultValue(FPPConfig.DEF_APPLYBLOCKS)
 				.setTooltip(Text.translatable("text.footprintparticle.option.applyBlocks.@Tooltip"))
 				.setSaveConsumer(config::setApplyBlocks)
-				.build());
+				.build()
+		);
 		general.addEntry(entryBuilder
 				.startStrList(Text.translatable("text.footprintparticle.option.blockHeight")
 						,config.getBlockHeight())
 				.setDefaultValue(FPPConfig.DEF_BLOCKHEIGHT)
 				.setTooltip(Text.translatable("text.footprintparticle.option.blockHeight.@Tooltip"))
 				.setSaveConsumer(config::setBlockHeight)
-				.build());
+				.build()
+		);
 		general.addEntry(entryBuilder
 				.startStrList(Text.translatable("text.footprintparticle.option.excludedBlocks")
 						,config.getExcludedBlocks())
 				.setDefaultValue(FPPConfig.DEF_EXCLUDEDBLOCKS)
 				.setTooltip(Text.translatable("text.footprintparticle.option.excludedBlocks.@Tooltip"))
 				.setSaveConsumer(config::setExcludedBlocks)
-				.build());
+				.build()
+		);
 		general.addEntry(entryBuilder
 				.startBooleanToggle(Text.translatable("text.footprintparticle.option.canGenWhenInvisible")
 						,config.getCanGenWhenInvisible())
 				.setDefaultValue(true)
 				.setSaveConsumer(config::setCanGenWhenInvisible)
-				.build());
+				.build()
+		);
 		general.addEntry(entryBuilder
 				.startStrList(Text.translatable("text.footprintparticle.option.excludedMobs")
 						,config.getExcludedMobs())
 				.setDefaultValue(FPPConfig.DEF_MODS)
 				.setTooltip(Text.translatable("text.footprintparticle.option.excludedMobs.@Tooltip"))
 				.setSaveConsumer(config::setExcludedMobs)
-				.build());
+				.build()
+		);
 		general.addEntry(entryBuilder
 				.startStrList(Text.translatable("text.footprintparticle.option.sizePerMob")
 						,config.getSizePerMob())
 				.setDefaultValue(FPPConfig.DEF_SIZE)
 				.setTooltip(Text.translatable("text.footprintparticle.option.sizePerMob.@Tooltip"))
 				.setSaveConsumer(config::setSizePerMob)
-				.build());
+				.build()
+		);
 		general.addEntry(entryBuilder
 				.startStrList(Text.translatable("text.footprintparticle.option.horseLikeMobs")
 						,config.getHorseLikeMobs())
 				.setDefaultValue(FPPConfig.DEF_FOUR_LEGS)
 				.setTooltip(Text.translatable("text.footprintparticle.option.horseLikeMobs.@Tooltip"))
 				.setSaveConsumer(config::setHorseLikeMobs)
-				.build());
+				.build()
+		);
 		general.addEntry(entryBuilder
 				.startStrList(Text.translatable("text.footprintparticle.option.spiderLikeMobs")
 						,config.getSpiderLikeMobs())
 				.setDefaultValue(FPPConfig.DEF_EIGHT_LEGS)
 				.setTooltip(Text.translatable("text.footprintparticle.option.spiderLikeMobs.@Tooltip"))
 				.setSaveConsumer(config::setSpiderLikeMobs)
-				.build());
+				.build()
+		);
 	}
 
 	private void buildMiscCategory() {
@@ -173,13 +189,29 @@ public class ConfigScreen {
 					}
 				})
 				.setSaveConsumer(value -> config.setRailFlameRange(value / 10f))
-				.build());
+				.build()
+		);
 		misc.addEntry(entryBuilder
 				.startBooleanToggle(Text.translatable("text.footprintparticle.option.boatTrail")
 						,config.isEnableBoatTrail())
 				.setDefaultValue(true)
 				.setSaveConsumer(config::setEnableBoatTrail)
-				.build());
+				.build()
+		);
+		misc.addEntry(entryBuilder
+				.startBooleanToggle(Text.translatable("text.footprintparticle.option.swimPop")
+						,config.isEnableSwimPop())
+				.setDefaultValue(true)
+				.setSaveConsumer(config::setEnableSwimPop)
+				.build()
+		);
+		misc.addEntry(entryBuilder
+				.startBooleanToggle(Text.translatable("text.footprintparticle.option.snowDust")
+						,config.isEnableSnowDust())
+				.setDefaultValue(true)
+				.setSaveConsumer(config::setEnableSnowDust)
+				.build()
+		);
 	}
 
 }

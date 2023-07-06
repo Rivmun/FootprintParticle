@@ -29,7 +29,9 @@
 	"text.footprintparticle.option.watermarkAlpha": "水渍透明度",
 	"text.footprintparticle.option.misc": "额外功能",
 	"text.footprintparticle.option.railSpark": "矿车行驶时产生火花",
-	"text.footprintparticle.option.boatTrail": "船行驶时产生水花",
+	"text.footprintparticle.option.boatTrail": "船只行驶时产生水花",
+	"text.footprintparticle.option.swimPop": "游泳时产生气泡",
+	"text.footprintparticle.option.snowDust": "扬起雪花（当在雪中生成脚印时）",
 	
 	"modmenu.descriptionTranslation.footprintparticle": "一个简单地为生物和玩家添加脚印粒子的模组。"
 }

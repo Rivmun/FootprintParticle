@@ -1,10 +1,12 @@
-package rimo.footprintparticle.config;
+package com.rimo.footprintparticle.config;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.rimo.footprintparticle.FPPClient;
+
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
-import rimo.footprintparticle.FPPClient;
 
 @Config(name = FPPClient.MODID)
 public class FPPConfig implements ConfigData {
@@ -77,6 +79,8 @@ public class FPPConfig implements ConfigData {
 	private float footprintAlpha = 0.7f;
 	private float railFlameRange = 0.2f;
 	private boolean enableBoatTrail = true;
+	private boolean enableSwimPop = true;
+	private boolean enableSnowDust = true;
 
 	public boolean isEnable() {return enableMod;}
 	public float getSecPerPrint() {return secPerPrint;}
@@ -95,6 +99,8 @@ public class FPPConfig implements ConfigData {
 	public float getFootprintAlpha() {return footprintAlpha;}
 	public float getRailFlameRange() {return railFlameRange;}
 	public boolean isEnableBoatTrail() {return enableBoatTrail;}
+	public boolean isEnableSwimPop() {return enableSwimPop;}
+	public boolean isEnableSnowDust() {return enableSnowDust;}
 
 	public void setEnableMod(boolean isEnable) {enableMod = isEnable;}
 	public void setSecPerPrint(float sec) {secPerPrint = sec;}
@@ -113,5 +119,7 @@ public class FPPConfig implements ConfigData {
 	public void setFootprintAlpha(float footprintAlpha) {this.footprintAlpha = footprintAlpha;}
 	public void setRailFlameRange(float railFlameRange) {this.railFlameRange = railFlameRange;}
 	public void setEnableBoatTrail(boolean enableBoatTrail) {this.enableBoatTrail = enableBoatTrail;}
+	public void setEnableSwimPop(boolean enableSwimPop) {this.enableSwimPop = enableSwimPop;}
+	public void setEnableSnowDust(boolean enableSnowDust) {this.enableSnowDust = enableSnowDust;}
 
 }

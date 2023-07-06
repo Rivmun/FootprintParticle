@@ -1,4 +1,4 @@
-package rimo.footprintparticle.particle;
+package com.rimo.footprintparticle.particle;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -16,7 +16,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import rimo.footprintparticle.FPPClient;
+
+import com.rimo.footprintparticle.FPPClient;
 
 public class FootprintParticle extends SpriteBillboardParticle {
 	public final SpriteProvider spriteProvider;

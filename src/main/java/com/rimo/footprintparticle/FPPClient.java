@@ -1,4 +1,4 @@
-package rimo.footprintparticle;
+package com.rimo.footprintparticle;
 
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigHolder;
@@ -9,11 +9,12 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rimo.footprintparticle.config.FPPConfig;
-import rimo.footprintparticle.particle.FootprintParticle;
-import rimo.footprintparticle.particle.FootprintParticleType;
-import rimo.footprintparticle.particle.WatermarkParticle;
-import rimo.footprintparticle.particle.WatermarkParticleType;
+
+import com.rimo.footprintparticle.config.FPPConfig;
+import com.rimo.footprintparticle.particle.FootprintParticle;
+import com.rimo.footprintparticle.particle.FootprintParticleType;
+import com.rimo.footprintparticle.particle.WatermarkParticle;
+import com.rimo.footprintparticle.particle.WatermarkParticleType;
 
 public class FPPClient implements ClientModInitializer {
 	public static final String MODID = "footprintparticle";
