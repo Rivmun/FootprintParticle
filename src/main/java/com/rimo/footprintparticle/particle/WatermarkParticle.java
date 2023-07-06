@@ -1,4 +1,6 @@
-package rimo.footprintparticle.particle;
+package com.rimo.footprintparticle.particle;
+
+import com.rimo.footprintparticle.FPPClient;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -7,7 +9,6 @@ import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.DefaultParticleType;
-import rimo.footprintparticle.FPPClient;
 
 public class WatermarkParticle extends FootprintParticle {
 

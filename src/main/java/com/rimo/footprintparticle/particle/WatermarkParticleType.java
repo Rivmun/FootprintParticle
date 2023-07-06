@@ -1,4 +1,4 @@
-package rimo.footprintparticle.particle;
+package com.rimo.footprintparticle.particle;
 
 public class WatermarkParticleType extends FootprintParticleType {
 
