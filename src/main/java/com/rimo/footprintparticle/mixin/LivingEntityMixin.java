@@ -119,17 +119,17 @@ public abstract class LivingEntityMixin extends Entity {
 						py += Float.parseFloat(str2[1]);
 						break;
 					}
+				}
 
 					// Snow Dust
-					if (FPPClient.CONFIG.isEnableSnowDust() && block.isOf(Blocks.SNOW))
-						for (int i = 0; i < 2; i++)
-							this.getWorld().addParticle(ParticleTypes.CLOUD, px, py, pz,
-									(Math.random() - 0.5f) / 10f,
-									0,
-									(Math.random() - 0.5f) / 10f
-							);
+				if (FPPClient.CONFIG.isEnableSnowDust() && block.isOf(Blocks.SNOW))
+					for (int i = 0; i < 2; i++)
+						this.getWorld().addParticle(ParticleTypes.CLOUD, px, py, pz,
+								(Math.random() - 0.5f) / 10f,
+								0,
+								(Math.random() - 0.5f) / 10f
+						);
 
-				}
 			} catch (Exception e) {
 				// Ignore...
 			}
