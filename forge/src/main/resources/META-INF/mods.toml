@@ -1,0 +1,42 @@
+modLoader = "javafml"
+loaderVersion = "[43,)"
+issueTrackerURL = "https://github.com/Rivmun/FootprintParticle/issues"
+license = "MIT"
+
+[[mods]]
+modId = "footprintparticle"
+version = "${version}"
+displayName = "Footprint Particle"
+authors = "Rimo"
+description = '''
+A simply mod that adds footprint for all mobs (and players).
+'''
+logoFile = "icon.png"
+
+[[dependencies.footprintparticle]]
+modId = "forge"
+mandatory = true
+versionRange = "[43,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.footprintparticle]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.19.2,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.footprintparticle]]
+modId = "architectury"
+mandatory = true
+versionRange = "[6.5.77,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.footprintparticle]]
+modId = "cloth_config"
+mandatory = true
+versionRange = "*"
+ordering = "AFTER"
+side = "BOTH"
