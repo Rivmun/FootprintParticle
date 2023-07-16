@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "footprintparticle",
+  "version": "${version}",
+  "name": "Footprint Particle",
+  "description": "A simply mod that adds footprint for all mobs (and players).",
+  "authors": [
+    "Rimo"
+  ],
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/footprintparticle",
+    "sources": "https://github.com/Rivmun/FootprintParticle",
+    "issues": "https://github.com.Rivemun/FootprintParticle/issues"
+  },
+  "license": "MIT",
+  "icon": "icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.rimo.footprintparticle.FPPFabric"
+    ],
+    "modmenu": [
+      "com.rimo.footprintparticle.config.ModMenuIntegration"
+    ]
+  },
+  "mixins": [
+    "footprintparticle.mixins.json"
+  ],
+  "depends": {
+    "fabric": "*",
+    "minecraft": "~1.18.2",
+    "architectury": ">=4.11.93",
+    "cloth-config2":"*"
+  },
+  "suggests": {
+    "modmenu": "*"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.modrinth": "https://modrinth.com/mod/footprintparticle",
+        "MCMOD.cn": "https://www.mcmod.cn/class/9454.html"
+      }
+    }
+  }
+}
