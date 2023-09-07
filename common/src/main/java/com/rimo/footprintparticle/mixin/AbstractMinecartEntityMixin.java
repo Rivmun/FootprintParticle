@@ -10,6 +10,7 @@ import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -21,10 +22,11 @@ public abstract class AbstractMinecartEntityMixin extends Entity {
 		super(type, world);
 	}
 
+	@Unique
 	private int timer = 0;
 
 	//TODO: inject at TAIL will do nothing, why?
-	@Inject(method = "tick", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "tick", at = @At("HEAD"))
 	public void tick(CallbackInfo ci) {
 		if (timer-- <= 0 && this.getVelocity().horizontalLength() != 0) {
 			if (this.getWorld().getBlockState(this.getBlockPos()).isIn(BlockTags.RAILS) && Math.random() <= FPPClient.CONFIG.getRailFlameRange()) {

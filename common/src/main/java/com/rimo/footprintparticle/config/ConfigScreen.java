@@ -198,10 +198,21 @@ public class ConfigScreen {
 				.build()
 		);
 		misc.addEntry(entryBuilder
-				.startBooleanToggle(Text.translatable("text.footprintparticle.option.swimPop")
-						,config.isEnableSwimPop())
-				.setDefaultValue(true)
-				.setSaveConsumer(config::setEnableSwimPop)
+				.startIntSlider(Text.translatable("text.footprintparticle.option.swimPop")
+						,config.getSwimPopLevel()
+						,0
+						,2)
+				.setDefaultValue(2)
+				.setTextGetter(value -> {
+					if (value == 0) {
+						return Text.translatable("text.footprintparticle.disabled");
+					} else if (value == 1) {
+						return Text.translatable("text.footprintparticle.playerOnly");
+					} else {
+						return Text.translatable("text.footprintparticle.all");
+					}
+				})
+				.setSaveConsumer(config::setSwimPopLevel)
 				.build()
 		);
 		misc.addEntry(entryBuilder
