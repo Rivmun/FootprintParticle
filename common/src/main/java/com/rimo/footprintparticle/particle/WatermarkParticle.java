@@ -28,7 +28,7 @@ public class WatermarkParticle extends FootprintParticle {
 		public Particle createParticle(DefaultParticleType parameters, ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
 			WatermarkParticle particle = new WatermarkParticle(world, x, y, z, velocityX, velocityY, velocityZ, this.spriteProvider);
 			if (parameters instanceof WatermarkParticleType printParameters)
-				particle.checkEntitySize(printParameters, particle);
+				particle.scale *= FPPClient.getEntityScale((printParameters.entity));
 			return particle;
 		}
 	}

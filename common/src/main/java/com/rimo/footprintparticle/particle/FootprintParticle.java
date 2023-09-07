@@ -7,7 +7,6 @@ import net.minecraft.client.particle.*;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.EntityType;
 import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -100,24 +99,9 @@ public class FootprintParticle extends SpriteBillboardParticle {
 		public Particle createParticle(DefaultParticleType parameters, ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
 			FootprintParticle particle = new FootprintParticle(world, x, y, z, velocityX, velocityY, velocityZ, this.spriteProvider);
 			if (parameters instanceof FootprintParticleType footprintParameters)
-				particle.checkEntitySize(footprintParameters, particle);
+				particle.scale *= FPPClient.getEntityScale((footprintParameters.entity));
 			return particle;
 		}
 	}
 
-	protected void checkEntitySize(FootprintParticleType parameters, FootprintParticle particle) {
-		try {
-			for (String str : FPPClient.CONFIG.getSizePerMob()) {
-				String[] str2 = str.split(",");
-				if (str2[0].contentEquals(EntityType.getId(parameters.entity.getType()).toString())) {
-					particle.scale = Float.parseFloat(str2[1]);
-				}
-			}
-		} catch (Exception e) {
-			// Ignore...
-		}
-		if (parameters.entity.isBaby()) {
-			particle.scale *= 0.66f;
-		}
-	}
 }
