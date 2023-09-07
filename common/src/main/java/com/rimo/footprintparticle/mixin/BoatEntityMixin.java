@@ -20,9 +20,9 @@ public abstract class BoatEntityMixin extends Entity {
 	}
 
 	@Shadow
-	abstract boolean checkBoatInWater();
-	
-	@Inject(method = "tick", at = @At("TAIL"), cancellable = true)
+	protected abstract boolean checkBoatInWater();
+
+	@Inject(method = "tick", at = @At("TAIL"))
 	public void tick(CallbackInfo ci) {
 		if (this.getVelocity().horizontalLength() > 0.1f) {
 			var i = Math.random() > 0.5f ? 1 : -1;		//TODO: boat's yaw is 90 degress more than other entity, strange.
