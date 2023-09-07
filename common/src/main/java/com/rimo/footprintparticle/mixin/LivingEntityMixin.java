@@ -65,9 +65,9 @@ public abstract class LivingEntityMixin extends Entity {
 			float range = FPPClient.getEntityScale((LivingEntity) (Object) this);
 			this.getWorld().addParticle(
 					ParticleTypes.BUBBLE,
-					this.getX() + Math.random() - 0.5f,
-					this.getY() + Math.random() - 0.5f,
-					this.getZ() + Math.random() - 0.5f,
+					this.getX() + Math.random() - 0.5f * range,
+					this.getY() + Math.random() - 0.5f * range,
+					this.getZ() + Math.random() - 0.5f * range,
 					0,
 					Math.random() / 10f,
 					0
