@@ -15,6 +15,13 @@ subprojects {
         silentMojangMappingsLicense()
     }
 
+    repositories {
+        // ... your other Maven repositories above, if any ...
+        maven {
+            url = "https://jitpack.io"
+        }
+    }
+
     dependencies {
         minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
         // The following line declares the mojmap mappings, you may use other mappings as well
