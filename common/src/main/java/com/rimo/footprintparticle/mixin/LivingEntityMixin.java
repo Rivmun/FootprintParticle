@@ -2,6 +2,7 @@ package com.rimo.footprintparticle.mixin;
 
 import com.rimo.footprintparticle.FPPClient;
 import com.rimo.footprintparticle.particle.FootprintParticleType;
+import com.rimo.footprintparticle.particle.SnowDustParticleType;
 import com.rimo.footprintparticle.particle.WatermarkParticleType;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -14,6 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -24,16 +26,19 @@ public abstract class LivingEntityMixin extends Entity {
 		super(type, world);
 	}
 
+	@Unique
 	private int timer = 0;
+	@Unique
 	private boolean wasOnGround = true;
+	@Unique
 	private int wetTimer = FPPClient.CONFIG.getWetDuration() * 20;
 
-	@Inject(method = "jump", at = @At("TAIL"), cancellable = true)
+	@Inject(method = "jump", at = @At("TAIL"))
 	protected void jump(CallbackInfo ci) {
 		this.footprintGenerator();
 	}
 
-	@Inject(method = "tick", at = @At("TAIL"), cancellable = true)
+	@Inject(method = "tick", at = @At("TAIL"))
 	public void tick(CallbackInfo ci) {
 		if (timer <= 0) {
 			if (!this.isSneaking() && !this.isSubmergedInWater()) {
@@ -54,18 +59,23 @@ public abstract class LivingEntityMixin extends Entity {
 		}
 
 		// Swim Pop
-		if (FPPClient.CONFIG.isEnableSwimPop() && this.isSwimming())
+		if (this.isSwimming() &&
+				(FPPClient.CONFIG.getSwimPopLevel() == 2 ||
+				(FPPClient.CONFIG.getSwimPopLevel() == 1 && this.isPlayer()))) {
+			float range = FPPClient.getEntityScale((LivingEntity) (Object) this);
 			this.getWorld().addParticle(
 					ParticleTypes.BUBBLE,
-					this.getX() + Math.random() - 0.5f,
-					this.getY() + Math.random() - 0.5f,
-					this.getZ() + Math.random() - 0.5f,
+					this.getX() + Math.random() - 0.5f * range,
+					this.getY() + Math.random() - 0.5f * range,
+					this.getZ() + Math.random() - 0.5f * range,
 					0,
 					Math.random() / 10f,
 					0
 			);
+		}
 	}
 
+	@Unique
 	public void footprintGenerator() {
 		if (!FPPClient.CONFIG.isEnable())
 			return;
@@ -122,12 +132,14 @@ public abstract class LivingEntityMixin extends Entity {
 
 				// Snow Dust
 				if (FPPClient.CONFIG.isEnableSnowDust() && block.isOf(Blocks.SNOW))
-					for (int i = 0; i < 2; i++)
-						this.getWorld().addParticle(ParticleTypes.CLOUD, px, py, pz,
+					for (int i = 0; i < 2; i++) {
+						SnowDustParticleType snowdust = FPPClient.SNOWDUST.get();
+						this.getWorld().addParticle(snowdust.setData(FPPClient.getEntityScale((LivingEntity) (Object) this)), px, py, pz,
 								(Math.random() - 0.5f) / 10f,
 								0,
 								(Math.random() - 0.5f) / 10f
 						);
+					}
 
 			} catch (Exception e) {
 				// Ignore...
@@ -153,6 +165,7 @@ public abstract class LivingEntityMixin extends Entity {
 		}
 	}
 
+	@Unique
 	private boolean isPrintCanGen(BlockPos pos) {
 		var block = this.getWorld().getBlockState(pos);
 		var canGen = FPPClient.CONFIG.getApplyBlocks().contains(block.getRegistryEntry().getKey().get().getValue().toString());
