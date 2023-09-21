@@ -8,7 +8,6 @@ import net.minecraft.client.particle.RainSplashParticle;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.DefaultParticleType;
-import net.minecraft.util.math.BlockPos;
 
 public class WaterSplashParticle extends RainSplashParticle {
 

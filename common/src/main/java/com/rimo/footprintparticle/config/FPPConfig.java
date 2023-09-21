@@ -5,28 +5,29 @@ import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Config(name = FPPClient.MOD_ID)
 public class FPPConfig implements ConfigData {
 
-	static final List<String> DEF_APPLYBLOCKS = new ArrayList<>(List.of(
+	static final List<String> DEF_APPLYBLOCKS = Arrays.asList(
 			"#minecraft:wool"
-	));
-	static final List<String> DEF_BLOCKHEIGHT = new ArrayList<>(List.of(
+	);
+	static final List<String> DEF_BLOCKHEIGHT = Arrays.asList(
 			"minecraft:snow,0.125",
 			"minecraft:soul_sand,0.125",
 			"minecraft:mud,0.125"
-	));
-	static final List<String> DEF_EXCLUDEDBLOCKS = new ArrayList<>(List.of(
+	);
+	static final List<String> DEF_EXCLUDEDBLOCKS = Arrays.asList(
 			"minecraft:beehive",
 			"#minecraft:flower",
 			"#minecraft:crop",
 			"#minecraft:leaves",
 			"#minecraft:sapling",
 			"#minecraft:replaceable_plants"
-	));
-	static final List<String> DEF_MODS = new ArrayList<>(List.of(
+	);
+	static final List<String> DEF_MODS = Arrays.asList(
 			"minecraft:parrot",
 			"minecraft:bee",
 			"minecraft:allay",
@@ -38,8 +39,8 @@ public class FPPConfig implements ConfigData {
 			"minecraft:dolphin",
 			"minecraft:wither",
 			"minecraft:ender_dragon"
-	));
-	static final List<String> DEF_SIZE = new ArrayList<>(List.of(
+	);
+	static final List<String> DEF_SIZE = Arrays.asList(
 			"minecraft:chicken,0.3",
 			"minecraft:pig,0.4",
 			"minecraft:cat,0.25",
@@ -48,18 +49,18 @@ public class FPPConfig implements ConfigData {
 			"minecraft:enderman,0.35",
 			"minecraft:slime,1.3",
 			"minecraft:magma_cube,1.3"
-	));
-	static final List<String> DEF_FOUR_LEGS = new ArrayList<>(List.of(
+	);
+	static final List<String> DEF_FOUR_LEGS = Arrays.asList(
 			"minecraft:horse",
 			"minecraft:donkey",
 			"minecraft:mule",
 			"minecraft:zombie_horse",
 			"minecraft:skeleton_horse"
-	));
-	static final List<String> DEF_EIGHT_LEGS = new ArrayList<>(List.of(
+	);
+	static final List<String> DEF_EIGHT_LEGS = Arrays.asList(
 			"minecraft:spider",
 			"minecraft:cave_spider"
-	));
+	);
 
 	private boolean enableMod = true;
 	private float secPerPrint = 0.5f;

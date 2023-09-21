@@ -13,7 +13,7 @@ public class WatermarkParticle extends FootprintParticle {
 
 	protected WatermarkParticle(ClientWorld clientWorld, double x, double y, double z, double vx, double vy, double vz, SpriteProvider spriteProvider) {
 		super(clientWorld, x, y, z, vx, vy, vz, spriteProvider);
-		this.setAlpha(FPPClient.CONFIG.getWatermarkAlpha() * (FPPClient.CONFIG.getWetDuration() * 20 - (float) vy) / FPPClient.CONFIG.getWetDuration() / 20);
+		this.setColorAlpha(FPPClient.CONFIG.getWatermarkAlpha() * (FPPClient.CONFIG.getWetDuration() * 20 - (float) vy) / FPPClient.CONFIG.getWetDuration() / 20);
 	}
 
 	@Environment(EnvType.CLIENT)
@@ -27,8 +27,8 @@ public class WatermarkParticle extends FootprintParticle {
 		@Override
 		public Particle createParticle(DefaultParticleType parameters, ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
 			WatermarkParticle particle = new WatermarkParticle(world, x, y, z, velocityX, velocityY, velocityZ, this.spriteProvider);
-			if (parameters instanceof WatermarkParticleType printParameters)
-				particle.scale *= FPPClient.getEntityScale((printParameters.entity));
+			if (parameters instanceof WatermarkParticleType)
+				particle.scale *= FPPClient.getEntityScale((((WatermarkParticleType) parameters).entity));
 			return particle;
 		}
 	}
