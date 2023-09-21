@@ -232,10 +232,10 @@ public class ConfigScreen {
 
 	private Text getAllMobOrPlayerOnlyText(int value) {
 		switch (value) {
-			case 0 -> {return new TranslatableText("text.footprintparticle.disabled");}
-			case 1 -> {return new TranslatableText("text.footprintparticle.playerOnly");}
-			case 2 -> {return new TranslatableText("text.footprintparticle.all");}
-			default -> {return Text.of("");}
+			case 0 : return new TranslatableText("text.footprintparticle.disabled");
+			case 1 : return new TranslatableText("text.footprintparticle.playerOnly");
+			case 2 : return new TranslatableText("text.footprintparticle.all");
+			default : return Text.of("");
 		}
 	}
 }

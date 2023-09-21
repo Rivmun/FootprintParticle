@@ -2,11 +2,9 @@ package com.rimo.footprintparticle;
 
 import com.rimo.footprintparticle.config.FPPConfig;
 import com.rimo.footprintparticle.particle.*;
-import dev.architectury.platform.Platform;
-import dev.architectury.registry.client.particle.ParticleProviderRegistry;
-import dev.architectury.registry.registries.DeferredRegister;
-import dev.architectury.registry.registries.RegistrySupplier;
-import dev.architectury.utils.Env;
+import me.shedaniel.architectury.platform.Platform;
+import me.shedaniel.architectury.registry.DeferredRegister;
+import me.shedaniel.architectury.registry.RegistrySupplier;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigHolder;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
@@ -14,13 +12,13 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.particle.ParticleType;
 import net.minecraft.util.registry.Registry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.Log4J2LoggerFactory;
 import virtuoel.pehkui.api.ScaleTypes;
 
 public class FPPClient {
 	public static final String MOD_ID = "footprintparticle";
-	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+	public static final InternalLogger LOGGER = Log4J2LoggerFactory.getInstance(MOD_ID);
 
 	public static final ConfigHolder<FPPConfig> CONFIGHOLDER = AutoConfig.register(FPPConfig.class, GsonConfigSerializer::new);
 	public static final FPPConfig CONFIG = CONFIGHOLDER.getConfig();
@@ -34,12 +32,10 @@ public class FPPClient {
 
 	public static void onInitializeClient() {
         PARTICLE.register();
-		if (Platform.getEnvironment() == Env.CLIENT) {
-			ParticleProviderRegistry.register(FOOTPRINT, FootprintParticle.DefaultFactory::new);
-			ParticleProviderRegistry.register(WATERMARK, WatermarkParticle.DefaultFactory::new);
-			ParticleProviderRegistry.register(SNOWDUST, SnowDustParticle.DefaultFactory::new);
-			ParticleProviderRegistry.register(WATERSPLASH, WaterSplashParticle.DefaultFactory::new);
-		}
+		/*
+		 * Architectury's particle registries has a critical issue in 1.16.5 and has not been resolved yet,
+		 * so we can only register the particle per platform manually.
+		 */
 	}
 
 	public static float getEntityScale(LivingEntity entity) {
