@@ -79,7 +79,8 @@ public class FPPConfig implements ConfigData {
 	private float railFlameRange = 0.2f;
 	private boolean enableBoatTrail = true;
 	private int swimPopLevel = 2;
-	private boolean enableSnowDust = true;
+	private int snowDustLevel = 2;
+	private int waterSplashLevel = 1;
 
 	public boolean isEnable() {return enableMod;}
 	public float getSecPerPrint() {return secPerPrint;}
@@ -99,7 +100,8 @@ public class FPPConfig implements ConfigData {
 	public float getRailFlameRange() {return railFlameRange;}
 	public boolean isEnableBoatTrail() {return enableBoatTrail;}
 	public int getSwimPopLevel() {return swimPopLevel;}
-	public boolean isEnableSnowDust() {return enableSnowDust;}
+	public int getSnowDustLevel() {return snowDustLevel;}
+	public int getWaterSplashLevel() {return waterSplashLevel;}
 
 	public void setEnableMod(boolean isEnable) {enableMod = isEnable;}
 	public void setSecPerPrint(float sec) {secPerPrint = sec;}
@@ -119,6 +121,6 @@ public class FPPConfig implements ConfigData {
 	public void setRailFlameRange(float railFlameRange) {this.railFlameRange = railFlameRange;}
 	public void setEnableBoatTrail(boolean enableBoatTrail) {this.enableBoatTrail = enableBoatTrail;}
 	public void setSwimPopLevel(int swimPopLevel) {this.swimPopLevel = swimPopLevel;}
-	public void setEnableSnowDust(boolean enableSnowDust) {this.enableSnowDust = enableSnowDust;}
-
+	public void setSnowDustLevel(int snowDustLevel) {this.snowDustLevel = snowDustLevel;}
+	public void setWaterSplashLevel(int waterSplashLevel) {this.waterSplashLevel = waterSplashLevel;}
 }
