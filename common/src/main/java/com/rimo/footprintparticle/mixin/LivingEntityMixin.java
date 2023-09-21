@@ -107,7 +107,7 @@ public abstract class LivingEntityMixin extends Entity {
 
 		// Check block type...
 		var pos = new BlockPos((int) px, (int) py, (int) pz);
-		var canGen = isPrintCanGen(pos) && !this.getWorld().getBlockState(pos).isAir();
+		var canGen = isPrintCanGen(pos) && this.getWorld().getBlockState(pos).isOpaque();
 		if (!canGen) {
 			pos = new BlockPos((int) px, (int) py - 1, (int) pz);
 			canGen = isPrintCanGen(pos) && this.getWorld().getBlockState(pos).isOpaque() && Block.isShapeFullCube(this.getWorld().getBlockState(pos).getCollisionShape(this.getWorld(), pos));
@@ -131,15 +131,20 @@ public abstract class LivingEntityMixin extends Entity {
 				}
 
 				// Snow Dust
-				if (FPPClient.CONFIG.isEnableSnowDust() && block.isOf(Blocks.SNOW))
-					for (int i = 0; i < 2; i++) {
+				if (block.isOf(Blocks.SNOW) &&
+						(FPPClient.CONFIG.getSnowDustLevel() == 2 ||
+								(FPPClient.CONFIG.getSnowDustLevel() == 1 && this.isPlayer()))) {
+					int i = this.isSprinting() ? 4 : 2;
+					int v = this.isSprinting() ? 3 : 10;
+					while (-- i >= 0) {
 						SnowDustParticleType snowdust = FPPClient.SNOWDUST.get();
 						this.getWorld().addParticle(snowdust.setData(FPPClient.getEntityScale((LivingEntity) (Object) this)), px, py, pz,
-								(Math.random() - 0.5f) / 10f,
+								(Math.random() - 0.5f) / v,
 								0,
-								(Math.random() - 0.5f) / 10f
+								(Math.random() - 0.5f) / v
 						);
 					}
+				}
 
 			} catch (Exception e) {
 				// Ignore...
@@ -147,7 +152,7 @@ public abstract class LivingEntityMixin extends Entity {
 		}
 
 		// Generate
-		double dx, dz;
+		double dx, dz;      // get facing
 		if (this.getVelocity().horizontalLength() == 0) {
 			dx = -MathHelper.sin((float) Math.toRadians(this.getRotationClient().y));
 			dz =  MathHelper.cos((float) Math.toRadians(this.getRotationClient().y));
@@ -155,13 +160,32 @@ public abstract class LivingEntityMixin extends Entity {
 			dx = this.getVelocity().getX();
 			dz = this.getVelocity().getZ();
 		}
-		if (canGen) {
+		if (canGen) {       // footprint
 			FootprintParticleType footprint = FPPClient.FOOTPRINT.get();
 			this.getWorld().addParticle(footprint.setData((LivingEntity) (Object) this), px, py, pz, dx, 0, dz);
-		} else if (wetTimer <= FPPClient.CONFIG.getWetDuration() * 20) {
+		} else if (wetTimer <= FPPClient.CONFIG.getWetDuration() * 20) {        // waterprint (gen when footprint not gen)
 			WatermarkParticleType watermark = FPPClient.WATERMARK.get();
 			var i = Math.random() > 0.5f ? 1 : -1;
 			this.getWorld().addParticle(watermark.setData((LivingEntity) (Object) this), px, py, pz, dx * i, wetTimer, dz * i);		// push timer to calc alpha
+		}
+		// water splash (gen whatever print gen)
+		if (wetTimer <= FPPClient.CONFIG.getWetDuration() * 20 &&
+				(FPPClient.CONFIG.getWaterSplashLevel() == 2 ||
+						(FPPClient.CONFIG.getWaterSplashLevel() == 1 && this.isPlayer()))) {
+			float range = FPPClient.getEntityScale((LivingEntity) (Object) this);
+			int i = (int)((this.isSprinting() ? 18 : 10) * Math.max((0.7f - (float) wetTimer / (FPPClient.CONFIG.getWetDuration() * 20)), 0));
+			int v = this.isSprinting() ? 3 : 6;
+			while (--i > 0) {
+				this.getWorld().addParticle(
+						FPPClient.WATERSPLASH.get(),
+						px - 0.25f * range + Math.random() / 4,
+						py,
+						pz - 0.25f * range + Math.random() / 4,
+						(Math.random() - 0.5f) / v,
+						0.02f + Math.random() * this.getVelocity().horizontalLength(),
+						(Math.random() - 0.5f) / v
+				);
+			}
 		}
 	}
 
