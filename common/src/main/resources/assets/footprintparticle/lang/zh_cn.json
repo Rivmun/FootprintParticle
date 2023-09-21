@@ -32,6 +32,7 @@
 	"text.footprintparticle.option.boatTrail": "船只行驶时产生水花",
 	"text.footprintparticle.option.swimPop": "游泳时产生气泡",
 	"text.footprintparticle.option.snowDust": "扬起雪花（当在雪中生成脚印时）",
+	"text.footprintparticle.option.waterSplash": "溅起水花（当在雨中行走时）",
 	"text.footprintparticle.playerOnly": "仅玩家",
 	"text.footprintparticle.all": "全部",
 
