@@ -30,6 +30,7 @@ public class FPPClient {
 	public static final RegistrySupplier<FootprintParticleType> FOOTPRINT = PARTICLE.register("footprint", () -> new FootprintParticleType(false));
 	public static final RegistrySupplier<WatermarkParticleType> WATERMARK = PARTICLE.register("watermark", () -> new WatermarkParticleType(false));
 	public static final RegistrySupplier<SnowDustParticleType> SNOWDUST = PARTICLE.register("snowdust", () -> new SnowDustParticleType(false));
+	public static final RegistrySupplier<WaterSplashParticleType> WATERSPLASH = PARTICLE.register("watersplash", () -> new WaterSplashParticleType(false));
 
 	public static void onInitializeClient() {
         PARTICLE.register();
@@ -37,6 +38,7 @@ public class FPPClient {
 			ParticleProviderRegistry.register(FOOTPRINT, FootprintParticle.DefaultFactory::new);
 			ParticleProviderRegistry.register(WATERMARK, WatermarkParticle.DefaultFactory::new);
 			ParticleProviderRegistry.register(SNOWDUST, SnowDustParticle.DefaultFactory::new);
+			ParticleProviderRegistry.register(WATERSPLASH, WaterSplashParticle.DefaultFactory::new);
 		}
 	}
 
