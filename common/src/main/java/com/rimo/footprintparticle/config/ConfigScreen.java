@@ -203,25 +203,38 @@ public class ConfigScreen {
 						,0
 						,2)
 				.setDefaultValue(2)
-				.setTextGetter(value -> {
-					if (value == 0) {
-						return Text.translatable("text.footprintparticle.disabled");
-					} else if (value == 1) {
-						return Text.translatable("text.footprintparticle.playerOnly");
-					} else {
-						return Text.translatable("text.footprintparticle.all");
-					}
-				})
+				.setTextGetter(this::getAllMobOrPlayerOnlyText)
 				.setSaveConsumer(config::setSwimPopLevel)
 				.build()
 		);
 		misc.addEntry(entryBuilder
-				.startBooleanToggle(Text.translatable("text.footprintparticle.option.snowDust")
-						,config.isEnableSnowDust())
-				.setDefaultValue(true)
-				.setSaveConsumer(config::setEnableSnowDust)
+				.startIntSlider(Text.translatable("text.footprintparticle.option.snowDust")
+						,config.getSnowDustLevel()
+						,0
+						,2)
+				.setDefaultValue(2)
+				.setTextGetter(this::getAllMobOrPlayerOnlyText)
+				.setSaveConsumer(config::setSnowDustLevel)
+				.build()
+		);
+		misc.addEntry(entryBuilder
+				.startIntSlider(Text.translatable("text.footprintparticle.option.waterSplash")
+						,config.getWaterSplashLevel()
+						,0
+						,2)
+				.setDefaultValue(1)
+				.setTextGetter(this::getAllMobOrPlayerOnlyText)
+				.setSaveConsumer(config::setWaterSplashLevel)
 				.build()
 		);
 	}
 
+	private Text getAllMobOrPlayerOnlyText(int value) {
+		switch (value) {
+			case 0 -> {return Text.translatable("text.footprintparticle.disabled");}
+			case 1 -> {return Text.translatable("text.footprintparticle.playerOnly");}
+			case 2 -> {return Text.translatable("text.footprintparticle.all");}
+			default -> {return Text.of("");}
+		}
+	}
 }

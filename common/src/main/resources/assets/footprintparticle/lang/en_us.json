@@ -32,6 +32,7 @@
 	"text.footprintparticle.option.boatTrail": "Boattttrail",
 	"text.footprintparticle.option.swimPop": "Pop up when swimming",
 	"text.footprintparticle.option.snowDust": "Kick up snow (when print gen on it)",
+	"text.footprintparticle.option.waterSplash": "Kick up splash (when walking on rain)",
 	"text.footprintparticle.playerOnly": "Player Only",
 	"text.footprintparticle.all": "All"
 }
