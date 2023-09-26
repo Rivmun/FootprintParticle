@@ -106,10 +106,10 @@ public abstract class LivingEntityMixin extends Entity {
 		}
 
 		// Check block type...
-		var pos = new BlockPos((int) px, (int) py, (int) pz);
+		var pos = new BlockPos(MathHelper.floor(px), MathHelper.floor(py), MathHelper.floor(pz));
 		var canGen = isPrintCanGen(pos) && this.getWorld().getBlockState(pos).isOpaque();
 		if (!canGen) {
-			pos = new BlockPos((int) px, (int) py - 1, (int) pz);
+			pos = new BlockPos(MathHelper.floor(px), MathHelper.floor(py) - 1, MathHelper.floor(pz));
 			canGen = isPrintCanGen(pos) && this.getWorld().getBlockState(pos).isOpaque() && Block.isShapeFullCube(this.getWorld().getBlockState(pos).getCollisionShape(this.getWorld(), pos));
 		} else {
 			// Fix height by blocks if in...
