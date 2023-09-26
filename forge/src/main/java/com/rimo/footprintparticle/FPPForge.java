@@ -9,7 +9,6 @@ import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.network.NetworkConstants;
 
 @Mod(FPPClient.MOD_ID)
 public class FPPForge {
@@ -18,15 +17,13 @@ public class FPPForge {
 		EventBuses.registerModEventBus(FPPClient.MOD_ID, FMLJavaModLoadingContext.get().getModEventBus());
 		FPPClient.onInitializeClient();
 
-		ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> NetworkConstants.IGNORESERVERONLY, (a, b) -> true));
+		ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> IExtensionPoint.DisplayTest.IGNORESERVERONLY, (a, b) -> true));
 		DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> FPPForge::registerModsPage);
 
 		DistExecutor.safeRunWhenOn(Dist.DEDICATED_SERVER, () -> () -> FPPClient.LOGGER.warn("'FootprintParticle' is a client side mod, it's should be removed from server mod folder."));
 	}
 
 	public static void registerModsPage() {
-		ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () -> new ConfigScreenHandler.ConfigScreenFactory((client, parent) -> {
-			return new ConfigScreen().buildScreen();
-		}));
+		ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () -> new ConfigScreenHandler.ConfigScreenFactory((client, parent) -> new ConfigScreen().buildScreen()));
 	}
 }
