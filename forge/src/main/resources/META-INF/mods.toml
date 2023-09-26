@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[45,)"
+loaderVersion = "[45,48)"
 issueTrackerURL = "https://github.com/Rivmun/FootprintParticle/issues"
 license = "MIT"
 
@@ -16,14 +16,14 @@ logoFile = "icon.png"
 [[dependencies.footprintparticle]]
 modId = "forge"
 mandatory = true
-versionRange = "[45,)"
+versionRange = "[45,48)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.footprintparticle]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.19.4,)"
+versionRange = "[1.19.4,1.20.1)"
 ordering = "NONE"
 side = "BOTH"
 

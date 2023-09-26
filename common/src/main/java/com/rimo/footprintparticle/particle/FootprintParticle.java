@@ -49,7 +49,7 @@ public class FootprintParticle extends SpriteBillboardParticle {
 		if (this.age > this.maxAge / 2)
 			this.alpha -= this.startAlpha / this.maxAge * 2;
 
-		if (this.age++ >= this.maxAge || this.world.isAir(new BlockPos((int) this.x, (int) (this.y - 0.02f), (int) this.z)))
+		if (this.age++ >= this.maxAge || this.world.isAir(new BlockPos(MathHelper.floor(this.x), MathHelper.floor(this.y - 0.02f), MathHelper.floor(this.z))))
 			this.markDead();
 	}
 
