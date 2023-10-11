@@ -83,8 +83,8 @@ public class ConfigScreen {
 						,1
 						,10)
 				.setDefaultValue(7)
-				.setTextGetter(value -> {return Text.of(value * 10 + "%");})
-				.setSaveConsumer(value -> {config.setFootprintAlpha(value / 10f);})
+				.setTextGetter(value -> Text.of(value * 10 + "%"))
+				.setSaveConsumer(value -> config.setFootprintAlpha(value / 10f))
 				.build()
 		);
 		general.addEntry(entryBuilder
@@ -93,8 +93,16 @@ public class ConfigScreen {
 						,1
 						,10)
 				.setDefaultValue(4)
-				.setTextGetter(value -> {return Text.of(value * 10 + "%");})
-				.setSaveConsumer(value -> {config.setWatermarkAlpha(value / 10f);})
+				.setTextGetter(value -> Text.of(value * 10 + "%"))
+				.setSaveConsumer(value -> config.setWatermarkAlpha(value / 10f))
+				.build()
+		);
+		general.addEntry(entryBuilder
+				.startFloatField(Text.translatable("text.footprintparticle.option.footprintSize")
+						,config.getFootprintSize())
+				.setDefaultValue(0.15625f)
+				.setTooltip(Text.translatable("text.footprintparticle.option.footprintSize.@Tooltip"))
+				.setSaveConsumer(config::setFootprintSize)
 				.build()
 		);
 		general.addEntry(entryBuilder
@@ -103,7 +111,7 @@ public class ConfigScreen {
 						,-8
 						,8)
 				.setDefaultValue(0)
-				.setTextGetter(value -> {return Text.translatable("text.footprintparticle.blocks", value * 0.0625f);})
+				.setTextGetter(value -> Text.translatable("text.footprintparticle.blocks", value * 0.0625f))
 				.setTooltip(Text.translatable("text.footprintparticle.option.printHeight.@Tooltip"))
 				.setSaveConsumer(value -> config.setPrintHeight(value * 0.0625f))
 				.build()

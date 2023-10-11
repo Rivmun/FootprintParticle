@@ -36,5 +36,7 @@
 	"text.footprintparticle.playerOnly": "Player Only",
 	"text.footprintparticle.all": "All",
 	"text.footprintparticle.option.mobInterval": "Mob Interval",
-	"text.footprintparticle.option.mobInterval.@Tooltip": "Mob in this list which SecondPerPrint\nwill multiply by specific value.\nFormat: §9§omodid:mobid,value§r"
+	"text.footprintparticle.option.mobInterval.@Tooltip": "Mob in this list which SecondPerPrint\nwill multiply by specific value.\nFormat: §9§omodid:mobid,value§r",
+	"text.footprintparticle.option.footprintSize": "Footprint Size",
+	"text.footprintparticle.option.footprintSize.@Tooltip": "Measure in blocks. \nChange it to half the texture width for better visual if you using custom texture.\nNormally, 1 pixel needs 0.03125 print size."
 }

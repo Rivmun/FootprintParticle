@@ -37,6 +37,8 @@
 	"text.footprintparticle.all": "全部",
 	"text.footprintparticle.option.mobInterval": "生成间隔倍率",
 	"text.footprintparticle.option.mobInterval.@Tooltip": "列表中生物的脚印生成间隔会乘以指定倍率。\n格式: §9§omodid:mobid,value§r",
+	"text.footprintparticle.option.footprintSize": "脚印大小",
+	"text.footprintparticle.option.footprintSize.@Tooltip": "单位为方块。\n为了更好的显示效果，当你在使用自定义脚印纹理时\n需要将该值设置为纹理宽度的一半。\n通常来说，每个像素对应0.03125脚印大小。",
 
 	"modmenu.descriptionTranslation.footprintparticle": "一个简单地为生物和玩家添加脚印粒子的模组。"
 }
