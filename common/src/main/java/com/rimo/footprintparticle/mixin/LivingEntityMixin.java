@@ -84,26 +84,61 @@ public abstract class LivingEntityMixin extends Entity {
 		if (!FPPClient.CONFIG.getCanGenWhenInvisible() && this.isInvisible())
 			return;
 
+		// Set Interval
 		timer = this.isSprinting() ? (int) (FPPClient.CONFIG.getSecPerPrint() * 13.33f) : (int) (FPPClient.CONFIG.getSecPerPrint() * 20);
+		for (String stream : FPPClient.CONFIG.getMobInterval()) {
+			String[] str = stream.split(",");
+			if (str[0].equals(EntityType.getId(this.getType()).toString())) {
+				try {
+					timer *= Float.parseFloat(str[1]);
+				} catch (Exception e) {
+					//
+				}
+				break;
+			}
+		}
 
 		// Fix pos...
 		var px = this.getX();
 		var py = this.getY() + 0.01f + FPPClient.CONFIG.getPrintHeight();
 		var pz = this.getZ();
 
-		// Horse and spider pos set on besides...
-		if (FPPClient.CONFIG.getHorseLikeMobs().contains(EntityType.getId(this.getType()).toString())) {
-			var i = Math.random() > 0.5f ? 1 : -1;		// Random sides
-			px = px - 0.75f * i * MathHelper.sin((float) Math.toRadians(this.getRotationClient().y));
-			pz = pz + 0.75f * i * MathHelper.cos((float) Math.toRadians(this.getRotationClient().y));
-			timer = (int) (this.getControllingPassenger() != null ? this.getControllingPassenger().isPlayer() ? timer * 0.5f : timer * 1.33f : timer * 1.33f);
+		// Horizontal Offset
+		// Front and back
+		var side = Math.random() > 0.5f ? 1 : -1;
+		var hOffset = 0.0625f;
+		for (String stream : FPPClient.CONFIG.getHorseLikeMobs()) {
+			String[] str = stream.split(",");
+			if (str[0].equals(EntityType.getId(this.getType()).toString())) {
+				hOffset = 0.75f;
+				try {
+					hOffset = Float.parseFloat(str[1]);
+				} catch (Exception e) {
+					//
+				}
+				timer = (int) (this.getControllingPassenger() != null ? this.getControllingPassenger().isPlayer() ? timer * 0.5f : timer * 1.33f : timer * 1.33f);
+				break;
+			}
 		}
-		if (FPPClient.CONFIG.getSpiderLikeMobs().contains(EntityType.getId(this.getType()).toString())) {
-			var i = Math.random() > 0.5f ? 1 : -1;
-			px = px - 0.90f * i * MathHelper.sin((float) Math.toRadians(this.getRotationClient().y + 90));
-			pz = pz + 0.90f * i * MathHelper.cos((float) Math.toRadians(this.getRotationClient().y + 90));
-			timer *= 0.66f;
+		px = px - hOffset * side * MathHelper.sin((float) Math.toRadians(this.getRotationClient().y));
+		pz = pz + hOffset * side * MathHelper.cos((float) Math.toRadians(this.getRotationClient().y));
+		// Left and right
+		side = Math.random() > 0.5f ? 1 : -1;
+		hOffset = 0.125f;
+		for (String stream : FPPClient.CONFIG.getSpiderLikeMobs()) {
+			String[] str = stream.split(",");
+			if (str[0].equals(EntityType.getId(this.getType()).toString())) {
+				hOffset = 0.9f;
+				try {
+					hOffset = Float.parseFloat(str[1]);
+				} catch (Exception e) {
+					//
+				}
+				break;
+			}
 		}
+		px = px - hOffset * side * MathHelper.sin((float) Math.toRadians(this.getRotationClient().y + 90));
+		pz = pz + hOffset * side * MathHelper.cos((float) Math.toRadians(this.getRotationClient().y + 90));
 
 		// Check block type...
 		var pos = new BlockPos(MathHelper.floor(px), MathHelper.floor(py), MathHelper.floor(pz));
