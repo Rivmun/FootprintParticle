@@ -84,8 +84,16 @@ public class ConfigScreen {
 						,1
 						,10)
 				.setDefaultValue(7)
-				.setTextGetter(value -> {return Text.of(value * 10 + "%");})
-				.setSaveConsumer(value -> {config.setFootprintAlpha(value / 10f);})
+				.setTextGetter(value -> Text.of(value * 10 + "%"))
+				.setSaveConsumer(value -> config.setFootprintAlpha(value / 10f))
+				.build()
+		);
+		general.addEntry(entryBuilder
+				.startFloatField(new TranslatableText("text.footprintparticle.option.footprintSize")
+						,config.getFootprintSize())
+				.setDefaultValue(0.15625f)
+				.setTooltip(new TranslatableText("text.footprintparticle.option.footprintSize.@Tooltip"))
+				.setSaveConsumer(config::setFootprintSize)
 				.build()
 		);
 		general.addEntry(entryBuilder
@@ -94,8 +102,8 @@ public class ConfigScreen {
 						,1
 						,10)
 				.setDefaultValue(4)
-				.setTextGetter(value -> {return Text.of(value * 10 + "%");})
-				.setSaveConsumer(value -> {config.setWatermarkAlpha(value / 10f);})
+				.setTextGetter(value -> Text.of(value * 10 + "%"))
+				.setSaveConsumer(value -> config.setWatermarkAlpha(value / 10f))
 				.build()
 		);
 		general.addEntry(entryBuilder
@@ -104,7 +112,7 @@ public class ConfigScreen {
 						,-8
 						,8)
 				.setDefaultValue(0)
-				.setTextGetter(value -> {return new TranslatableText("text.footprintparticle.blocks", value * 0.0625f);})
+				.setTextGetter(value -> new TranslatableText("text.footprintparticle.blocks", value * 0.0625f))
 				.setTooltip(new TranslatableText("text.footprintparticle.option.printHeight.@Tooltip"))
 				.setSaveConsumer(value -> config.setPrintHeight(value * 0.0625f))
 				.build()
@@ -146,6 +154,14 @@ public class ConfigScreen {
 				.setDefaultValue(FPPConfig.DEF_MODS)
 				.setTooltip(new TranslatableText("text.footprintparticle.option.excludedMobs.@Tooltip"))
 				.setSaveConsumer(config::setExcludedMobs)
+				.build()
+		);
+		general.addEntry(entryBuilder
+				.startStrList(new TranslatableText("text.footprintparticle.option.mobInterval")
+						,config.getMobInterval())
+				.setDefaultValue(FPPConfig.DEF_MOB_INTERVAL)
+				.setTooltip(new TranslatableText("text.footprintparticle.option.mobInterval.@Tooltip"))
+				.setSaveConsumer(config::setMobInterval)
 				.build()
 		);
 		general.addEntry(entryBuilder
