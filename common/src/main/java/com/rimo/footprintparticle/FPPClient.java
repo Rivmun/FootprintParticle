@@ -49,7 +49,7 @@ public class FPPClient {
 			for (String str : FPPClient.CONFIG.getSizePerMob()) {
 				String[] str2 = str.split(",");
 				if (str2[0].contentEquals(EntityType.getId(entity.getType()).toString())) {
-					scale = Float.parseFloat(str2[1]);
+					scale *= Float.parseFloat(str2[1]);
 				}
 			}
 		} catch (Exception e) {

@@ -1,8 +1,5 @@
 {
   "textures": [
-    "footprintparticle:footprint_0",
-    "footprintparticle:footprint_1",
-    "footprintparticle:footprint_2",
-    "footprintparticle:footprint_3"
+    "footprintparticle:footprint"
   ]
 }
