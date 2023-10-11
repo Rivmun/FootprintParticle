@@ -29,7 +29,7 @@ public class FootprintParticle extends SpriteBillboardParticle {
 		this.setColorAlpha(FPPClient.CONFIG.getFootprintAlpha());
 		this.angle = (float) MathHelper.atan2(vx, vz);
 		this.maxAge = (int) (FPPClient.CONFIG.getPrintLifetime() * 20);
-		this.scale = 0.5f;
+		this.scale = FPPClient.CONFIG.getFootprintSize();
 	}
 
 	@Override
