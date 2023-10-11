@@ -14,12 +14,12 @@
 	"text.footprintparticle.option.canGenWhenInvisible": "允许为隐形实体生成脚印",
 	"text.footprintparticle.option.excludedMobs": "生物例外",
 	"text.footprintparticle.option.excludedMobs.@Tooltip": "以下生物不会生成脚印。\n格式: §9§omodid:mobid§r",
-	"text.footprintparticle.option.sizePerMob": "脚印大小",
-	"text.footprintparticle.option.sizePerMob.@Tooltip": "为某种生物设置单独的脚印大小。\n格式: §9§omodid:mobid,size§r\n大多数生物的默认大小为 0.5。\n此设置的优先级低于“例外”列表。",
-	"text.footprintparticle.option.horseLikeMobs": "马匹类生物",
-	"text.footprintparticle.option.horseLikeMobs.@Tooltip": "列表中的生物将在前方或后方生成脚印，\n且将自动根据骑乘状态调整生成频率。",
-	"text.footprintparticle.option.spiderLikeMobs": "蜘蛛类生物",
-	"text.footprintparticle.option.spiderLikeMobs.@Tooltip": "列表中的生物将在左右两侧生成脚印，\n且拥有更高的生成频率（以匹配它们的八条腿）。",
+	"text.footprintparticle.option.sizePerMob": "脚印大小倍率",
+	"text.footprintparticle.option.sizePerMob.@Tooltip": "为某种生物设置单独的脚印大小倍率。\n格式: §9§omodid:mobid,size§r\n此设置的优先级低于“例外”列表。",
+	"text.footprintparticle.option.horseLikeMobs": "脚印前后偏移",
+	"text.footprintparticle.option.horseLikeMobs.@Tooltip": "列表中的生物将使用指定的前后偏移值，\n且将自动根据骑乘状态调整生成频率。\n格式: §9§omodid:mobid,wide§r\n如果wide参数留空，则默认使用0.75",
+	"text.footprintparticle.option.spiderLikeMobs": "脚印左右偏移",
+	"text.footprintparticle.option.spiderLikeMobs.@Tooltip": "列表中的生物将使用指定的左右偏移值。\n格式: §9§omodid:mobid,wide§r\n如果wide参数留空，则默认使用0.9",
 	"text.footprintparticle.option.wetDuration": "潮湿时间（水渍）",
 	"text.footprintparticle.option.wetDuration.@Tooltip": "控制当你离开水/雨后依旧生成水渍的时间。\n设为 0 可禁用水渍。\n§l水渍§r会在脚印无法生成时生成，且无视方块列表。",
 	"text.footprintparticle.disabled": "已禁用",
@@ -35,6 +35,8 @@
 	"text.footprintparticle.option.waterSplash": "溅起水花（当在雨中行走时）",
 	"text.footprintparticle.playerOnly": "仅玩家",
 	"text.footprintparticle.all": "全部",
+	"text.footprintparticle.option.mobInterval": "生成间隔倍率",
+	"text.footprintparticle.option.mobInterval.@Tooltip": "列表中生物的脚印生成间隔会乘以指定倍率。\n格式: §9§omodid:mobid,value§r",
 
 	"modmenu.descriptionTranslation.footprintparticle": "一个简单地为生物和玩家添加脚印粒子的模组。"
 }

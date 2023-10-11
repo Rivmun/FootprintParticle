@@ -148,6 +148,14 @@ public class ConfigScreen {
 				.build()
 		);
 		general.addEntry(entryBuilder
+				.startStrList(Text.translatable("text.footprintparticle.option.mobInterval")
+						,config.getMobInterval())
+				.setDefaultValue(FPPConfig.DEF_MOB_INTERVAL)
+				.setTooltip(Text.translatable("text.footprintparticle.option.mobInterval.@Tooltip"))
+				.setSaveConsumer(config::setMobInterval)
+				.build()
+		);
+		general.addEntry(entryBuilder
 				.startStrList(Text.translatable("text.footprintparticle.option.sizePerMob")
 						,config.getSizePerMob())
 				.setDefaultValue(FPPConfig.DEF_SIZE)
