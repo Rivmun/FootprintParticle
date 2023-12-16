@@ -1,6 +1,7 @@
 package com.rimo.footprintparticle.mixin;
 
 import com.rimo.footprintparticle.FPPClient;
+import com.rimo.footprintparticle.Util;
 import com.rimo.footprintparticle.particle.FootprintParticleType;
 import com.rimo.footprintparticle.particle.SnowDustParticleType;
 import com.rimo.footprintparticle.particle.WatermarkParticleType;
@@ -62,7 +63,7 @@ public abstract class LivingEntityMixin extends Entity {
 		if (this.isSwimming() &&
 				(FPPClient.CONFIG.getSwimPopLevel() == 2 ||
 				(FPPClient.CONFIG.getSwimPopLevel() == 1 && this.isPlayer()))) {
-			float range = FPPClient.getEntityScale((LivingEntity) (Object) this);
+			float range = Util.getEntityScale((LivingEntity) (Object) this);
 			this.getWorld().addParticle(
 					ParticleTypes.BUBBLE,
 					this.getX() + Math.random() - 0.5f * range,
@@ -77,7 +78,8 @@ public abstract class LivingEntityMixin extends Entity {
 
 	@Unique
 	public void footprintGenerator() {
-		if (!FPPClient.CONFIG.isEnable())
+		if (FPPClient.CONFIG.isEnable() == 0 ||
+				(FPPClient.CONFIG.isEnable() == 1 && !this.isPlayer()))
 			return;
 		if (FPPClient.CONFIG.getExcludedMobs().contains(EntityType.getId(this.getType()).toString()))
 			return;
@@ -173,7 +175,7 @@ public abstract class LivingEntityMixin extends Entity {
 					int v = this.isSprinting() ? 3 : 10;
 					while (--i >= 0) {
 						SnowDustParticleType snowdust = FPPClient.SNOWDUST.get();
-						this.getWorld().addParticle(snowdust.setData(FPPClient.getEntityScale((LivingEntity) (Object) this)), px, py, pz,
+						this.getWorld().addParticle(snowdust.setData(Util.getEntityScale((LivingEntity) (Object) this)), px, py, pz,
 								(Math.random() - 0.5f) / v,
 								0,
 								(Math.random() - 0.5f) / v
@@ -207,7 +209,7 @@ public abstract class LivingEntityMixin extends Entity {
 		if (wetTimer <= FPPClient.CONFIG.getWetDuration() * 20 &&
 				(FPPClient.CONFIG.getWaterSplashLevel() == 2 ||
 				(FPPClient.CONFIG.getWaterSplashLevel() == 1 && this.isPlayer()))) {
-			float range = FPPClient.getEntityScale((LivingEntity) (Object) this);
+			float range = Util.getEntityScale((LivingEntity) (Object) this);
 			int i = (int)((this.isSprinting() ? 18 : 10) * Math.max((0.7f - (float) wetTimer / (FPPClient.CONFIG.getWetDuration() * 20)), 0));
 			int v = this.isSprinting() ? 3 : 6;
 			while (--i > 0) {

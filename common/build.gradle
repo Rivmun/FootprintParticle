@@ -14,6 +14,8 @@ dependencies {
     modApi "dev.architectury:architectury:${rootProject.architectury_version}"
     // Pehkui
     modApi "com.github.Virtuoel:Pehkui:${rootProject.pehkui_version}"
+    // RandomMobSizes
+    modImplementation "curse.maven:random-mob-sizes-555230:4607731"
 
     // Cloth Config
     modCompileOnly("me.shedaniel.cloth:cloth-config:${rootProject.cloth_config_version}") {
