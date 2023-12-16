@@ -75,7 +75,7 @@ public class FPPConfig implements ConfigData {
 			"minecraft:creeper,0.8"
 	);
 	static final List<String> DEF_CUSTOM_PRINT = Arrays.asList(
-			"minecraft:cat,cat"
+			"mod_id:mob_id,fileName_NoExtend"
 	);
 
 	private int enableMod = 2;
