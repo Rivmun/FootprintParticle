@@ -10,13 +10,10 @@ import dev.architectury.utils.Env;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigHolder;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.particle.ParticleType;
 import net.minecraft.registry.RegistryKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import virtuoel.pehkui.api.ScaleTypes;
 
 public class FPPClient {
 	public static final String MOD_ID = "footprintparticle";
@@ -40,28 +37,5 @@ public class FPPClient {
 			ParticleProviderRegistry.register(SNOWDUST, SnowDustParticle.DefaultFactory::new);
 			ParticleProviderRegistry.register(WATERSPLASH, WaterSplashParticle.DefaultFactory::new);
 		}
-	}
-
-	public static float getEntityScale(LivingEntity entity) {
-		float scale = 1f;
-
-		try {
-			for (String str : FPPClient.CONFIG.getSizePerMob()) {
-				String[] str2 = str.split(",");
-				if (str2[0].contentEquals(EntityType.getId(entity.getType()).toString())) {
-					scale *= Float.parseFloat(str2[1]);
-				}
-			}
-		} catch (Exception e) {
-			// Ignore...
-		}
-
-		if (Platform.isModLoaded("pehkui"))
-			scale *= ScaleTypes.BASE.getScaleData(entity).getScale();
-
-		if (entity.isBaby())
-			scale *= 0.66f;
-
-		return scale;
 	}
 }
