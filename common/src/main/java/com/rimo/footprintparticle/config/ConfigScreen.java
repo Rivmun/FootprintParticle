@@ -32,9 +32,12 @@ public class ConfigScreen {
 
 	private void buildCategory() {
 		general.addEntry(entryBuilder
-				.startBooleanToggle(new TranslatableText("text.footprintparticle.option.enableMod")
-						,config.isEnable())
-				.setDefaultValue(true)
+				.startIntSlider(new TranslatableText("text.footprintparticle.option.enableMod")
+						,config.isEnable()
+						,0
+						,2)
+				.setDefaultValue(2)
+				.setTextGetter(this::getAllMobOrPlayerOnlyText)
 				.setSaveConsumer(config::setEnableMod)
 				.build()
 		);
@@ -96,14 +99,6 @@ public class ConfigScreen {
 				.setDefaultValue(4)
 				.setTextGetter(value -> Text.of(value * 10 + "%"))
 				.setSaveConsumer(value -> config.setWatermarkAlpha(value / 10f))
-				.build()
-		);
-		general.addEntry(entryBuilder
-				.startFloatField(new TranslatableText("text.footprintparticle.option.footprintSize")
-						,config.getFootprintSize())
-				.setDefaultValue(0.15625f)
-				.setTooltip(new TranslatableText("text.footprintparticle.option.footprintSize.@Tooltip"))
-				.setSaveConsumer(config::setFootprintSize)
 				.build()
 		);
 		general.addEntry(entryBuilder
@@ -186,6 +181,22 @@ public class ConfigScreen {
 				.setDefaultValue(FPPConfig.DEF_EIGHT_LEGS)
 				.setTooltip(new TranslatableText("text.footprintparticle.option.spiderLikeMobs.@Tooltip"))
 				.setSaveConsumer(config::setSpiderLikeMobs)
+				.build()
+		);
+		general.addEntry(entryBuilder
+				.startStrList(new TranslatableText("text.footprintparticle.option.customPrint")
+						,config.getCustomPrint())
+				.setDefaultValue(FPPConfig.DEF_CUSTOM_PRINT)
+				.setTooltip(new TranslatableText("text.footprintparticle.option.customPrint.@Tooltip"))
+				.setSaveConsumer(config::setCustomPrint)
+				.build()
+		);
+		general.addEntry(entryBuilder
+				.startIntField(new TranslatableText("text.footprintparticle.option.footprintSize")
+						,config.getFootprintSize())
+				.setDefaultValue(5)
+				.setTooltip(new TranslatableText("text.footprintparticle.option.footprintSize.@Tooltip"))
+				.setSaveConsumer(config::setFootprintSize)
 				.build()
 		);
 	}

@@ -6,9 +6,9 @@
   "mixins": [
   ],
   "client": [
-    "LivingEntityMixin",
+    "AbstractMinecartEntityMixin",
     "BoatEntityMixin",
-    "AbstractMinecartEntityMixin"
+    "LivingEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1
