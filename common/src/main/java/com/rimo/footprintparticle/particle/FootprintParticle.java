@@ -36,7 +36,7 @@ public class FootprintParticle extends SpriteBillboardParticle {
 		try {
 			this.setSprite(spriteList.get((int) (Math.random() * spriteList.size())));
 		} catch (Exception e) {
-			FPPClient.LOGGER.error("Wrong customization in FootprintParticle, please check.");
+			FPPClient.LOGGER.error("Wrong custom texture for " + EntityType.getId(parameters.entity.getType()).toString() + ", please check.");
 			this.setSprite(spriteProvider);
 		}
 	}
