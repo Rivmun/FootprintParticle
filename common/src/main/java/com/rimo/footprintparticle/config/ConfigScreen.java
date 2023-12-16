@@ -191,9 +191,9 @@ public class ConfigScreen {
 				.build()
 		);
 		general.addEntry(entryBuilder
-				.startFloatField(Text.translatable("text.footprintparticle.option.footprintSize")
+				.startIntField(Text.translatable("text.footprintparticle.option.footprintSize")
 						,config.getFootprintSize())
-				.setDefaultValue(0.15625f)
+				.setDefaultValue(5)
 				.setTooltip(Text.translatable("text.footprintparticle.option.footprintSize.@Tooltip"))
 				.setSaveConsumer(config::setFootprintSize)
 				.build()

@@ -37,8 +37,8 @@
 	"text.footprintparticle.all": "All",
 	"text.footprintparticle.option.mobInterval": "Mob Interval",
 	"text.footprintparticle.option.mobInterval.@Tooltip": "Mob in this list which SecondPerPrint\nwill multiply by specific value.\nFormat: §9§omodid:mobid,value§r",
-	"text.footprintparticle.option.footprintSize": "Footprint Size",
-	"text.footprintparticle.option.footprintSize.@Tooltip": "Measure in blocks. \nChange it to half the texture width for better visual if you using custom texture.\nNormally, 1 pixel needs 0.03125 print size.",
+	"text.footprintparticle.option.footprintSize": "General Footprint Size",
+	"text.footprintparticle.option.footprintSize.@Tooltip": "Measure in pixel. \nChange it to actual texture width for better visual if you using custom texture.",
 	"text.footprintparticle.option.customPrint": "Custom Print Texture",
 	"text.footprintparticle.option.customPrint.@Tooltip": "Set a specific texture for a specific mob.\nFormat: §9§omodid:mobid,fileName1,fileName2,...§r\n§5file§r must be a PNG and located at\n§oassets/footprintparticle/textures/particle§r\nin your resourcepack.\nMeanwhile, you need to register it at\n§oassets/footprintparticle/particles/footprint.json§r or\n§oassets/footprintparticle/particles/watermark.json§r\nif you want to replace watermark at same time.\nMore see in wiki."
 }

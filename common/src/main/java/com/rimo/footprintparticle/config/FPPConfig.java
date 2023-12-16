@@ -85,7 +85,7 @@ public class FPPConfig implements ConfigData {
 	private int wetDuration = 10;
 	private float watermarkAlpha = 0.4f;
 	private float footprintAlpha = 0.7f;
-	private float footprintSize = 0.15625f;
+	private int footprintSize = 5;
 	private boolean canGenWhenInvisible = true;
 	private List<String> applyBlocks = DEF_APPLYBLOCKS;
 	private List<String> blockHeight = DEF_BLOCKHEIGHT;
@@ -123,7 +123,7 @@ public class FPPConfig implements ConfigData {
 	public int getSnowDustLevel() {return snowDustLevel;}
 	public int getWaterSplashLevel() {return waterSplashLevel;}
 	public List<String> getMobInterval() {return mobInterval;}
-	public float getFootprintSize() {return footprintSize;}
+	public int getFootprintSize() {return footprintSize;}
 	public List<String> getCustomPrint() {return customPrint;}
 
 	public void setEnableMod(int isEnable) {enableMod = isEnable;}
@@ -147,6 +147,6 @@ public class FPPConfig implements ConfigData {
 	public void setSnowDustLevel(int snowDustLevel) {this.snowDustLevel = snowDustLevel;}
 	public void setWaterSplashLevel(int waterSplashLevel) {this.waterSplashLevel = waterSplashLevel;}
 	public void setMobInterval(List<String> mobInterval) {this.mobInterval = mobInterval;}
-	public void setFootprintSize(float footprintSize) {this.footprintSize = footprintSize;}
+	public void setFootprintSize(int footprintSize) {this.footprintSize = footprintSize;}
 	public void setCustomPrint(List<String> customPrint) {this.customPrint = customPrint;}
 }

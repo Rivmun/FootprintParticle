@@ -28,14 +28,14 @@ public class FootprintParticle extends SpriteBillboardParticle {
 		this.setAlpha(FPPClient.CONFIG.getFootprintAlpha());
 		this.angle = (float) MathHelper.atan2(vx, vz);
 		this.maxAge = (int) (FPPClient.CONFIG.getPrintLifetime() * 20);
-		this.scale = FPPClient.CONFIG.getFootprintSize();
+		this.scale = FPPClient.CONFIG.getFootprintSize() * 0.03125f;
 
 		this.scale *= Util.getEntityScale((parameters.entity));
 
 		List<Sprite> spriteList = Util.getCustomSprites(parameters.entity, spriteProvider, defName);
 		try {
 			this.setSprite(spriteList.get((int) (Math.random() * spriteList.size())));
-		} catch (ArrayIndexOutOfBoundsException e) {
+		} catch (Exception e) {
 			FPPClient.LOGGER.error("Wrong customization in FootprintParticle, please check.");
 			this.setSprite(spriteProvider);
 		}
