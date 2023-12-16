@@ -74,8 +74,11 @@ public class FPPConfig implements ConfigData {
 			"minecraft:iron_golem,2",
 			"minecraft:creeper,0.8"
 	);
+	static final List<String> DEF_CUSTOM_PRINT = Arrays.asList(
+			"minecraft:cat,cat"
+	);
 
-	private boolean enableMod = true;
+	private int enableMod = 2;
 	private float secPerPrint = 0.5f;
 	private float printLifetime = 5.0f;
 	private float printHeight = 0f;
@@ -97,8 +100,9 @@ public class FPPConfig implements ConfigData {
 	private int swimPopLevel = 2;
 	private int snowDustLevel = 2;
 	private int waterSplashLevel = 1;
+	private List<String> customPrint = DEF_CUSTOM_PRINT;
 
-	public boolean isEnable() {return enableMod;}
+	public int isEnable() {return enableMod;}
 	public float getSecPerPrint() {return secPerPrint;}
 	public float getPrintLifetime() {return printLifetime;}
 	public float getPrintHeight() {return printHeight;}
@@ -120,8 +124,9 @@ public class FPPConfig implements ConfigData {
 	public int getWaterSplashLevel() {return waterSplashLevel;}
 	public List<String> getMobInterval() {return mobInterval;}
 	public float getFootprintSize() {return footprintSize;}
+	public List<String> getCustomPrint() {return customPrint;}
 
-	public void setEnableMod(boolean isEnable) {enableMod = isEnable;}
+	public void setEnableMod(int isEnable) {enableMod = isEnable;}
 	public void setSecPerPrint(float sec) {secPerPrint = sec;}
 	public void setPrintLifetime(float time) {printLifetime = time;}
 	public void setPrintHeight(float height) {printHeight = height;}
@@ -143,4 +148,5 @@ public class FPPConfig implements ConfigData {
 	public void setWaterSplashLevel(int waterSplashLevel) {this.waterSplashLevel = waterSplashLevel;}
 	public void setMobInterval(List<String> mobInterval) {this.mobInterval = mobInterval;}
 	public void setFootprintSize(float footprintSize) {this.footprintSize = footprintSize;}
+	public void setCustomPrint(List<String> customPrint) {this.customPrint = customPrint;}
 }
