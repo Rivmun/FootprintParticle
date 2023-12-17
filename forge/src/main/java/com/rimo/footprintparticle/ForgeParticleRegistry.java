@@ -1,5 +1,6 @@
 package com.rimo.footprintparticle;
 
+import com.rimo.footprintparticle.FPPClient;
 import com.rimo.footprintparticle.particle.FootprintParticle;
 import com.rimo.footprintparticle.particle.SnowDustParticle;
 import com.rimo.footprintparticle.particle.WaterSplashParticle;

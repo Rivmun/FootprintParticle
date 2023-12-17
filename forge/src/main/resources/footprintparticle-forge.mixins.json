@@ -6,9 +6,8 @@
   "mixins": [
   ],
   "client": [
-    "AbstractMinecartEntityMixin",
-    "BoatEntityMixin",
-    "LivingEntityMixin"
+    "ParticleManagerAccessor",
+    "ParticleManagerAccessor$SimpleSpriteProviderAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
