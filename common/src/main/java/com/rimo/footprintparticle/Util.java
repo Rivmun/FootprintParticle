@@ -1,7 +1,7 @@
 package com.rimo.footprintparticle;
 
+import dev.architectury.injectables.annotations.ExpectPlatform;
 import me.shedaniel.architectury.platform.Platform;
-import me.shedaniel.architectury.registry.ParticleProviderRegistry;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.entity.EntityType;
@@ -10,7 +10,6 @@ import virtuoel.pehkui.api.ScaleTypes;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Util {
 	public static float getEntityScale(LivingEntity entity) {
@@ -50,10 +49,17 @@ public class Util {
 			}
 		}
 		List<String> finalSpriteNames = Arrays.asList(spriteNames);
-		return ((ParticleProviderRegistry.ExtendedSpriteSet) spriteProvider).getSprites().stream().filter(sprite ->
-				finalSpriteNames.stream().anyMatch(str ->
-						sprite.getId().getPath().substring(9).contentEquals(str)
-				)
-		).collect(Collectors.toList());
+		/*
+		 * Due to particle issue on ArchAPI, we can not cast spriteProvider to ArchImpl.
+		 * On forge side, mixin to ParticleManager.SimpleSpriteProvider to access sprites is ok,
+		 * but fabric side, only using fabric-api can access because spriteProvider actually a FabricSpriteProvider, not a vanilla itself.
+		 * So we must cast spriteProvider on each side individually.
+		 */
+		return getSpriteListExpectPlatform(spriteProvider,finalSpriteNames);
+	}
+
+	@ExpectPlatform
+	public static List<Sprite> getSpriteListExpectPlatform(SpriteProvider spriteProvider, List<String> finalSpriteNames) {
+		throw new AssertionError();
 	}
 }

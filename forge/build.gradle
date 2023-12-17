@@ -15,6 +15,7 @@ loom {
         extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
 
         mixinConfig "footprintparticle.mixins.json"
+        mixinConfig "footprintparticle-forge.mixins.json"
     }
 }
 
