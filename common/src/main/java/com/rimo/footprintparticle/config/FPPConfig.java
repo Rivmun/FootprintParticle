@@ -33,10 +33,18 @@ public class FPPConfig implements ConfigData {
 			"minecraft:allay",
 			"minecraft:bat",
 			"minecraft:phantom",
+			"minecraft:cod",
+			"minecraft:salmon",
+			"minecraft:tropical_fish",
+			"minecraft:pufferfish",
 			"minecraft:squid",
 			"minecraft:glow_squid",
 			"minecraft:axolotl",
 			"minecraft:dolphin",
+			"minecraft:silverfish",
+			"minecraft:endermite",
+			"minecraft:blaze",
+			"minecraft:ghast",
 			"minecraft:wither",
 			"minecraft:ender_dragon"
 	);
@@ -46,6 +54,7 @@ public class FPPConfig implements ConfigData {
 			"minecraft:cat,0.5",
 			"minecraft:ocelot,0.5",
 			"minecraft:wolf,0.6",
+			"minecraft:sniffer,1.5",
 			"minecraft:enderman,0.6",
 			"minecraft:slime,2",
 			"minecraft:magma_cube,2",
@@ -59,18 +68,24 @@ public class FPPConfig implements ConfigData {
 			"minecraft:mule",
 			"minecraft:zombie_horse",
 			"minecraft:skeleton_horse",
+			"minecraft:camel",
+			"minecraft:sniffer,1",
 			"minecraft:ravager,1",
 			"minecraft:creeper,0.3"
 	);
 	static final List<String> DEF_EIGHT_LEGS = Arrays.asList(
 			"minecraft:spider",
 			"minecraft:cave_spider",
+			"minecraft:camel,0.3",
+			"minecraft:sniffer,0.5",
 			"minecraft:iron_golem,0.3",
 			"minecraft:ravager,0.5"
 	);
 	static final List<String> DEF_MOB_INTERVAL = Arrays.asList(
 			"minecraft:spider,0.5",
 			"minecraft:cave_spider,0.5",
+			"minecraft:camel,2",
+			"minecraft:sniffer,3",
 			"minecraft:iron_golem,2",
 			"minecraft:creeper,0.8"
 	);
