@@ -26,11 +26,11 @@ public abstract class BoatEntityMixin extends Entity {
 	@Inject(method = "tick", at = @At("TAIL"))
 	public void tick(CallbackInfo ci) {
 		if (FPPClient.CONFIG.isEnableBoatTrail()) {
-			int k = (int)(this.getVelocity().length() * 10);
+			int k = (int)(this.getVelocity().horizontalLength() * 10);
 			while (Math.random() < k-- / 5f) {
-				int i = Math.random() > 0.5f ? 1 : -1;		//TODO: boat's yaw is 90 degrees more than other entity, strange.
+				var i = Math.random() > 0.5f ? 1 : -1;		//TODO: boat's yaw is 90 degrees more than other entity, strange.
 				if (this.checkBoatInWater()) {
-					this.world.addParticle(        // at head
+					this.getWorld().addParticle(        // at head
 							ParticleTypes.RAIN,
 							this.getX() + 1.2f * MathHelper.cos((float) Math.toRadians(this.getRotationClient().y + 90 + Math.random() * 30 * i)),
 							(int) this.getY() + 1f,
@@ -40,17 +40,17 @@ public abstract class BoatEntityMixin extends Entity {
 							0
 					);
 					for (int j = 0; j < 2; j++) {
-						this.world.addParticle(        // at paddle
+						this.getWorld().addParticle(        // at paddle
 								FPPClient.WATERSPLASH.get(),
 								this.getX() + i * MathHelper.cos((float) Math.toRadians(this.getRotationClient().y - 10 + Math.random() * 20)),
 								(int) this.getY() + 1f,
 								this.getZ() + i * MathHelper.sin((float) Math.toRadians(this.getRotationClient().y - 10 + Math.random() * 20)),
 								(Math.random() - 0.5f) / 4f,
-								Math.random() * this.getVelocity().length() / 2f,
+								Math.random() * this.getVelocity().horizontalLength() / 2f,
 								(Math.random() - 0.5f) / 4f
 						);
 					}
-					this.world.addParticle(        // at tail
+					this.getWorld().addParticle(        // at tail
 							ParticleTypes.BUBBLE,
 							this.getX() - 1.2f * MathHelper.cos((float) Math.toRadians(this.getRotationClient().y + 90 + Math.random() * 30 * i)),
 							(int) this.getY() + 0.5f + Math.random() / 2f,
@@ -61,7 +61,7 @@ public abstract class BoatEntityMixin extends Entity {
 					);
 				} else {
 					if (Math.random() > 0.5f) {
-						this.world.addParticle(		// at paddle
+						this.getWorld().addParticle(		// at paddle
 								ParticleTypes.CLOUD,
 								this.getX() + i * MathHelper.cos((float) Math.toRadians(this.getRotationClient().y - 10 + Math.random() * 20)),
 								this.getY(),
@@ -71,7 +71,7 @@ public abstract class BoatEntityMixin extends Entity {
 								Math.random() / 5f
 						);
 					} else {
-						this.world.addParticle(        // at tail
+						this.getWorld().addParticle(        // at tail
 								ParticleTypes.CLOUD,
 								this.getX() - 1.2f * MathHelper.cos((float) Math.toRadians(this.getRotationClient().y + 90 + Math.random() * 30 * i)),
 								this.getY(),

@@ -104,6 +104,7 @@ public abstract class LivingEntityMixin extends Entity {
 		var px = this.getX();
 		var py = this.getY() + 0.01f + FPPClient.CONFIG.getPrintHeight();
 		var pz = this.getZ();
+		var scale = Util.getEntityScale((LivingEntity) (Object) this);
 
 		// Horizontal Offset
 		// Front and back
@@ -122,6 +123,7 @@ public abstract class LivingEntityMixin extends Entity {
 				break;
 			}
 		}
+		hOffset *= scale;
 		px = px - hOffset * side * MathHelper.sin((float) Math.toRadians(this.getRotationClient().y));
 		pz = pz + hOffset * side * MathHelper.cos((float) Math.toRadians(this.getRotationClient().y));
 		// Left and right
@@ -139,6 +141,7 @@ public abstract class LivingEntityMixin extends Entity {
 				break;
 			}
 		}
+		hOffset *= scale;
 		px = px - hOffset * side * MathHelper.sin((float) Math.toRadians(this.getRotationClient().y + 90));
 		pz = pz + hOffset * side * MathHelper.cos((float) Math.toRadians(this.getRotationClient().y + 90));
 
@@ -175,7 +178,7 @@ public abstract class LivingEntityMixin extends Entity {
 					int v = this.isSprinting() ? 3 : 10;
 					while (--i >= 0) {
 						SnowDustParticleType snowdust = FPPClient.SNOWDUST.get();
-						this.getWorld().addParticle(snowdust.setData(Util.getEntityScale((LivingEntity) (Object) this)), px, py, pz,
+						this.getWorld().addParticle(snowdust.setData(scale), px, py, pz,
 								(Math.random() - 0.5f) / v,
 								0,
 								(Math.random() - 0.5f) / v

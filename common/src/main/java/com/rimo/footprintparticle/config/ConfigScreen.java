@@ -82,6 +82,13 @@ public class ConfigScreen {
 				.build()
 		);
 		general.addEntry(entryBuilder
+				.startFloatField(new TranslatableText("text.footprintparticle.option.watermarkLifetime")
+						,config.getWatermarkLifetime())
+				.setDefaultValue(5.0f)
+				.setSaveConsumer(config::setWatermarkLifetime)
+				.build()
+		);
+		general.addEntry(entryBuilder
 				.startIntSlider(new TranslatableText("text.footprintparticle.option.footprintAlpha")
 						,(int) (config.getFootprintAlpha() * 10)
 						,1
