@@ -98,13 +98,13 @@ public class FootprintParticle extends SpriteBillboardParticle {
 
 		float k = this.getMinU();
 		float l = this.getMaxU();
-		float n = this.getMaxV();
 		float m = this.getMinV();
+		float n = this.getMaxV();
 		int o = this.getBrightness(tickDelta);
-		vertexConsumer.vertex(pos[0].x, pos[0].y, pos[0].z).texture(l, n).color(this.red, this.green, this.blue, this.alpha).light(o).next();
-		vertexConsumer.vertex(pos[1].x, pos[1].y, pos[1].z).texture(l, m).color(this.red, this.green, this.blue, this.alpha).light(o).next();
-		vertexConsumer.vertex(pos[2].x, pos[2].y, pos[2].z).texture(k, m).color(this.red, this.green, this.blue, this.alpha).light(o).next();
-		vertexConsumer.vertex(pos[3].x, pos[3].y, pos[3].z).texture(k, n).color(this.red, this.green, this.blue, this.alpha).light(o).next();
+		vertexConsumer.vertex(pos[0].x, pos[0].y, pos[0].z).texture(l, n).color(this.red, this.green, this.blue, this.alpha).light(o);
+		vertexConsumer.vertex(pos[1].x, pos[1].y, pos[1].z).texture(l, m).color(this.red, this.green, this.blue, this.alpha).light(o);
+		vertexConsumer.vertex(pos[2].x, pos[2].y, pos[2].z).texture(k, m).color(this.red, this.green, this.blue, this.alpha).light(o);
+		vertexConsumer.vertex(pos[3].x, pos[3].y, pos[3].z).texture(k, n).color(this.red, this.green, this.blue, this.alpha).light(o);
 	}
 
 	@Environment(EnvType.CLIENT)

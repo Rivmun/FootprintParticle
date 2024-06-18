@@ -22,6 +22,7 @@
 	"text.footprintparticle.option.spiderLikeMobs.@Tooltip": "列表中的生物将使用指定的左右偏移值。\n格式: §9§omodid:mobid,wide§r\n如果wide参数留空，则默认使用0.9",
 	"text.footprintparticle.option.wetDuration": "潮湿时间（水渍）",
 	"text.footprintparticle.option.wetDuration.@Tooltip": "控制当你离开水/雨后依旧生成水渍的时间。\n设为 0 可禁用水渍。\n§l水渍§r会在脚印无法生成时生成，且无视方块列表。",
+	"text.footprintparticle.option.watermarkLifetime": "水渍持续时间",
 	"text.footprintparticle.disabled": "已禁用",
 	"text.footprintparticle.seconds": "%s 秒",
 	"text.footprintparticle.blocks": "%s 方块",
@@ -41,7 +42,6 @@
 	"text.footprintparticle.option.footprintSize.@Tooltip": "单位为像素。\n为了更好的显示效果，当你在使用自定义脚印纹理时\n需要将该值设置为实际纹理宽度。",
 	"text.footprintparticle.option.customPrint": "自定义脚印纹理",
 	"text.footprintparticle.option.customPrint.@Tooltip": "为特定生物设置特定的脚印纹理。\n格式: §9§omodid:mobid,fileName1,fileName2,...§r\n§5file§r必须是一张PNG图片且放置于资源包中的\n§oassets/footprintparticle/textures/particle§r下。\n同时，你需要在\n§oassets/footprintparticle/particles/footprint.json§r或\n§oassets/footprintparticle/particles/watermark.json§r\n中注册你的纹理。\n更多信息请查阅wiki。",
-	"text.footprintparticle.option.watermarkLifetime": "水渍持续时间",
 
 	"modmenu.descriptionTranslation.footprintparticle": "一个简单地为生物和玩家添加脚印粒子的模组。"
 }

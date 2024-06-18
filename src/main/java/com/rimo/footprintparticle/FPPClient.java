@@ -25,9 +25,10 @@ public class FPPClient implements ClientModInitializer {
 	public static final WaterSplashParticleType WATERSPLASH = Registry.register(Registries.PARTICLE_TYPE, MOD_ID + ":watersplash", new WaterSplashParticleType(true));
 
 	public void onInitializeClient() {
-		ParticleFactoryRegistry.getInstance().register(FPPClient.FOOTPRINT, FootprintParticle.DefaultFactory::new);
-		ParticleFactoryRegistry.getInstance().register(FPPClient.WATERMARK, WatermarkParticle.DefaultFactory::new);
-		ParticleFactoryRegistry.getInstance().register(FPPClient.SNOWDUST, SnowDustParticle.DefaultFactory::new);
-		ParticleFactoryRegistry.getInstance().register(FPPClient.WATERSPLASH, WaterSplashParticle.DefaultFactory::new);
+		ParticleFactoryRegistry registry = ParticleFactoryRegistry.getInstance();
+		registry.register(FPPClient.FOOTPRINT, FootprintParticle.DefaultFactory::new);
+		registry.register(FPPClient.WATERMARK, WatermarkParticle.DefaultFactory::new);
+		registry.register(FPPClient.SNOWDUST, SnowDustParticle.DefaultFactory::new);
+		registry.register(FPPClient.WATERSPLASH, WaterSplashParticle.DefaultFactory::new);
 	}
 }
