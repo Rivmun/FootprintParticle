@@ -20,6 +20,7 @@
 	"text.footprintparticle.option.horseLikeMobs.@Tooltip": "Mobs in this list will have a specific front-back offset to gen.\nThey'll also changed frequency when is mounted or dismounted.\nFormat: §9§omodid:mobid,value§r\n0.75 will be used if value is empty.",
 	"text.footprintparticle.option.spiderLikeMobs": "Print Left-Right Offset",
 	"text.footprintparticle.option.spiderLikeMobs.@Tooltip": "Mobs in this list will have a specific left-right offset to gen.\nFormat: §9§omodid:mobid,value§r\n0.9 will be used if value is empty.",
+	"text.footprintparticle.option.wetDuration": "Wet Duration for Watermark",
 	"text.footprintparticle.option.wetDuration.@Tooltip": "Control how long the time of Watermark gen\nafter you away from water/rain.\nSet 0 to disable watermark.\nThe §lWatermark§l is gen when footprint cannot gen.\nIt's ignored block list.",
 	"text.footprintparticle.option.watermarkLifetime": "Watermark Lifetime",
 	"text.footprintparticle.disabled": "Disabled",
@@ -40,6 +41,5 @@
 	"text.footprintparticle.option.footprintSize": "General Footprint Size",
 	"text.footprintparticle.option.footprintSize.@Tooltip": "Measure in pixel. \nChange it to actual texture width for better visual if you using custom texture.",
 	"text.footprintparticle.option.customPrint": "Custom Print Texture",
-	"text.footprintparticle.option.customPrint.@Tooltip": "Set a specific texture for a specific mob.\nFormat: §9§omodid:mobid,fileName1,fileName2,...§r\n§5file§r must be a PNG and located at\n§oassets/footprintparticle/textures/particle§r\nin your resourcepack.\nMeanwhile, you need to register it at\n§oassets/footprintparticle/particles/footprint.json§r or\n§oassets/footprintparticle/particles/watermark.json§r\nif you want to replace watermark at same time.\nMore see in wiki.",
-	"text.footprintparticle.option.wetDuration": "Wet Duration for Watermark"
+	"text.footprintparticle.option.customPrint.@Tooltip": "Set a specific texture for a specific mob.\nFormat: §9§omodid:mobid,fileName1,fileName2,...§r\n§5file§r must be a PNG and located at\n§oassets/footprintparticle/textures/particle§r\nin your resourcepack.\nMeanwhile, you need to register it at\n§oassets/footprintparticle/particles/footprint.json§r or\n§oassets/footprintparticle/particles/watermark.json§r\nif you want to replace watermark at same time.\nMore see in wiki."
 }
