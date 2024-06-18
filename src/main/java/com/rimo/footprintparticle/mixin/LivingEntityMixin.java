@@ -176,7 +176,7 @@ public abstract class LivingEntityMixin extends Entity {
 								(FPPClient.CONFIG.getSnowDustLevel() == 1 && this.isPlayer()))) {
 					int i = this.isSprinting() ? 4 : 2;
 					int v = this.isSprinting() ? 3 : 10;
-					while (-- i >= 0) {
+					while (--i >= 0) {
 						SnowDustParticleType snowdust = FPPClient.SNOWDUST;
 						this.getWorld().addParticle(snowdust.setData(scale), px, py, pz,
 								(Math.random() - 0.5f) / v,
