@@ -1,8 +1,8 @@
 package com.rimo.footprintparticle;
 
-import com.tristankechlo.random_mob_sizes.mixin_access.MobMixinAddon;
+import com.tristankechlo.random_mob_sizes.mixin_helper.MobMixinAddon;
 import dev.architectury.platform.Platform;
-import dev.architectury.registry.client.particle.ParticleProviderRegistry;
+import net.fabricmc.fabric.api.client.particle.v1.FabricSpriteProvider;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.entity.EntityType;
@@ -31,7 +31,7 @@ public class Util {
 		if (Platform.isModLoaded("pehkui"))
 			scale *= ScaleTypes.BASE.getScaleData(entity).getScale();
 		if (Platform.isModLoaded("random_mob_sizes") && entity instanceof MobEntity) {
-			scale *= ((MobMixinAddon) entity).getMobScaling();
+			scale *= ((MobMixinAddon) entity).getMobScaling$RandomMobSizes();
 		} else if (entity.isBaby()) {
 			scale *= 0.66f;
 		}
@@ -53,7 +53,7 @@ public class Util {
 			}
 		}
 		List<String> finalSpriteNames = Arrays.asList(spriteNames);
-		return ((ParticleProviderRegistry.ExtendedSpriteSet) spriteProvider).getSprites().stream().filter(sprite ->
+		return ((FabricSpriteProvider) spriteProvider).getSprites().stream().filter(sprite ->
 				finalSpriteNames.stream().anyMatch(str ->
 						sprite.getContents().getId().getPath().contentEquals(str)
 				)

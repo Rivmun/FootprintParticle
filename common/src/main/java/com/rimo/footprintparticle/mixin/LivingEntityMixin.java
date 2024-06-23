@@ -174,7 +174,7 @@ public abstract class LivingEntityMixin extends Entity {
 					int i = this.isSprinting() ? 4 : 2;
 					int v = this.isSprinting() ? 3 : 10;
 					while (--i >= 0) {
-						SnowDustParticleType snowdust = FPPClient.SNOWDUST.get();
+						SnowDustParticleType snowdust = FPPClient.SNOWDUST;
 						this.getWorld().addParticle(snowdust.setData(Util.getEntityScale((LivingEntity) (Object) this)), px, py, pz,
 								(Math.random() - 0.5f) / v,
 								0,
@@ -198,10 +198,10 @@ public abstract class LivingEntityMixin extends Entity {
 			dz = this.getVelocity().getZ();
 		}
 		if (canGen) {       // footprint
-			FootprintParticleType footprint = FPPClient.FOOTPRINT.get();
+			FootprintParticleType footprint = FPPClient.FOOTPRINT;
 			this.getWorld().addParticle(footprint.setData((LivingEntity) (Object) this), px, py, pz, dx, 0, dz);
 		} else if (wetTimer <= FPPClient.CONFIG.getWetDuration() * 20) {        // waterprint (gen when footprint not gen)
-			WatermarkParticleType watermark = FPPClient.WATERMARK.get();
+			WatermarkParticleType watermark = FPPClient.WATERMARK;
 			var i = Math.random() > 0.5f ? 1 : -1;
 			this.getWorld().addParticle(watermark.setData((LivingEntity) (Object) this), px, py, pz, dx * i, wetTimer, dz * i);		// push timer to calc alpha
 		}
@@ -214,7 +214,7 @@ public abstract class LivingEntityMixin extends Entity {
 			int v = this.isSprinting() ? 3 : 6;
 			while (--i > 0) {
 				this.getWorld().addParticle(
-						FPPClient.WATERSPLASH.get(),
+						FPPClient.WATERSPLASH,
 						px - 0.25f * range + Math.random() / 4,
 						py,
 						pz - 0.25f * range + Math.random() / 4,

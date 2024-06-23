@@ -12,10 +12,11 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     // Remove the next line if you don't want to depend on the API
     modApi "dev.architectury:architectury:${rootProject.architectury_version}"
+    modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
     // Pehkui
     modApi "com.github.Virtuoel:Pehkui:${rootProject.pehkui_version}"
     // Random Mob Sizes
-    modImplementation "curse.maven:random-mob-sizes-555230:4607735"
+    modImplementation "curse.maven:random-mob-sizes-555230:5429252"
 
     // Cloth Config
     modCompileOnly("me.shedaniel.cloth:cloth-config:${rootProject.cloth_config_version}") {

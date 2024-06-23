@@ -41,7 +41,7 @@ public abstract class BoatEntityMixin extends Entity {
 					);
 					for (int j = 0; j < 2; j++) {
 						this.getWorld().addParticle(        // at paddle
-								FPPClient.WATERSPLASH.get(),
+								FPPClient.WATERSPLASH,
 								this.getX() + i * MathHelper.cos((float) Math.toRadians(this.getRotationClient().y - 10 + Math.random() * 20)),
 								(int) this.getY() + 1f,
 								this.getZ() + i * MathHelper.sin((float) Math.toRadians(this.getRotationClient().y - 10 + Math.random() * 20)),

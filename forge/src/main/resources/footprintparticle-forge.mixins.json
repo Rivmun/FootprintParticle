@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.rimo.footprintparticle.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+  ],
+  "client": [
+    "ParticleManagerAccessor",
+    "ParticleManagerAccessor$SimpleSpriteProviderAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
