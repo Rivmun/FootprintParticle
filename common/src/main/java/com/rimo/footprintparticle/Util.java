@@ -1,11 +1,13 @@
 package com.rimo.footprintparticle;
 
+import com.tristankechlo.random_mob_sizes.mixin_helper.MobMixinAddon;
 import dev.architectury.platform.Platform;
 import dev.architectury.registry.client.particle.ParticleProviderRegistry;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.MobEntity;
 import virtuoel.pehkui.api.ScaleTypes;
 
 import java.util.Arrays;
@@ -26,11 +28,13 @@ public class Util {
 			}
 		}
 
-		if (Platform.isModLoaded("pehkui"))
-			scale *= ScaleTypes.BASE.getScaleData(entity).getScale();
-
 		if (entity.isBaby())
 			scale *= 0.66f;
+		if (Platform.isModLoaded("pehkui"))
+			scale *= ScaleTypes.BASE.getScaleData(entity).getScale();
+		if (Platform.isModLoaded("random_mob_sizes") && entity instanceof MobEntity)
+			scale *= ((MobMixinAddon) entity).getMobScaling$RandomMobSizes();
+
 
 		return scale;
 	}

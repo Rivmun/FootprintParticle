@@ -14,6 +14,7 @@ public class WatermarkParticle extends FootprintParticle {
 	protected WatermarkParticle(ClientWorld clientWorld, double x, double y, double z, double vx, double vy, double vz, SpriteProvider spriteProvider, FootprintParticleType parameters, String defName) {
 		super(clientWorld, x, y, z, vx, vy, vz, spriteProvider, parameters, defName);
 		this.setAlpha(FPPClient.CONFIG.getWatermarkAlpha() * (FPPClient.CONFIG.getWetDuration() * 20 - (float) vy) / FPPClient.CONFIG.getWetDuration() / 20);
+		this.maxAge = (int) (FPPClient.CONFIG.getWatermarkLifetime() * 20);
 	}
 
 	@Environment(EnvType.CLIENT)

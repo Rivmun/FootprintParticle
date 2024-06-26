@@ -19,6 +19,9 @@ dependencies {
     modCompileOnly("me.shedaniel.cloth:cloth-config:${rootProject.cloth_config_version}") {
         exclude(group: "net.fabricmc.fabric-api")
 	}
+
+    // RandomMobSizes
+    modImplementation "curse.maven:random-mob-sizes-555230:5429305"
 }
 
 publishing {
