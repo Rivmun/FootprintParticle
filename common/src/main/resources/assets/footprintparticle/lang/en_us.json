@@ -22,6 +22,7 @@
 	"text.footprintparticle.option.spiderLikeMobs.@Tooltip": "Mobs in this list will have a specific left-right offset to gen.\nFormat: §9§omodid:mobid,value§r\n0.9 will be used if value is empty.",
 	"text.footprintparticle.option.wetDuration": "Wet Duration for Watermark",
 	"text.footprintparticle.option.wetDuration.@Tooltip": "Control how long the time of Watermark gen\nafter you away from water/rain.\nSet 0 to disable watermark.\nThe §lWatermark§l is gen when footprint cannot gen.\nIt's ignored block list.",
+	"text.footprintparticle.option.watermarkLifetime": "Watermark Lifetime",
 	"text.footprintparticle.disabled": "Disabled",
 	"text.footprintparticle.seconds": "%s Second(s)",
 	"text.footprintparticle.blocks": "%s Block(s)",

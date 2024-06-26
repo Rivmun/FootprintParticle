@@ -27,7 +27,7 @@ public class FPPClient {
 	public static final RegistrySupplier<WaterSplashParticleType> WATERSPLASH = PARTICLE.register("watersplash", () -> new WaterSplashParticleType(false));
 
 	public static void onInitializeClient() {
-        PARTICLE.register();
+		PARTICLE.register();
 		/*
 		 * Architectury's particle registries has a critical issue in 1.16.5 and has not been resolved yet,
 		 * so we can only register the particle per platform manually.

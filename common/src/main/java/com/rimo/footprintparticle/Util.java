@@ -26,11 +26,10 @@ public class Util {
 			}
 		}
 
+		if (entity.isBaby())
+			scale *= 0.5f;
 		if (Platform.isModLoaded("pehkui"))
 			scale *= ScaleTypes.BASE.getScaleData(entity).getScale();
-
-		if (entity.isBaby())
-			scale *= 0.66f;
 
 		return scale;
 	}
