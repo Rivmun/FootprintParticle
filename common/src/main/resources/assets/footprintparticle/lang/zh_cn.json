@@ -22,6 +22,7 @@
 	"text.footprintparticle.option.spiderLikeMobs.@Tooltip": "列表中的生物将使用指定的左右偏移值。\n格式: §9§omodid:mobid,wide§r\n如果wide参数留空，则默认使用0.9",
 	"text.footprintparticle.option.wetDuration": "潮湿时间（水渍）",
 	"text.footprintparticle.option.wetDuration.@Tooltip": "控制当你离开水/雨后依旧生成水渍的时间。\n设为 0 可禁用水渍。\n§l水渍§r会在脚印无法生成时生成，且无视方块列表。",
+	"text.footprintparticle.option.watermarkLifetime": "水渍持续时间",
 	"text.footprintparticle.disabled": "已禁用",
 	"text.footprintparticle.seconds": "%s 秒",
 	"text.footprintparticle.blocks": "%s 方块",
