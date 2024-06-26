@@ -14,6 +14,7 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -28,35 +29,36 @@ public abstract class LivingEntityMixin extends Entity {
 	}
 
 	@Unique
-	private int timer = 0;
+	private int fpp$timer = 0;
 	@Unique
-	private boolean wasOnGround = true;
+	private boolean fpp$wasOnGround = true;
 	@Unique
-	private int wetTimer = FPPClient.CONFIG.getWetDuration() * 20;
+	private int fpp$wetTimer = FPPClient.CONFIG.getWetDuration() * 20;
 
 	@Inject(method = "jump", at = @At("TAIL"))
 	protected void jump(CallbackInfo ci) {
-		this.footprintGenerator();
+		this.fpp$footprintGenerator();
 	}
 
 	@Inject(method = "tick", at = @At("TAIL"))
 	public void tick(CallbackInfo ci) {
-		if (timer <= 0) {
+
+		if (fpp$timer <= 0) {
 			if (!this.isSneaking() && !this.isSubmergedInWater()) {
 				// Either on ground moving or landing
-				if ((this.getVelocity().horizontalLength() != 0 && this.isOnGround()) || (!wasOnGround && this.isOnGround())) {
-					this.footprintGenerator();
+				if ((this.getVelocity().horizontalLength() != 0 && this.isOnGround()) || (! fpp$wasOnGround && this.isOnGround())) {
+					this.fpp$footprintGenerator();
 				}
-				wasOnGround = this.isOnGround();
+				fpp$wasOnGround = this.isOnGround();
 			}
 		} else {
-			timer--;
+			fpp$timer--;
 		}
 
 		if (this.isTouchingWaterOrRain()) {
-			wetTimer = 0;
-		} else if (wetTimer <= FPPClient.CONFIG.getWetDuration() * 20){
-			wetTimer++;
+			fpp$wetTimer = 0;
+		} else if (fpp$wetTimer <= FPPClient.CONFIG.getWetDuration() * 20){
+			fpp$wetTimer++;
 		}
 
 		// Swim Pop
@@ -77,7 +79,7 @@ public abstract class LivingEntityMixin extends Entity {
 	}
 
 	@Unique
-	public void footprintGenerator() {
+	public void fpp$footprintGenerator() {
 		if (FPPClient.CONFIG.isEnable() == 0 ||
 				(FPPClient.CONFIG.isEnable() == 1 && !this.isPlayer()))
 			return;
@@ -87,12 +89,12 @@ public abstract class LivingEntityMixin extends Entity {
 			return;
 
 		// Set Interval
-		timer = this.isSprinting() ? (int) (FPPClient.CONFIG.getSecPerPrint() * 13.33f) : (int) (FPPClient.CONFIG.getSecPerPrint() * 20);
+		fpp$timer = this.isSprinting() ? (int) (FPPClient.CONFIG.getSecPerPrint() * 13.33f) : (int) (FPPClient.CONFIG.getSecPerPrint() * 20);
 		for (String stream : FPPClient.CONFIG.getMobInterval()) {
 			String[] str = stream.split(",");
 			if (str[0].equals(EntityType.getId(this.getType()).toString())) {
 				try {
-					timer *= Float.parseFloat(str[1]);
+					fpp$timer *= Float.parseFloat(str[1]);
 				} catch (Exception e) {
 					//
 				}
@@ -119,7 +121,7 @@ public abstract class LivingEntityMixin extends Entity {
 				} catch (Exception e) {
 					//
 				}
-				timer = (int) (this.getPrimaryPassenger() != null ? this.getPrimaryPassenger().isPlayer() ? timer * 0.5f : timer * 1.33f : timer * 1.33f);
+				fpp$timer = (int) (this.getPrimaryPassenger() != null ? this.getPrimaryPassenger().isPlayer() ? fpp$timer * 0.5f : fpp$timer * 1.33f : fpp$timer * 1.33f);
 				break;
 			}
 		}
@@ -147,10 +149,10 @@ public abstract class LivingEntityMixin extends Entity {
 
 		// Check block type...
 		var pos = new BlockPos(px, py, pz);
-		var canGen = isPrintCanGen(pos) && this.getWorld().getBlockState(pos).isOpaque();
+		var canGen = fpp$isPrintCanGen(pos) && this.getWorld().getBlockState(pos).isOpaque();
 		if (!canGen) {
 			pos = new BlockPos(px, py - 1, pz);
-			canGen = isPrintCanGen(pos) && this.getWorld().getBlockState(pos).isOpaque() && Block.isShapeFullCube(this.getWorld().getBlockState(pos).getCollisionShape(this.getWorld(), pos));
+			canGen = fpp$isPrintCanGen(pos) && this.getWorld().getBlockState(pos).isOpaque() && Block.isShapeFullCube(this.getWorld().getBlockState(pos).getCollisionShape(this.getWorld(), pos));
 		} else {
 			// Fix height by blocks if in...
 			try {
@@ -203,17 +205,17 @@ public abstract class LivingEntityMixin extends Entity {
 		if (canGen) {       // footprint
 			FootprintParticleType footprint = FPPClient.FOOTPRINT.get();
 			this.getWorld().addParticle(footprint.setData((LivingEntity) (Object) this), px, py, pz, dx, 0, dz);
-		} else if (wetTimer <= FPPClient.CONFIG.getWetDuration() * 20) {        // waterprint (gen when footprint not gen)
+		} else if (fpp$wetTimer <= FPPClient.CONFIG.getWetDuration() * 20) {        // waterprint (gen when footprint not gen)
 			WatermarkParticleType watermark = FPPClient.WATERMARK.get();
 			var i = Math.random() > 0.5f ? 1 : -1;
-			this.getWorld().addParticle(watermark.setData((LivingEntity) (Object) this), px, py, pz, dx * i, wetTimer, dz * i);		// push timer to calc alpha
+			this.getWorld().addParticle(watermark.setData((LivingEntity) (Object) this), px, py, pz, dx * i, fpp$wetTimer, dz * i);		// push timer to calc alpha
 		}
 		// water splash (gen whatever print gen)
-		if (wetTimer <= FPPClient.CONFIG.getWetDuration() * 20 &&
+		if (fpp$wetTimer <= FPPClient.CONFIG.getWetDuration() * 20 &&
 				(FPPClient.CONFIG.getWaterSplashLevel() == 2 ||
 				(FPPClient.CONFIG.getWaterSplashLevel() == 1 && this.isPlayer()))) {
 			float range = Util.getEntityScale((LivingEntity) (Object) this);
-			int i = (int)((this.isSprinting() ? 18 : 10) * Math.max((0.7f - (float) wetTimer / (FPPClient.CONFIG.getWetDuration() * 20)), 0));
+			int i = (int)((this.isSprinting() ? 18 : 10) * Math.max((0.7f - (float) fpp$wetTimer / (FPPClient.CONFIG.getWetDuration() * 20)), 0));
 			int v = this.isSprinting() ? 3 : 6;
 			while (--i > 0) {
 				this.getWorld().addParticle(
@@ -230,7 +232,7 @@ public abstract class LivingEntityMixin extends Entity {
 	}
 
 	@Unique
-	private boolean isPrintCanGen(BlockPos pos) {
+	private boolean fpp$isPrintCanGen(BlockPos pos) {
 		var block = this.getWorld().getBlockState(pos);
 		var canGen = FPPClient.CONFIG.getApplyBlocks().contains(block.getBlock().getRegistryEntry().getKey().get().getValue().toString());
 		if (!canGen) {
