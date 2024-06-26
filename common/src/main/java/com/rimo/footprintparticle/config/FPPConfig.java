@@ -59,14 +59,14 @@ public class FPPConfig implements ConfigData {
 			"minecraft:mule",
 			"minecraft:zombie_horse",
 			"minecraft:skeleton_horse",
-			"minecraft:ravager,1",
+			"minecraft:ravager,0.5",
 			"minecraft:creeper,0.3"
 	);
 	static final List<String> DEF_EIGHT_LEGS = Arrays.asList(
 			"minecraft:spider",
 			"minecraft:cave_spider",
 			"minecraft:iron_golem,0.3",
-			"minecraft:ravager,0.5"
+			"minecraft:ravager,0.3"
 	);
 	static final List<String> DEF_MOB_INTERVAL = Arrays.asList(
 			"minecraft:spider,0.5",
@@ -81,6 +81,7 @@ public class FPPConfig implements ConfigData {
 	private int enableMod = 2;
 	private float secPerPrint = 0.5f;
 	private float printLifetime = 5.0f;
+	private float watermarkLifetime = 5.0f;
 	private float printHeight = 0f;
 	private int wetDuration = 10;
 	private float watermarkAlpha = 0.4f;
@@ -105,6 +106,7 @@ public class FPPConfig implements ConfigData {
 	public int isEnable() {return enableMod;}
 	public float getSecPerPrint() {return secPerPrint;}
 	public float getPrintLifetime() {return printLifetime;}
+	public float getWatermarkLifetime() {return watermarkLifetime;}
 	public float getPrintHeight() {return printHeight;}
 	public List<String> getApplyBlocks() {return applyBlocks;}
 	public List<String> getBlockHeight() {return blockHeight;}
@@ -129,6 +131,7 @@ public class FPPConfig implements ConfigData {
 	public void setEnableMod(int isEnable) {enableMod = isEnable;}
 	public void setSecPerPrint(float sec) {secPerPrint = sec;}
 	public void setPrintLifetime(float time) {printLifetime = time;}
+	public void setWatermarkLifetime(float watermarkLifetime) {this.watermarkLifetime = watermarkLifetime;}
 	public void setPrintHeight(float height) {printHeight = height;}
 	public void setApplyBlocks(List<String> list) {applyBlocks = new ArrayList<>(list);}
 	public void setBlockHeight(List<String> list) {blockHeight = new ArrayList<>(list);}
