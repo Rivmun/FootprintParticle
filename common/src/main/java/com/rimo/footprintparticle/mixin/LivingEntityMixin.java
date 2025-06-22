@@ -238,7 +238,7 @@ public abstract class LivingEntityMixin extends Entity {
 			}
 			if (!canGen) {
 				// Hardness Filter. See on https://minecraft.fandom.com/wiki/Breaking#Blocks_by_hardness
-				canGen = MathHelper.abs(block.getBlock().getHardness()) < 0.7f;
+				canGen = MathHelper.abs(block.getBlock().getHardness()) < FPPClient.CONFIG.getHardnessGate();
 				if (canGen) {
 					canGen = !FPPClient.CONFIG.getExcludedBlocks().contains(block.getRegistryEntry().getKey().get().getValue().toString());
 					if (canGen) {
