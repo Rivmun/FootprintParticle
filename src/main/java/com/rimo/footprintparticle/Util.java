@@ -1,12 +1,12 @@
 package com.rimo.footprintparticle;
 
 import net.fabricmc.fabric.api.client.particle.v1.FabricSpriteProvider;
-import net.fabricmc.loader.api.FabricLoader;
+//import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import virtuoel.pehkui.api.ScaleTypes;
+//import virtuoel.pehkui.api.ScaleTypes;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,8 +28,8 @@ public class Util {
 
 		if (entity.isBaby())
 			scale *= 0.5f;
-		if (FabricLoader.getInstance().isModLoaded("pehkui"))
-			scale *= ScaleTypes.BASE.getScaleData(entity).getScale();
+//		if (FabricLoader.getInstance().isModLoaded("pehkui"))
+//			scale *= ScaleTypes.BASE.getScaleData(entity).getScale();
 
 		scale *= entity.getScale();
 

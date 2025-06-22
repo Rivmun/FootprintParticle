@@ -31,7 +31,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity {
 		if (timer-- <= 0 && this.getVelocity().horizontalLength() != 0) {
 			if (this.getWorld().getBlockState(this.getBlockPos()).isIn(BlockTags.RAILS) && Math.random() <= FPPClient.CONFIG.getRailFlameRange()) {
 				var i = Math.random() > 0.5f ? 1 : -1;
-				this.getWorld().addParticle(
+				this.getWorld().addParticleClient(
 						ParticleTypes.ELECTRIC_SPARK,
 						this.getX() + i * 0.4f * MathHelper.cos((float) Math.toRadians(this.getRotationClient().y + 90)),
 						this.getY() + 0.0625f,

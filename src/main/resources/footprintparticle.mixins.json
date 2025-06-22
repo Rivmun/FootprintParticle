@@ -7,7 +7,7 @@
   ],
   "client": [
     "LivingEntityMixin",
-    "BoatEntityMixin",
+    "AbstractBoatEntityMixin",
     "AbstractMinecartEntityMixin"
   ],
   "injectors": {

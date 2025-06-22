@@ -64,7 +64,7 @@ public abstract class LivingEntityMixin extends Entity {
 				(FPPClient.CONFIG.getSwimPopLevel() == 2 ||
 						(FPPClient.CONFIG.getSwimPopLevel() == 1 && this.isPlayer()))) {
 			float range = Util.getEntityScale((LivingEntity) (Object) this);
-			this.getWorld().addParticle(
+			this.getWorld().addParticleClient(
 					ParticleTypes.BUBBLE,
 					this.getX() + Math.random() - 0.5f * range,
 					this.getY() + Math.random() - 0.5f * range,
@@ -178,7 +178,7 @@ public abstract class LivingEntityMixin extends Entity {
 					int v = this.isSprinting() ? 3 : 10;
 					while (--i >= 0) {
 						SnowDustParticleType snowdust = FPPClient.SNOWDUST;
-						this.getWorld().addParticle(snowdust.setData(scale), px, py, pz,
+						this.getWorld().addParticleClient(snowdust.setData(scale), px, py, pz,
 								(Math.random() - 0.5f) / v,
 								0,
 								(Math.random() - 0.5f) / v
@@ -202,11 +202,11 @@ public abstract class LivingEntityMixin extends Entity {
 		}
 		if (canGen) {       // footprint
 			FootprintParticleType footprint = FPPClient.FOOTPRINT;
-			this.getWorld().addParticle(footprint.setData((LivingEntity) (Object) this), px, py, pz, dx, 0, dz);
+			this.getWorld().addParticleClient(footprint.setData((LivingEntity) (Object) this), px, py, pz, dx, 0, dz);
 		} else if (wetTimer <= FPPClient.CONFIG.getWetDuration() * 20) {        // waterprint (gen when footprint not gen)
 			WatermarkParticleType watermark = FPPClient.WATERMARK;
 			var i = Math.random() > 0.5f ? 1 : -1;
-			this.getWorld().addParticle(watermark.setData((LivingEntity) (Object) this), px, py, pz, dx * i, wetTimer, dz * i);		// push timer to calc alpha
+			this.getWorld().addParticleClient(watermark.setData((LivingEntity) (Object) this), px, py, pz, dx * i, wetTimer, dz * i);		// push timer to calc alpha
 		}
 		// water splash (gen whatever print gen)
 		if (wetTimer <= FPPClient.CONFIG.getWetDuration() * 20 &&
@@ -216,7 +216,7 @@ public abstract class LivingEntityMixin extends Entity {
 			int i = (int)((this.isSprinting() ? 18 : 10) * Math.max((0.7f - (float) wetTimer / (FPPClient.CONFIG.getWetDuration() * 20)), 0));
 			int v = this.isSprinting() ? 3 : 6;
 			while (--i > 0) {
-				this.getWorld().addParticle(
+				this.getWorld().addParticleClient(
 						FPPClient.WATERSPLASH,
 						px - 0.25f * range + Math.random() / 4,
 						py,

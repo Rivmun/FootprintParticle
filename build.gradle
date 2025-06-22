@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.6-SNAPSHOT'
+	id 'fabric-loom' version '1.10-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -17,7 +17,7 @@ repositories {
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
 	maven { url "https://maven.shedaniel.me/" }
-	maven {	url "https://jitpack.io" }
+	//maven {	url "https://jitpack.io" }
 	maven { url "https://maven.terraformersmc.com/releases/" }
 	maven { url "https://cursemaven.com" }
 }
@@ -37,7 +37,7 @@ dependencies {
 	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
 
     // Pehkui
-    modApi "com.github.Virtuoel:Pehkui:${project.pehkui_version}"
+    //modApi "com.github.Virtuoel:Pehkui:${project.pehkui_version}"
 	// Random mob sizes
 	//modImplementation "curse.maven:random-mob-sizes-555230:5356415"
 
