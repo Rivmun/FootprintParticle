@@ -6,7 +6,7 @@
 	"text.footprintparticle.option.printHeight": "粒子高度偏移",
 	"text.footprintparticle.option.printHeight.@Tooltip": "手动调整脚印的全局高度偏移，以避免开启光影时粒子生成在地面内。",
 	"text.footprintparticle.option.applyBlocks": "方块列表",
-	"text.footprintparticle.option.applyBlocks.@Tooltip": "以下方块上将生成脚印。\n格式: §9§omodid:blockid§r 或 §9§o#modid:blocktag§r\n建议在内建的硬度过滤器无法满足要求时再使用。",
+	"text.footprintparticle.option.applyBlocks.@Tooltip": "以下方块上将生成脚印。\n格式: §9§omodid:blockid§r 或 §9§o#modid:blocktag§r\n此设置的优先级高于硬度过滤器。",
 	"text.footprintparticle.option.blockHeight": "方块偏移",
 	"text.footprintparticle.option.blockHeight.@Tooltip": "生成在这些方块上的脚印将应用额外偏移。\n格式: §9§omodid:blockid,height§r 或 §9§o#modid:blocktag,height§r\n仅当你位于该方块内时生效。",
 	"text.footprintparticle.option.excludedBlocks": "方块列外",
@@ -41,6 +41,8 @@
 	"text.footprintparticle.option.footprintSize.@Tooltip": "单位为像素。\n为了更好的显示效果，当你在使用自定义脚印纹理时\n需要将该值设置为实际纹理宽度。",
 	"text.footprintparticle.option.customPrint": "自定义脚印纹理",
 	"text.footprintparticle.option.customPrint.@Tooltip": "为特定生物设置特定的脚印纹理。\n格式: §9§omodid:mobid,fileName1,fileName2,...§r\n§5file§r必须是一张PNG图片且放置于资源包中的\n§oassets/footprintparticle/textures/particle§r下。\n同时，你需要在\n§oassets/footprintparticle/particles/footprint.json§r或\n§oassets/footprintparticle/particles/watermark.json§r\n中注册你的纹理。\n更多信息请查阅wiki。",
+	"text.footprintparticle.option.hardnessGate": "方块硬度门限",
+	"text.footprintparticle.option.hardnessGate.@Tooltip": "硬度小于该值的方块将生成脚印。\n你可以将该值设为0来禁用所有方块，或者设为999来启用所有方块\n默认值为0.7",
 
 	"modmenu.descriptionTranslation.footprintparticle": "一个简单地为生物和玩家添加脚印粒子的模组。"
 }
