@@ -128,11 +128,11 @@ public class ConfigScreen {
 				.build()
 		);
 		general.addEntry(entryBuilder
-				.startStrList(new TranslatableText("text.footprintparticle.option.blockHeight")
-						,config.getBlockHeight())
-				.setDefaultValue(FPPConfig.DEF_BLOCKHEIGHT)
-				.setTooltip(new TranslatableText("text.footprintparticle.option.blockHeight.@Tooltip"))
-				.setSaveConsumer(config::setBlockHeight)
+				.startFloatField(new TranslatableText("text.footprintparticle.option.hardnessGate")
+						,config.getHardnessGate())
+				.setDefaultValue(0.7f)
+				.setTooltip(new TranslatableText("text.footprintparticle.option.hardnessGate.@Tooltip"))
+				.setSaveConsumer(config::setHardnessGate)
 				.build()
 		);
 		general.addEntry(entryBuilder
@@ -141,6 +141,14 @@ public class ConfigScreen {
 				.setDefaultValue(FPPConfig.DEF_EXCLUDEDBLOCKS)
 				.setTooltip(new TranslatableText("text.footprintparticle.option.excludedBlocks.@Tooltip"))
 				.setSaveConsumer(config::setExcludedBlocks)
+				.build()
+		);
+		general.addEntry(entryBuilder
+				.startStrList(new TranslatableText("text.footprintparticle.option.blockHeight")
+						,config.getBlockHeight())
+				.setDefaultValue(FPPConfig.DEF_BLOCKHEIGHT)
+				.setTooltip(new TranslatableText("text.footprintparticle.option.blockHeight.@Tooltip"))
+				.setSaveConsumer(config::setBlockHeight)
 				.build()
 		);
 		general.addEntry(entryBuilder
