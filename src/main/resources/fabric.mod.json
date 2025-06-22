@@ -28,7 +28,7 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.15.0",
-		"minecraft": ">=1.21",
+		"minecraft": ">=1.21 <=1.21.1",
 		"java": ">=21",
 		"fabric-api": "*",
 		"cloth-config2":"*"
@@ -38,10 +38,10 @@
 	},
 	"custom": {
 		"modmenu": {
-		"links": {
-			"modmenu.modrinth": "https://modrinth.com/mod/footprintparticle",
-			"MCMOD.cn": "https://www.mcmod.cn/class/9454.html"
-		}
+			"links": {
+				"modmenu.modrinth": "https://modrinth.com/mod/footprintparticle",
+				"MCMOD.cn": "https://www.mcmod.cn/class/9454.html"
+			}
 		}
 	}
 }
