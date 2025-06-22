@@ -102,6 +102,7 @@ public class FPPConfig implements ConfigData {
 	private int snowDustLevel = 2;
 	private int waterSplashLevel = 1;
 	private List<String> customPrint = DEF_CUSTOM_PRINT;
+	private float hardnessGate = 0.7f;
 
 	public int isEnable() {return enableMod;}
 	public float getSecPerPrint() {return secPerPrint;}
@@ -127,6 +128,7 @@ public class FPPConfig implements ConfigData {
 	public List<String> getMobInterval() {return mobInterval;}
 	public int getFootprintSize() {return footprintSize;}
 	public List<String> getCustomPrint() {return customPrint;}
+	public float getHardnessGate() {return hardnessGate;}
 
 	public void setEnableMod(int isEnable) {enableMod = isEnable;}
 	public void setSecPerPrint(float sec) {secPerPrint = sec;}
@@ -152,4 +154,5 @@ public class FPPConfig implements ConfigData {
 	public void setMobInterval(List<String> mobInterval) {this.mobInterval = mobInterval;}
 	public void setFootprintSize(int footprintSize) {this.footprintSize = footprintSize;}
 	public void setCustomPrint(List<String> customPrint) {this.customPrint = customPrint;}
+	public void setHardnessGate(float gate) {this.hardnessGate = gate;}
 }
