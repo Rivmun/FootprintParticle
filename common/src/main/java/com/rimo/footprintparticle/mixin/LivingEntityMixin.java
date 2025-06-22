@@ -14,7 +14,6 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -243,7 +242,7 @@ public abstract class LivingEntityMixin extends Entity {
 			}
 			if (!canGen) {
 				// Hardness Filter. See on https://minecraft.fandom.com/wiki/Breaking#Blocks_by_hardness
-				canGen = MathHelper.abs(block.getBlock().getHardness()) < 0.7f;
+				canGen = MathHelper.abs(block.getBlock().getHardness()) < FPPClient.CONFIG.getHardnessGate();
 				if (canGen) {
 					canGen = !FPPClient.CONFIG.getExcludedBlocks().contains(block.getBlock().getRegistryEntry().getKey().get().getValue().toString());
 					if (canGen) {

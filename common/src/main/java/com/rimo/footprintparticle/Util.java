@@ -43,7 +43,7 @@ public class Util {
 			String[] str2 = str.split(",");
 			try {
 				if (str2[0].contentEquals(EntityType.getId(entity.getType()).toString())) {
-					spriteNames = str2;
+					spriteNames = Arrays.copyOfRange(str2, 1, str2.length);
 					break;
 				}
 			} catch (Exception e) {
