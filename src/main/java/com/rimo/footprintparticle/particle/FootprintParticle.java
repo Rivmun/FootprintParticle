@@ -14,6 +14,7 @@ import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.Heightmap;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -21,13 +22,27 @@ import java.util.List;
 
 public class FootprintParticle extends SpriteBillboardParticle {
 	protected float startAlpha;
+	private final Quaternionf q;
+	private final BlockPos pos;
 
 	protected FootprintParticle(ClientWorld clientWorld, double x, double y, double z, double vx, double vy, double vz, SpriteProvider spriteProvider, FootprintParticleType parameters, String defName) {
 		super(clientWorld, x, y, z, vx, vy, vz);
+		pos = new BlockPos(MathHelper.floor(this.x), MathHelper.floor(this.y - 0.02f), MathHelper.floor(this.z));
 
 		this.setVelocity(0, 0, 0);
 		this.setAlpha(FPPClient.CONFIG.getFootprintAlpha());
 		this.angle = (float) MathHelper.atan2(vx, vz);
+
+		/*
+		 * Quaternion expression powered by Deepseek.ai 👍
+		 * rotating particle to horizontal plane and facing towards to entity moving direction
+		 */
+		float halfAngle = this.angle / 2;
+		double factor = MathHelper.SQUARE_ROOT_OF_TWO / 2;
+		double sf = MathHelper.sin(halfAngle) * factor;
+		double cf = MathHelper.cos(halfAngle) * factor;
+		this.q = new Quaternionf(-cf, sf, sf, cf).rotateLocalY(MathHelper.PI);
+
 		this.maxAge = (int) (FPPClient.CONFIG.getPrintLifetime() * 20);
 		this.scale = FPPClient.CONFIG.getFootprintSize() * 0.03125f;
 
@@ -61,20 +76,16 @@ public class FootprintParticle extends SpriteBillboardParticle {
 		if (this.age > this.maxAge / 2)
 			this.alpha -= this.startAlpha / this.maxAge * 2;
 
-		if (this.age++ >= this.maxAge || this.world.isAir(new BlockPos(MathHelper.floor(this.x), MathHelper.floor(this.y - 0.02f), MathHelper.floor(this.z))))
+		if (this.world.isRaining() && this.world.getTopY(Heightmap.Type.MOTION_BLOCKING, pos) <= this.y)
+			this.age += FPPClient.CONFIG.getLifeTimeAcc();
+
+		if (this.age++ >= this.maxAge || this.world.isAir(pos))
 			this.markDead();
 	}
 
 	@Override
 	public void render(VertexConsumer vertexConsumer, Camera camera, float tickDelta) {
-		/*
-		 * Quaternion expression powered by Deepseek.ai 👍
-		 */
-		float halfAngle = this.angle / 2;
-		double factor = MathHelper.SQUARE_ROOT_OF_TWO / 2;
-		double sf = MathHelper.sin(halfAngle) * factor;
-		double cf = MathHelper.cos(halfAngle) * factor;
-		this.render(vertexConsumer, camera, new Quaternionf(-cf, sf, sf, cf), tickDelta);
+		this.render(vertexConsumer, camera, this.q, tickDelta);
 	}
 
 	@Environment(EnvType.CLIENT)
