@@ -27,7 +27,7 @@ public class Util {
 		}
 
 		if (entity.isBaby())
-			scale *= 0.5f;
+			scale *= 0.66f;
 //		if (FabricLoader.getInstance().isModLoaded("pehkui"))
 //			scale *= ScaleTypes.BASE.getScaleData(entity).getScale();
 
