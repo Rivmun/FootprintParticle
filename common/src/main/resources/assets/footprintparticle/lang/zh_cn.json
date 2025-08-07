@@ -44,6 +44,8 @@
 	"text.footprintparticle.option.customPrint.@Tooltip": "为特定生物设置特定的脚印纹理。\n格式: §9§omodid:mobid,fileName1,fileName2,...§r\n§5file§r必须是一张PNG图片且放置于资源包中的\n§oassets/footprintparticle/textures/particle§r下。\n同时，你需要在\n§oassets/footprintparticle/particles/footprint.json§r或\n§oassets/footprintparticle/particles/watermark.json§r\n中注册你的纹理。\n更多信息请查阅wiki。",
 	"text.footprintparticle.option.hardnessGate": "方块硬度门限",
 	"text.footprintparticle.option.hardnessGate.@Tooltip": "硬度小于该值的方块将生成脚印。\n你可以将该值设为0来禁用所有方块，或者设为999来启用所有方块\n默认值为0.7",
+	"text.footprintparticle.option.lifeTimeAcc": "下雨时时间缩短",
+	"text.footprintparticle.option.lifeTimeAcc.@Tooltip": "下雨时粒子的消失速度会比正常快多少",
 
 	"modmenu.descriptionTranslation.footprintparticle": "一个简单地为生物和玩家添加脚印粒子的模组。"
 }
