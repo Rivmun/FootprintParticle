@@ -43,5 +43,7 @@
 	"text.footprintparticle.option.customPrint": "Custom Print Texture",
 	"text.footprintparticle.option.customPrint.@Tooltip": "Set a specific texture for a specific mob.\nFormat: §9§omodid:mobid,fileName1,fileName2,...§r\n§5file§r must be a PNG and located at\n§oassets/footprintparticle/textures/particle§r\nin your resourcepack.\nMeanwhile, you need to register it at\n§oassets/footprintparticle/particles/footprint.json§r or\n§oassets/footprintparticle/particles/watermark.json§r\nif you want to replace watermark at same time.\nMore see in wiki.",
 	"text.footprintparticle.option.hardnessGate": "Hardness Gate",
-	"text.footprintparticle.option.hardnessGate.@Tooltip": "Block which hardness smaller than gate will gen print.\nYou can set 0 to disable all blocks (whitelist), or 999 to allow all blocks (blacklist)\nDefault is 0.7"
+	"text.footprintparticle.option.hardnessGate.@Tooltip": "Block which hardness smaller than gate will gen print.\nYou can set 0 to disable all blocks (whitelist), or 999 to allow all blocks (blacklist)\nDefault is 0.7",
+	"text.footprintparticle.option.lifeTimeAcc": "Lifetime reduce when Rain",
+	"text.footprintparticle.option.lifeTimeAcc.@Tooltip": "How fast do particles disappear during rain compared to normal"
 }

@@ -103,6 +103,7 @@ public class FPPConfig implements ConfigData {
 	private int waterSplashLevel = 1;
 	private List<String> customPrint = DEF_CUSTOM_PRINT;
 	private float hardnessGate = 0.7f;
+	private int lifeTimeAcc = 0;
 
 	public int isEnable() {return enableMod;}
 	public float getSecPerPrint() {return secPerPrint;}
@@ -129,6 +130,7 @@ public class FPPConfig implements ConfigData {
 	public int getFootprintSize() {return footprintSize;}
 	public List<String> getCustomPrint() {return customPrint;}
 	public float getHardnessGate() {return hardnessGate;}
+	public int getLifeTimeAcc() {return lifeTimeAcc;}
 
 	public void setEnableMod(int isEnable) {enableMod = isEnable;}
 	public void setSecPerPrint(float sec) {secPerPrint = sec;}
@@ -155,4 +157,5 @@ public class FPPConfig implements ConfigData {
 	public void setFootprintSize(int footprintSize) {this.footprintSize = footprintSize;}
 	public void setCustomPrint(List<String> customPrint) {this.customPrint = customPrint;}
 	public void setHardnessGate(float gate) {this.hardnessGate = gate;}
+	public void setLifeTimeAcc(int lifeTimeAcc) {this.lifeTimeAcc = lifeTimeAcc;}
 }
