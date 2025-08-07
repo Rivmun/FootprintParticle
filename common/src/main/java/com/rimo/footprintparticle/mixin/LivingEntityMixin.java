@@ -249,7 +249,7 @@ public abstract class LivingEntityMixin extends Entity {
 			}
 			if (!canGen) {
 				// Hardness Filter. See on https://minecraft.fandom.com/wiki/Breaking#Blocks_by_hardness
-				canGen = CONFIG.getLifeTimeAcc() > 0 && MathHelper.abs(block.getBlock().getBlastResistance()) < CONFIG.getHardnessGate();
+				canGen = CONFIG.getHardnessGate() > 0 && MathHelper.abs(block.getBlock().getBlastResistance()) < CONFIG.getHardnessGate();
 				if (canGen) {
 					canGen = ! CONFIG.getExcludedBlocks().contains(Registry.BLOCK.getId(block.getBlock()).toString());
 					if (canGen) {
@@ -266,3 +266,4 @@ public abstract class LivingEntityMixin extends Entity {
 	}
 
 }
+
