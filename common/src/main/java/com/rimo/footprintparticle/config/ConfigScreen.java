@@ -88,6 +88,16 @@ public class ConfigScreen {
 				.build()
 		);
 		general.addEntry(entryBuilder
+				.startIntSlider(Text.translatable("text.footprintparticle.option.lifeTimeAcc")
+						,config.getLifeTimeAcc()
+						,0
+						,10)
+				.setDefaultValue(0)
+				.setTooltip(Text.translatable("text.footprintparticle.option.lifeTimeAcc.@Tooltip"))
+				.setSaveConsumer(config::setLifeTimeAcc)
+				.build()
+		);
+		general.addEntry(entryBuilder
 				.startIntSlider(Text.translatable("text.footprintparticle.option.footprintAlpha")
 						,(int) (config.getFootprintAlpha() * 10)
 						,1
