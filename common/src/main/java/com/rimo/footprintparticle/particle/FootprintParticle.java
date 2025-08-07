@@ -14,6 +14,7 @@ import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.Heightmap;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -21,9 +22,11 @@ import java.util.List;
 
 public class FootprintParticle extends SpriteBillboardParticle {
 	protected float startAlpha;
+	private final BlockPos pos;
 
 	protected FootprintParticle(ClientWorld clientWorld, double x, double y, double z, double vx, double vy, double vz, SpriteProvider spriteProvider, FootprintParticleType parameters, String defName) {
 		super(clientWorld, x, y, z, vx, vy, vz);
+		pos = new BlockPos(MathHelper.floor(this.x), MathHelper.floor(this.y - 0.02f), MathHelper.floor(this.z));
 
 		this.setVelocity(0, 0, 0);
 		this.setAlpha(FPPClient.CONFIG.getFootprintAlpha());
@@ -61,7 +64,10 @@ public class FootprintParticle extends SpriteBillboardParticle {
 		if (this.age > this.maxAge / 2)
 			this.alpha -= this.startAlpha / this.maxAge * 2;
 
-		if (this.age++ >= this.maxAge || this.world.isAir(new BlockPos(MathHelper.floor(this.x), MathHelper.floor(this.y - 0.02f), MathHelper.floor(this.z))))
+		if (this.world.isRaining() && this.world.getTopPosition(Heightmap.Type.MOTION_BLOCKING, pos).getY() <= this.y)
+			this.age += FPPClient.CONFIG.getLifeTimeAcc();
+
+		if (this.age++ >= this.maxAge || this.world.isAir(pos))
 			this.markDead();
 	}
 

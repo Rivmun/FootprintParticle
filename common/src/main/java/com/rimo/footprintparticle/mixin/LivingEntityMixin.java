@@ -21,6 +21,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static com.rimo.footprintparticle.FPPClient.CONFIG;
+
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
 	public LivingEntityMixin(EntityType<?> type, World world) {
@@ -32,7 +34,7 @@ public abstract class LivingEntityMixin extends Entity {
 	@Unique
 	private boolean fpp$wasOnGround = true;
 	@Unique
-	private int fpp$wetTimer = FPPClient.CONFIG.getWetDuration() * 20;
+	private int fpp$wetTimer = CONFIG.getWetDuration() * 20;
 
 	@Inject(method = "jump", at = @At("TAIL"))
 	protected void jump(CallbackInfo ci) {
@@ -55,14 +57,14 @@ public abstract class LivingEntityMixin extends Entity {
 
 		if (this.isTouchingWaterOrRain()) {
 			fpp$wetTimer = 0;
-		} else if (fpp$wetTimer <= FPPClient.CONFIG.getWetDuration() * 20){
+		} else if (fpp$wetTimer <= CONFIG.getWetDuration() * 20){
 			fpp$wetTimer++;
 		}
 
 		// Swim Pop
 		if (this.isSwimming() &&
-				(FPPClient.CONFIG.getSwimPopLevel() == 2 ||
-				(FPPClient.CONFIG.getSwimPopLevel() == 1 && this.isPlayer()))) {
+				(CONFIG.getSwimPopLevel() == 2 ||
+				(CONFIG.getSwimPopLevel() == 1 && this.isPlayer()))) {
 			float range = Util.getEntityScale((LivingEntity) (Object) this);
 			this.getWorld().addParticle(
 					ParticleTypes.BUBBLE,
@@ -78,17 +80,17 @@ public abstract class LivingEntityMixin extends Entity {
 
 	@Unique
 	public void fpp$footprintGenerator() {
-		if (FPPClient.CONFIG.isEnable() == 0 ||
-				(FPPClient.CONFIG.isEnable() == 1 && !this.isPlayer()))
+		if (CONFIG.isEnable() == 0 ||
+				(CONFIG.isEnable() == 1 && !this.isPlayer()))
 			return;
-		if (FPPClient.CONFIG.getExcludedMobs().contains(EntityType.getId(this.getType()).toString()))
+		if (CONFIG.getExcludedMobs().contains(EntityType.getId(this.getType()).toString()))
 			return;
-		if (!FPPClient.CONFIG.getCanGenWhenInvisible() && this.isInvisible())
+		if (! CONFIG.getCanGenWhenInvisible() && this.isInvisible())
 			return;
 
 		// Set Interval
-		fpp$timer = this.isSprinting() ? (int) (FPPClient.CONFIG.getSecPerPrint() * 13.33f) : (int) (FPPClient.CONFIG.getSecPerPrint() * 20);
-		for (String stream : FPPClient.CONFIG.getMobInterval()) {
+		fpp$timer = this.isSprinting() ? (int) (CONFIG.getSecPerPrint() * 13.33f) : (int) (CONFIG.getSecPerPrint() * 20);
+		for (String stream : CONFIG.getMobInterval()) {
 			String[] str = stream.split(",");
 			if (str[0].equals(EntityType.getId(this.getType()).toString())) {
 				try {
@@ -102,7 +104,7 @@ public abstract class LivingEntityMixin extends Entity {
 
 		// Fix pos...
 		var px = this.getX();
-		var py = this.getY() + 0.01f + FPPClient.CONFIG.getPrintHeight();
+		var py = this.getY() + 0.01f + CONFIG.getPrintHeight();
 		var pz = this.getZ();
 		var scale = Util.getEntityScale((LivingEntity) (Object) this);
 
@@ -110,7 +112,7 @@ public abstract class LivingEntityMixin extends Entity {
 		// Front and back
 		var side = Math.random() > 0.5f ? 1 : -1;
 		var hOffset = 0.0625f;
-		for (String stream : FPPClient.CONFIG.getHorseLikeMobs()) {
+		for (String stream : CONFIG.getHorseLikeMobs()) {
 			String[] str = stream.split(",");
 			if (str[0].equals(EntityType.getId(this.getType()).toString())) {
 				hOffset = 0.75f;
@@ -129,7 +131,7 @@ public abstract class LivingEntityMixin extends Entity {
 		// Left and right
 		side = Math.random() > 0.5f ? 1 : -1;
 		hOffset = 0.125f;
-		for (String stream : FPPClient.CONFIG.getSpiderLikeMobs()) {
+		for (String stream : CONFIG.getSpiderLikeMobs()) {
 			String[] str = stream.split(",");
 			if (str[0].equals(EntityType.getId(this.getType()).toString())) {
 				hOffset = 0.9f;
@@ -155,7 +157,7 @@ public abstract class LivingEntityMixin extends Entity {
 			// Fix height by blocks if in...
 			try {
 				var block = this.getWorld().getBlockState(pos);
-				for (String str : FPPClient.CONFIG.getBlockHeight()) {
+				for (String str : CONFIG.getBlockHeight()) {
 					String[] str2 = str.split(",");
 					if (str2[0].charAt(0) == '#') {
 						for (TagKey<Block> tag : block.streamTags().toList()) {
@@ -172,8 +174,8 @@ public abstract class LivingEntityMixin extends Entity {
 
 				// Snow Dust
 				if (block.isOf(Blocks.SNOW) &&
-						(FPPClient.CONFIG.getSnowDustLevel() == 2 ||
-								(FPPClient.CONFIG.getSnowDustLevel() == 1 && this.isPlayer()))) {
+						(CONFIG.getSnowDustLevel() == 2 ||
+								(CONFIG.getSnowDustLevel() == 1 && this.isPlayer()))) {
 					int i = this.isSprinting() ? 4 : 2;
 					int v = this.isSprinting() ? 3 : 10;
 					while (--i >= 0) {
@@ -203,17 +205,17 @@ public abstract class LivingEntityMixin extends Entity {
 		if (canGen) {       // footprint
 			FootprintParticleType footprint = FPPClient.FOOTPRINT.get();
 			this.getWorld().addParticle(footprint.setData((LivingEntity) (Object) this), px, py, pz, dx, 0, dz);
-		} else if (fpp$wetTimer <= FPPClient.CONFIG.getWetDuration() * 20) {        // waterprint (gen when footprint not gen)
+		} else if (fpp$wetTimer <= CONFIG.getWetDuration() * 20) {        // waterprint (gen when footprint not gen)
 			WatermarkParticleType watermark = FPPClient.WATERMARK.get();
 			var i = Math.random() > 0.5f ? 1 : -1;
 			this.getWorld().addParticle(watermark.setData((LivingEntity) (Object) this), px, py, pz, dx * i, fpp$wetTimer, dz * i);		// push timer to calc alpha
 		}
 		// water splash (gen whatever print gen)
-		if (fpp$wetTimer <= FPPClient.CONFIG.getWetDuration() * 20 &&
-				(FPPClient.CONFIG.getWaterSplashLevel() == 2 ||
-						(FPPClient.CONFIG.getWaterSplashLevel() == 1 && this.isPlayer()))) {
+		if (fpp$wetTimer <= CONFIG.getWetDuration() * 20 &&
+				(CONFIG.getWaterSplashLevel() == 2 ||
+						(CONFIG.getWaterSplashLevel() == 1 && this.isPlayer()))) {
 			float range = Util.getEntityScale((LivingEntity) (Object) this);
-			int i = (int)((this.isSprinting() ? 18 : 10) * Math.max((0.7f - (float) fpp$wetTimer / (FPPClient.CONFIG.getWetDuration() * 20)), 0));
+			int i = (int)((this.isSprinting() ? 18 : 10) * Math.max((0.7f - (float) fpp$wetTimer / (CONFIG.getWetDuration() * 20)), 0));
 			int v = this.isSprinting() ? 3 : 6;
 			while (--i > 0) {
 				this.getWorld().addParticle(
@@ -232,21 +234,21 @@ public abstract class LivingEntityMixin extends Entity {
 	@Unique
 	private boolean fpp$isPrintCanGen(BlockPos pos) {
 		var block = this.getWorld().getBlockState(pos);
-		var canGen = FPPClient.CONFIG.getApplyBlocks().contains(block.getRegistryEntry().getKey().get().getValue().toString());
+		var canGen = CONFIG.getApplyBlocks().contains(block.getRegistryEntry().getKey().get().getValue().toString());
 		if (!canGen) {
 			for (TagKey<Block> tag : block.streamTags().toList()) {
-				canGen = FPPClient.CONFIG.getApplyBlocks().contains("#" + tag.id().toString());
+				canGen = CONFIG.getApplyBlocks().contains("#" + tag.id().toString());
 				if (canGen)
 					break;
 			}
 			if (!canGen) {
 				// Hardness Filter. See on https://minecraft.fandom.com/wiki/Breaking#Blocks_by_hardness
-				canGen = MathHelper.abs(block.getBlock().getHardness()) < FPPClient.CONFIG.getHardnessGate();
+				canGen = CONFIG.getHardnessGate() > 0 && MathHelper.abs(block.getBlock().getHardness()) < CONFIG.getHardnessGate();
 				if (canGen) {
-					canGen = !FPPClient.CONFIG.getExcludedBlocks().contains(block.getRegistryEntry().getKey().get().getValue().toString());
+					canGen = ! CONFIG.getExcludedBlocks().contains(block.getRegistryEntry().getKey().get().getValue().toString());
 					if (canGen) {
 						for (TagKey<Block> tag : block.streamTags().toList()) {
-							canGen = !FPPClient.CONFIG.getExcludedBlocks().contains("#" + tag.id().toString());
+							canGen = ! CONFIG.getExcludedBlocks().contains("#" + tag.id().toString());
 							if (!canGen)
 								break;
 						}
