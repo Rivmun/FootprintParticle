@@ -57,14 +57,15 @@ public class FootprintParticle extends SpriteBillboardParticle {
 		this.y -= 0.01f / this.maxAge;
 		this.prevPosY = this.y;
 
-		if (this.age > this.maxAge / 2)
-			this.alpha -= this.startAlpha / this.maxAge * 2;
-
 		if (this.world.isRaining() && this.world.getTopPosition(Heightmap.Type.MOTION_BLOCKING, pos).getY() <= this.y)
-			this.age += FPPClient.CONFIG.getLifeTimeAcc();
+			if (this.age + FPPClient.CONFIG.getLifeTimeAcc() < this.maxAge)
+				this.age += FPPClient.CONFIG.getLifeTimeAcc();
 
 		if (this.age++ >= this.maxAge || this.world.isAir(pos))
 			this.markDead();
+
+		if (this.age > this.maxAge / 2f)
+			this.alpha = this.startAlpha - (this.startAlpha * (this.age - this.maxAge / 2f) / (this.maxAge / 2f));
 	}
 
 	@Override
