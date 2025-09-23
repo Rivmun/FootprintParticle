@@ -6,38 +6,36 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.EntityType;
 import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.Heightmap;
 import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 import java.util.List;
 
-public class FootprintParticle extends SpriteBillboardParticle {
+public class FootprintParticle extends BillboardParticle {
 	protected float startAlpha;
 	private final Quaternionf q;
 	private final BlockPos pos;
 
 	protected FootprintParticle(ClientWorld clientWorld, double x, double y, double z, double vx, double vy, double vz, SpriteProvider spriteProvider, FootprintParticleType parameters, String defName) {
-		super(clientWorld, x, y, z, vx, vy, vz);
+		super(clientWorld, x, y, z, vx, vy, vz, spriteProvider.getSprite(Random.create()));
 		pos = new BlockPos(MathHelper.floor(this.x), MathHelper.floor(this.y - 0.02f), MathHelper.floor(this.z));
 
 		this.setVelocity(0, 0, 0);
 		this.setAlpha(FPPClient.CONFIG.getFootprintAlpha());
-		this.angle = (float) MathHelper.atan2(vx, vz);
+		this.zRotation = (float) MathHelper.atan2(vx, vz);
 
 		/*
 		 * Quaternion expression powered by Deepseek.ai 👍
 		 * rotating particle to horizontal plane and facing towards to entity moving direction
 		 */
-		float halfAngle = this.angle / 2;
+		float halfAngle = this.zRotation / 2;
 		double factor = MathHelper.SQUARE_ROOT_OF_TWO / 2;
 		double sf = MathHelper.sin(halfAngle) * factor;
 		double cf = MathHelper.cos(halfAngle) * factor;
@@ -53,22 +51,21 @@ public class FootprintParticle extends SpriteBillboardParticle {
 			this.setSprite(spriteList.get((int) (Math.random() * spriteList.size())));
 		} catch (Exception e) {
 			FPPClient.LOGGER.error("Wrong custom texture for " + EntityType.getId(parameters.entity.getType()).toString() + ", please check.");
-			this.setSprite(spriteProvider);
 		}
 	}
 
-	@Override
+    @Override
+    protected RenderType getRenderType() {
+        return RenderType.field_62641;
+    }
+
+    @Override
 	public void setAlpha(float a) {
 		super.setAlpha(a);
 		this.startAlpha = a;
 	}
 
-	@Override
-	public ParticleTextureSheet getType() {
-		return ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT;
-	}
-
-	@Override
+    @Override
 	public void tick() {
 		this.y -= 0.01f / this.maxAge;
 		this.lastY = this.y;
@@ -85,8 +82,8 @@ public class FootprintParticle extends SpriteBillboardParticle {
 	}
 
 	@Override
-	public void render(VertexConsumer vertexConsumer, Camera camera, float tickDelta) {
-		this.render(vertexConsumer, camera, this.q, tickDelta);
+	public void render(BillboardParticleSubmittable submittable, Camera camera, float tickDelta) {
+		this.render(submittable, camera, this.q, tickDelta);
 	}
 
 	@Environment(EnvType.CLIENT)
@@ -98,7 +95,7 @@ public class FootprintParticle extends SpriteBillboardParticle {
 		}
 
 		@Override
-		public Particle createParticle(SimpleParticleType parameters, ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
+		public Particle createParticle(SimpleParticleType parameters, ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, Random random) {
 			return new FootprintParticle(world, x, y, z, velocityX, velocityY, velocityZ, this.spriteProvider, (FootprintParticleType) parameters, "footprint");
 		}
 	}

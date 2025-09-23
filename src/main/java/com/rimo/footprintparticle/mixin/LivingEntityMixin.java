@@ -71,7 +71,7 @@ public abstract class LivingEntityMixin extends Entity {
 				(CONFIG.getSwimPopLevel() == 2 ||
 						(CONFIG.getSwimPopLevel() == 1 && this.isPlayer()))) {
 			float range = Util.getEntityScale((LivingEntity) (Object) this);
-			this.getWorld().addParticleClient(
+			this.getEntityWorld().addParticleClient(
 					ParticleTypes.BUBBLE,
 					this.getX() + Math.random() - 0.5f * range,
 					this.getY() + Math.random() - 0.5f * range,
@@ -154,14 +154,14 @@ public abstract class LivingEntityMixin extends Entity {
 
 		// Check block type...
 		var pos = new BlockPos(MathHelper.floor(px), MathHelper.floor(py), MathHelper.floor(pz));
-		var canGen = isPrintCanGen(pos) && this.getWorld().getBlockState(pos).isOpaque();
+		var canGen = isPrintCanGen(pos) && this.getEntityWorld().getBlockState(pos).isOpaque();
 		if (!canGen) {
 			pos = new BlockPos(MathHelper.floor(px), MathHelper.floor(py) - 1, MathHelper.floor(pz));
-			canGen = isPrintCanGen(pos) && this.getWorld().getBlockState(pos).isOpaque() && Block.isShapeFullCube(this.getWorld().getBlockState(pos).getCollisionShape(this.getWorld(), pos));
+			canGen = isPrintCanGen(pos) && this.getEntityWorld().getBlockState(pos).isOpaque() && Block.isShapeFullCube(this.getEntityWorld().getBlockState(pos).getCollisionShape(this.getEntityWorld(), pos));
 		} else {
 			// Fix height by blocks if in...
 			try {
-				var block = this.getWorld().getBlockState(pos);
+				var block = this.getEntityWorld().getBlockState(pos);
 				for (String str : CONFIG.getBlockHeight()) {
 					String[] str2 = str.split(",");
 					if (str2[0].charAt(0) == '#') {
@@ -185,7 +185,7 @@ public abstract class LivingEntityMixin extends Entity {
 					int v = this.isSprinting() ? 3 : 10;
 					while (--i >= 0) {
 						SnowDustParticleType snowdust = FPPClient.SNOWDUST;
-						this.getWorld().addParticleClient(snowdust.setData(scale), px, py, pz,
+						this.getEntityWorld().addParticleClient(snowdust.setData(scale), px, py, pz,
 								(Math.random() - 0.5f) / v,
 								0,
 								(Math.random() - 0.5f) / v
@@ -209,11 +209,11 @@ public abstract class LivingEntityMixin extends Entity {
 		}
 		if (canGen) {       // footprint
 			FootprintParticleType footprint = FPPClient.FOOTPRINT;
-			this.getWorld().addParticleClient(footprint.setData((LivingEntity) (Object) this), px, py, pz, dx, 0, dz);
+			this.getEntityWorld().addParticleClient(footprint.setData((LivingEntity) (Object) this), px, py, pz, dx, 0, dz);
 		} else if (wetTimer <= CONFIG.getWetDuration() * 20) {        // waterprint (gen when footprint not gen)
 			WatermarkParticleType watermark = FPPClient.WATERMARK;
 			var i = Math.random() > 0.5f ? 1 : -1;
-			this.getWorld().addParticleClient(watermark.setData((LivingEntity) (Object) this), px, py, pz, dx * i, wetTimer, dz * i);		// push timer to calc alpha
+			this.getEntityWorld().addParticleClient(watermark.setData((LivingEntity) (Object) this), px, py, pz, dx * i, wetTimer, dz * i);		// push timer to calc alpha
 		}
 		// water splash (gen whatever print gen)
 		if (wetTimer <= CONFIG.getWetDuration() * 20 &&
@@ -223,7 +223,7 @@ public abstract class LivingEntityMixin extends Entity {
 			int i = (int)((this.isSprinting() ? 18 : 10) * Math.max((0.7f - (float) wetTimer / (CONFIG.getWetDuration() * 20)), 0));
 			int v = this.isSprinting() ? 3 : 6;
 			while (--i > 0) {
-				this.getWorld().addParticleClient(
+				this.getEntityWorld().addParticleClient(
 						FPPClient.WATERSPLASH,
 						px - 0.25f * range + Math.random() / 4,
 						py,
@@ -238,7 +238,7 @@ public abstract class LivingEntityMixin extends Entity {
 
 	@Unique
 	private boolean isPrintCanGen(BlockPos pos) {
-		var block = this.getWorld().getBlockState(pos);
+		var block = this.getEntityWorld().getBlockState(pos);
 		var canGen = CONFIG.getApplyBlocks().contains(block.getRegistryEntry().getKey().orElse(AIR).getValue().toString());
 		if (!canGen) {
 			for (TagKey<Block> tag : block.streamTags().toList()) {

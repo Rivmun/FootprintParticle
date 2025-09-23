@@ -30,7 +30,7 @@ public abstract class AbstractBoatEntityMixin extends Entity {
 			while (Math.random() < k-- / 5f) {
 				var i = Math.random() > 0.5f ? 1 : -1;		//TODO: boat's yaw is 90 degrees more than other entity, strange.
 				if (this.checkBoatInWater()) {
-					this.getWorld().addParticleClient(		// at head
+					this.getEntityWorld().addParticleClient(		// at head
 							ParticleTypes.RAIN,
 							this.getX() + 1.2f * MathHelper.cos((float) Math.toRadians(this.getRotationClient().y + 90 + Math.random() * 30 * i)),
 							(int) this.getY() + 1f,
@@ -40,7 +40,7 @@ public abstract class AbstractBoatEntityMixin extends Entity {
 							0
 					);
 					for (int j = 0; j < 2; j++) {
-						this.getWorld().addParticleClient(        // at paddle
+						this.getEntityWorld().addParticleClient(        // at paddle
 								FPPClient.WATERSPLASH,
 								this.getX() + i * MathHelper.cos((float) Math.toRadians(this.getRotationClient().y - 10 + Math.random() * 20)),
 								(int) this.getY() + 1f,
@@ -50,7 +50,7 @@ public abstract class AbstractBoatEntityMixin extends Entity {
 								(Math.random() - 0.5f) / 4f
 						);
 					}
-					this.getWorld().addParticleClient(        // at tail
+					this.getEntityWorld().addParticleClient(        // at tail
 							ParticleTypes.BUBBLE,
 							this.getX() - 1.2f * MathHelper.cos((float) Math.toRadians(this.getRotationClient().y + 90 + Math.random() * 30 * i)),
 							(int) this.getY() + 0.5f + Math.random() / 2f,
@@ -61,7 +61,7 @@ public abstract class AbstractBoatEntityMixin extends Entity {
 					);
 				} else {
 					if (Math.random() > 0.5f) {
-						this.getWorld().addParticleClient(		// at paddle
+						this.getEntityWorld().addParticleClient(		// at paddle
 								ParticleTypes.CLOUD,
 								this.getX() + i * MathHelper.cos((float) Math.toRadians(this.getRotationClient().y - 10 + Math.random() * 20)),
 								this.getY(),
@@ -71,7 +71,7 @@ public abstract class AbstractBoatEntityMixin extends Entity {
 								Math.random() / 5f
 						);
 					} else {
-						this.getWorld().addParticleClient(        // at tail
+						this.getEntityWorld().addParticleClient(        // at tail
 								ParticleTypes.CLOUD,
 								this.getX() - 1.2f * MathHelper.cos((float) Math.toRadians(this.getRotationClient().y + 90 + Math.random() * 30 * i)),
 								this.getY(),
