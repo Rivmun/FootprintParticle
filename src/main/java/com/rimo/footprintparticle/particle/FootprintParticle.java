@@ -56,7 +56,7 @@ public class FootprintParticle extends BillboardParticle {
 
     @Override
     protected RenderType getRenderType() {
-        return RenderType.field_62641;
+        return RenderType.PARTICLE_ATLAS_TRANSLUCENT;
     }
 
     @Override

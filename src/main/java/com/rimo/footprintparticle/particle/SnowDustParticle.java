@@ -45,7 +45,7 @@ public class SnowDustParticle extends BillboardParticle {
 
     @Override
     protected RenderType getRenderType() {
-        return RenderType.field_62641;
+        return RenderType.PARTICLE_ATLAS_TRANSLUCENT;
     }
 
     @Environment(EnvType.CLIENT)
