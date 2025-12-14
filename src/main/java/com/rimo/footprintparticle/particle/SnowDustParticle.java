@@ -2,62 +2,63 @@ package com.rimo.footprintparticle.particle;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.particle.BillboardParticle;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleFactory;
-import net.minecraft.client.particle.SpriteProvider;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.particle.SimpleParticleType;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.util.RandomSource;
+import org.jetbrains.annotations.NotNull;
 
-public class SnowDustParticle extends BillboardParticle {
-    private final SpriteProvider spriteProvider;
+// Copy from net.minecraft.client.particle.PlayerCloudParticle
+public class SnowDustParticle extends SingleQuadParticle {
+    private final SpriteSet sprites;
 
-    // Copy from net.minecraft.client.particle.CloudParticle
-    SnowDustParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, SpriteProvider spriteProvider) {
-        super(world, x, y, z, (double)0.0F, (double)0.0F, (double)0.0F, spriteProvider.getFirst());
-        this.velocityMultiplier = 0.96F;
-        this.spriteProvider = spriteProvider;
-        float f = 2.5F;
-        this.velocityX *= (double)0.1F;
-        this.velocityY *= (double)0.1F;
-        this.velocityZ *= (double)0.1F;
-        this.velocityX += velocityX;
-//        this.velocityY += velocityY;
-        this.velocityZ += velocityZ;
-        float g = 1.0F - (float)(Math.random() * (double)0.3F);
-        this.red = g;
-        this.green = g;
-        this.blue = g;
-        this.scale *= 1.875F;
-        int i = (int)((double)8.0F / (Math.random() * 0.8 + 0.3));
-        this.maxAge = (int)Math.max((float)i * 2.5F, 1.0F);
-//        this.collidesWithWorld = false;
-        this.updateSprite(spriteProvider);
+    SnowDustParticle(ClientLevel clientLevel, double d, double e, double f, double g, double h, double i, SpriteSet spriteSet) {
+        super(clientLevel, d, e, f, (double) 0.0F, (double) 0.0F, (double) 0.0F, spriteSet.first());
+        this.friction = 0.96F;
+        this.sprites = spriteSet;
+        float j = 2.5F;
+        this.xd *= (double) 0.1F;
+        this.yd *= (double) 0.1F;
+        this.zd *= (double) 0.1F;
+        this.xd += g;
+//        this.yd += h;
+        this.zd += i;
+        float k = 1.0F - this.random.nextFloat() * 0.3F;
+        this.rCol = k;
+        this.gCol = k;
+        this.bCol = k;
+        this.quadSize *= 1.875F;
+        int l = (int) ((double) 8.0F / ((double) this.random.nextFloat() * 0.8 + 0.3));
+        this.lifetime = (int) Math.max((float) l * 2.5F, 1.0F);
+//        this.hasPhysics = false;
+        this.setSpriteFromAge(spriteSet);
     }
 
     @Override
     public void tick() {
         super.tick();
-        if (!this.dead)
-            this.updateSprite(this.spriteProvider);
+        if (!this.removed)
+            this.setSpriteFromAge(this.sprites);
     }
 
     @Override
-    protected RenderType getRenderType() {
-        return RenderType.PARTICLE_ATLAS_TRANSLUCENT;
+    public @NotNull Layer getLayer() {
+        return Layer.TRANSLUCENT;
     }
 
     @Environment(EnvType.CLIENT)
-    public static class DefaultFactory implements ParticleFactory<SimpleParticleType> {
-        private final SpriteProvider spriteProvider;
+    public static class DefaultFactory implements ParticleProvider<@NotNull SimpleParticleType> {
+        private final SpriteSet spriteProvider;
 
-        public DefaultFactory(SpriteProvider spriteProvider) {
+        public DefaultFactory(SpriteSet spriteProvider) {
             this.spriteProvider = spriteProvider;
         }
 
         @Override
-        public Particle createParticle(SimpleParticleType parameters, ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, Random random) {
+        public Particle createParticle(SimpleParticleType parameters, @NotNull ClientLevel world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, RandomSource random) {
             Particle particle = new SnowDustParticle(world, x, y, z, velocityX, velocityY, velocityZ, this.spriteProvider);
             if (parameters instanceof SnowDustParticleType snowdust)
                 particle.scale(snowdust.size);

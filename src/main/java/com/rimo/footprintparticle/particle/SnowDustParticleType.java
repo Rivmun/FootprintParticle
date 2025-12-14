@@ -1,7 +1,7 @@
 package com.rimo.footprintparticle.particle;
 
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.SimpleParticleType;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.SimpleParticleType;
 
 public class SnowDustParticleType extends SimpleParticleType {
     public float size;
@@ -10,7 +10,7 @@ public class SnowDustParticleType extends SimpleParticleType {
         super(alwaysShow);
     }
 
-    public ParticleEffect setData(float size) {
+    public ParticleOptions setData(float size) {
         this.size = size;
         return this;
     }

@@ -1,12 +1,10 @@
 package com.rimo.footprintparticle;
 
 import net.fabricmc.fabric.api.client.particle.v1.FabricSpriteProvider;
-//import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.particle.SpriteProvider;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-//import virtuoel.pehkui.api.ScaleTypes;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +16,7 @@ public class Util {
 		for (String str : FPPClient.CONFIG.getSizePerMob()) {
 			String[] str2 = str.split(",");
 			try {
-				if (str2[0].contentEquals(EntityType.getId(entity.getType()).toString())) {
+				if (str2[0].contentEquals(EntityType.getKey(entity.getType()).toString())) {
 					scale *= Float.parseFloat(str2[1]);
 				}
 			} catch (Exception e) {
@@ -36,12 +34,12 @@ public class Util {
 		return scale;
 	}
 
-	public static List<Sprite> getCustomSprites(LivingEntity entity, SpriteProvider spriteProvider, String def) {
+	public static List<TextureAtlasSprite> getCustomSprites(LivingEntity entity, SpriteSet spriteProvider, String def) {
 		String[] spriteNames = {def};
 		for (String str : FPPClient.CONFIG.getCustomPrint()) {
 			String[] str2 = str.split(",");
 			try {
-				if (str2[0].contentEquals(EntityType.getId(entity.getType()).toString())) {
+				if (str2[0].contentEquals(EntityType.getKey(entity.getType()).toString())) {
 					spriteNames = Arrays.copyOfRange(str2, 1, str2.length);
 					break;
 				}
@@ -52,7 +50,7 @@ public class Util {
 		List<String> finalSpriteNames = Arrays.asList(spriteNames);
 		return ((FabricSpriteProvider) spriteProvider).getSprites().stream().filter(sprite ->
 				finalSpriteNames.stream().anyMatch(str ->
-						sprite.getContents().getId().getPath().contentEquals(str)
+						sprite.contents().name().getPath().contentEquals(str)
 				)
 		).toList();
 	}

@@ -1,6 +1,6 @@
 package com.rimo.footprintparticle.particle;
 
-import net.minecraft.particle.SimpleParticleType;
+import net.minecraft.core.particles.SimpleParticleType;
 
 public class WaterSplashParticleType extends SimpleParticleType {
 

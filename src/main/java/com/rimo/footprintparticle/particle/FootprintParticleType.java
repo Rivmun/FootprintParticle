@@ -1,8 +1,8 @@
 package com.rimo.footprintparticle.particle;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.SimpleParticleType;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.world.entity.LivingEntity;
 
 public class FootprintParticleType extends SimpleParticleType {
 
@@ -12,7 +12,7 @@ public class FootprintParticleType extends SimpleParticleType {
 		super(alwaysShow);
 	}
 
-	public ParticleEffect setData(LivingEntity entity) {
+	public ParticleOptions setData(LivingEntity entity) {
 		this.entity = entity;
 		return this;
 	}

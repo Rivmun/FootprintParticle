@@ -5,19 +5,20 @@ import com.rimo.footprintparticle.Util;
 import com.rimo.footprintparticle.particle.FootprintParticleType;
 import com.rimo.footprintparticle.particle.SnowDustParticleType;
 import com.rimo.footprintparticle.particle.WatermarkParticleType;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.TagKey;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,12 +29,12 @@ import static com.rimo.footprintparticle.FPPClient.CONFIG;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
-	public LivingEntityMixin(EntityType<?> type, World world) {
+	public LivingEntityMixin(EntityType<?> type, Level world) {
 		super(type, world);
 	}
 
 	@Unique
-	private final RegistryKey<Block> AIR = RegistryKey.of(RegistryKeys.BLOCK, Identifier.ofVanilla("air"));
+	private final ResourceKey<@NotNull Block> AIR = ResourceKey.create(Registries.BLOCK, Identifier.withDefaultNamespace("air"));
 	@Unique
 	private int timer = 0;
 	@Unique
@@ -41,7 +42,7 @@ public abstract class LivingEntityMixin extends Entity {
 	@Unique
 	private int wetTimer = CONFIG.getWetDuration() * 20;
 
-	@Inject(method = "jump", at = @At("TAIL"))
+	@Inject(method = "jumpFromGround", at = @At("TAIL"))
 	protected void jump(CallbackInfo ci) {
 		this.footprintGenerator();
 	}
@@ -49,18 +50,18 @@ public abstract class LivingEntityMixin extends Entity {
 	@Inject(method = "tick", at = @At("TAIL"))
 	public void tick(CallbackInfo ci) {
 		if (timer <= 0) {
-			if (!this.isSneaking() && !this.isSubmergedInWater()) {
+			if (!this.isShiftKeyDown() && !this.isUnderWater()) {
 				// Either on ground moving or landing
-				if ((this.getVelocity().horizontalLength() != 0 && this.isOnGround()) || (!wasOnGround && this.isOnGround())) {
+				if ((this.getDeltaMovement().horizontalDistance() != 0 && this.onGround()) || (!wasOnGround && this.onGround())) {
 					this.footprintGenerator();
 				}
-				wasOnGround = this.isOnGround();
+				wasOnGround = this.onGround();
 			}
 		} else {
 			timer--;
 		}
 
-		if (this.isTouchingWaterOrRain()) {
+		if (this.isInWaterOrRain()) {
 			wetTimer = 0;
 		} else if (wetTimer <= CONFIG.getWetDuration() * 20){
 			wetTimer++;
@@ -69,9 +70,9 @@ public abstract class LivingEntityMixin extends Entity {
 		// Swim Pop
 		if (this.isSwimming() &&
 				(CONFIG.getSwimPopLevel() == 2 ||
-						(CONFIG.getSwimPopLevel() == 1 && this.isPlayer()))) {
+						(CONFIG.getSwimPopLevel() == 1 && this.isAlwaysTicking()))) {
 			float range = Util.getEntityScale((LivingEntity) (Object) this);
-			this.getEntityWorld().addParticleClient(
+			this.level().addParticle(
 					ParticleTypes.BUBBLE,
 					this.getX() + Math.random() - 0.5f * range,
 					this.getY() + Math.random() - 0.5f * range,
@@ -86,9 +87,9 @@ public abstract class LivingEntityMixin extends Entity {
 	@Unique
 	public void footprintGenerator() {
 		if (CONFIG.isEnable() == 0 ||
-				(CONFIG.isEnable() == 1 && !this.isPlayer()))
+				(CONFIG.isEnable() == 1 && !this.isAlwaysTicking()))
 			return;
-		if (CONFIG.getExcludedMobs().contains(EntityType.getId(this.getType()).toString()))
+		if (CONFIG.getExcludedMobs().contains(EntityType.getKey(this.getType()).toString()))
 			return;
 		if (!CONFIG.getCanGenWhenInvisible() && this.isInvisible())
 			return;
@@ -97,7 +98,7 @@ public abstract class LivingEntityMixin extends Entity {
 		timer = this.isSprinting() ? (int) (CONFIG.getSecPerPrint() * 13.33f) : (int) (CONFIG.getSecPerPrint() * 20);
 		for (String stream : CONFIG.getMobInterval()) {
 			String[] str = stream.split(",");
-			if (str[0].equals(EntityType.getId(this.getType()).toString())) {
+			if (str[0].equals(EntityType.getKey(this.getType()).toString())) {
 				try {
 					timer *= Float.parseFloat(str[1]);
 				} catch (Exception e) {
@@ -119,26 +120,26 @@ public abstract class LivingEntityMixin extends Entity {
 		var hOffset = 0.0625f;
 		for (String stream : CONFIG.getHorseLikeMobs()) {
 			String[] str = stream.split(",");
-			if (str[0].equals(EntityType.getId(this.getType()).toString())) {
+			if (str[0].equals(EntityType.getKey(this.getType()).toString())) {
 				hOffset = 0.75f;
 				try {
 					hOffset = Float.parseFloat(str[1]);
 				} catch (Exception e) {
 					//
 				}
-				timer = (int) (this.getControllingPassenger() != null ? this.getControllingPassenger().isPlayer() ? timer * 0.5f : timer * 1.33f : timer * 1.33f);
+				timer = (int) (this.getControllingPassenger() != null ? this.getControllingPassenger().isAlwaysTicking() ? timer * 0.5f : timer * 1.33f : timer * 1.33f);
 				break;
 			}
 		}
 		hOffset *= scale;
-		px = px - hOffset * side * MathHelper.sin((float) Math.toRadians(this.getRotationClient().y));
-		pz = pz + hOffset * side * MathHelper.cos((float) Math.toRadians(this.getRotationClient().y));
+		px = px - hOffset * side * Mth.sin((float) Math.toRadians(this.getRotationVector().y));
+		pz = pz + hOffset * side * Mth.cos((float) Math.toRadians(this.getRotationVector().y));
 		// Left and right
 		side = Math.random() > 0.5f ? 1 : -1;
 		hOffset = 0.125f;
 		for (String stream : CONFIG.getSpiderLikeMobs()) {
 			String[] str = stream.split(",");
-			if (str[0].equals(EntityType.getId(this.getType()).toString())) {
+			if (str[0].equals(EntityType.getKey(this.getType()).toString())) {
 				hOffset = 0.9f;
 				try {
 					hOffset = Float.parseFloat(str[1]);
@@ -149,43 +150,43 @@ public abstract class LivingEntityMixin extends Entity {
 			}
 		}
 		hOffset *= scale;
-		px = px - hOffset * side * MathHelper.sin((float) Math.toRadians(this.getRotationClient().y + 90));
-		pz = pz + hOffset * side * MathHelper.cos((float) Math.toRadians(this.getRotationClient().y + 90));
+		px = px - hOffset * side * Mth.sin((float) Math.toRadians(this.getRotationVector().y + 90));
+		pz = pz + hOffset * side * Mth.cos((float) Math.toRadians(this.getRotationVector().y + 90));
 
 		// Check block type...
-		var pos = new BlockPos(MathHelper.floor(px), MathHelper.floor(py), MathHelper.floor(pz));
-		var canGen = isPrintCanGen(pos) && this.getEntityWorld().getBlockState(pos).isOpaque();
+		var pos = new BlockPos(Mth.floor(px), Mth.floor(py), Mth.floor(pz));
+		var canGen = isPrintCanGen(pos) && this.level().getBlockState(pos).canOcclude();
 		if (!canGen) {
-			pos = new BlockPos(MathHelper.floor(px), MathHelper.floor(py) - 1, MathHelper.floor(pz));
-			canGen = isPrintCanGen(pos) && this.getEntityWorld().getBlockState(pos).isOpaque() && Block.isShapeFullCube(this.getEntityWorld().getBlockState(pos).getCollisionShape(this.getEntityWorld(), pos));
+			pos = new BlockPos(Mth.floor(px), Mth.floor(py) - 1, Mth.floor(pz));
+			canGen = isPrintCanGen(pos) && this.level().getBlockState(pos).canOcclude() && Block.isShapeFullBlock(this.level().getBlockState(pos).getCollisionShape(this.level(), pos));
 		} else {
 			// Fix height by blocks if in...
 			try {
-				var block = this.getEntityWorld().getBlockState(pos);
+				var block = this.level().getBlockState(pos);
 				for (String str : CONFIG.getBlockHeight()) {
 					String[] str2 = str.split(",");
 					if (str2[0].charAt(0) == '#') {
-						for (TagKey<Block> tag : block.streamTags().toList()) {
-							if (str2[0].equals("#" + tag.id().toString())) {
+						for (TagKey<Block> tag : block.getTags().toList()) {
+							if (str2[0].equals("#" + tag.location().toString())) {
 								py += Float.parseFloat(str2[1]);
 								break;
 							}
 						}
-					} else if (str2[0].contentEquals(block.getRegistryEntry().getKey().orElse(AIR).getValue().toString())) {
+					} else if (str2[0].contentEquals(block.getBlockHolder().unwrapKey().orElse(AIR).identifier().toString())) {
 						py += Float.parseFloat(str2[1]);
 						break;
 					}
 				}
 
 				// Snow Dust
-				if (block.isOf(Blocks.SNOW) &&
+				if (block.is(Blocks.SNOW) &&
 						(CONFIG.getSnowDustLevel() == 2 ||
-								(CONFIG.getSnowDustLevel() == 1 && this.isPlayer()))) {
+								(CONFIG.getSnowDustLevel() == 1 && this.isAlwaysTicking()))) {
 					int i = this.isSprinting() ? 4 : 2;
 					int v = this.isSprinting() ? 3 : 10;
 					while (--i >= 0) {
 						SnowDustParticleType snowdust = FPPClient.SNOWDUST;
-						this.getEntityWorld().addParticleClient(snowdust.setData(scale), px, py, pz,
+						this.level().addParticle(snowdust.setData(scale), px, py, pz,
 								(Math.random() - 0.5f) / v,
 								0,
 								(Math.random() - 0.5f) / v
@@ -200,36 +201,36 @@ public abstract class LivingEntityMixin extends Entity {
 
 		// Generate
 		double dx, dz;      // get facing
-		if (this.getVelocity().horizontalLength() == 0) {
-			dx = -MathHelper.sin((float) Math.toRadians(this.getRotationClient().y));
-			dz =  MathHelper.cos((float) Math.toRadians(this.getRotationClient().y));
+		if (this.getDeltaMovement().horizontalDistance() == 0) {
+			dx = -Mth.sin((float) Math.toRadians(this.getRotationVector().y));
+			dz =  Mth.cos((float) Math.toRadians(this.getRotationVector().y));
 		} else {
-			dx = this.getVelocity().getX();
-			dz = this.getVelocity().getZ();
+			dx = this.getDeltaMovement().x();
+			dz = this.getDeltaMovement().z();
 		}
 		if (canGen) {       // footprint
 			FootprintParticleType footprint = FPPClient.FOOTPRINT;
-			this.getEntityWorld().addParticleClient(footprint.setData((LivingEntity) (Object) this), px, py, pz, dx, 0, dz);
+			this.level().addParticle(footprint.setData((LivingEntity) (Object) this), px, py, pz, dx, 0, dz);
 		} else if (wetTimer <= CONFIG.getWetDuration() * 20) {        // waterprint (gen when footprint not gen)
 			WatermarkParticleType watermark = FPPClient.WATERMARK;
 			var i = Math.random() > 0.5f ? 1 : -1;
-			this.getEntityWorld().addParticleClient(watermark.setData((LivingEntity) (Object) this), px, py, pz, dx * i, wetTimer, dz * i);		// push timer to calc alpha
+			this.level().addParticle(watermark.setData((LivingEntity) (Object) this), px, py, pz, dx * i, wetTimer, dz * i);		// push timer to calc alpha
 		}
 		// water splash (gen whatever print gen)
 		if (wetTimer <= CONFIG.getWetDuration() * 20 &&
 				(CONFIG.getWaterSplashLevel() == 2 ||
-						(CONFIG.getWaterSplashLevel() == 1 && this.isPlayer()))) {
+						(CONFIG.getWaterSplashLevel() == 1 && this.isAlwaysTicking()))) {
 			float range = Util.getEntityScale((LivingEntity) (Object) this);
 			int i = (int)((this.isSprinting() ? 18 : 10) * Math.max((0.7f - (float) wetTimer / (CONFIG.getWetDuration() * 20)), 0));
 			int v = this.isSprinting() ? 3 : 6;
 			while (--i > 0) {
-				this.getEntityWorld().addParticleClient(
+				this.level().addParticle(
 						FPPClient.WATERSPLASH,
 						px - 0.25f * range + Math.random() / 4,
 						py,
 						pz - 0.25f * range + Math.random() / 4,
 						(Math.random() - 0.5f) / v,
-						0.02f + Math.random() * this.getVelocity().horizontalLength(),
+						0.02f + Math.random() * this.getDeltaMovement().horizontalDistance(),
 						(Math.random() - 0.5f) / v
 				);
 			}
@@ -238,22 +239,22 @@ public abstract class LivingEntityMixin extends Entity {
 
 	@Unique
 	private boolean isPrintCanGen(BlockPos pos) {
-		var block = this.getEntityWorld().getBlockState(pos);
-		var canGen = CONFIG.getApplyBlocks().contains(block.getRegistryEntry().getKey().orElse(AIR).getValue().toString());
+		var block = this.level().getBlockState(pos);
+		var canGen = CONFIG.getApplyBlocks().contains(block.getBlockHolder().unwrapKey().orElse(AIR).identifier().toString());
 		if (!canGen) {
-			for (TagKey<Block> tag : block.streamTags().toList()) {
-				canGen = CONFIG.getApplyBlocks().contains("#" + tag.id().toString());
+			for (TagKey<Block> tag : block.getTags().toList()) {
+				canGen = CONFIG.getApplyBlocks().contains("#" + tag.location());
 				if (canGen)
 					break;
 			}
 			if (!canGen) {
 				// Hardness Filter. See on https://minecraft.fandom.com/wiki/Breaking#Blocks_by_hardness
-				canGen = CONFIG.getHardnessGate() > 0 && MathHelper.abs(block.getBlock().getHardness()) < CONFIG.getHardnessGate();
+				canGen = CONFIG.getHardnessGate() > 0 && Mth.abs(block.getBlock().defaultDestroyTime()) < CONFIG.getHardnessGate();
 				if (canGen) {
-					canGen = !CONFIG.getExcludedBlocks().contains(block.getRegistryEntry().getKey().orElse(AIR).getValue().toString());
+					canGen = !CONFIG.getExcludedBlocks().contains(block.getBlockHolder().unwrapKey().orElse(AIR).identifier().toString());
 					if (canGen) {
-						for (TagKey<Block> tag : block.streamTags().toList()) {
-							canGen = !CONFIG.getExcludedBlocks().contains("#" + tag.id().toString());
+						for (TagKey<Block> tag : block.getTags().toList()) {
+							canGen = !CONFIG.getExcludedBlocks().contains("#" + tag.location());
 							if (!canGen)
 								break;
 						}
