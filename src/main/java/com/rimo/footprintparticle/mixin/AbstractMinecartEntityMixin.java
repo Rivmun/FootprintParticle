@@ -23,12 +23,12 @@ public abstract class AbstractMinecartEntityMixin extends Entity {
 	}
 
 	@Unique
-	private int timer = 0;
+	private int fpp$timer = 0;
 
 	//TODO: inject at TAIL will do nothing, why?
 	@Inject(method = "tick", at = @At("HEAD"))
-	public void tick(CallbackInfo ci) {
-		if (timer-- <= 0 && this.getDeltaMovement().horizontalDistance() != 0) {
+	public void fpp$tick(CallbackInfo ci) {
+		if (fpp$timer-- <= 0 && this.getDeltaMovement().horizontalDistance() != 0) {
 			if (this.level().getBlockState(this.blockPosition()).is(BlockTags.RAILS) && Math.random() <= FPPClient.CONFIG.getRailFlameRange()) {
 				var i = Math.random() > 0.5f ? 1 : -1;
 				this.level().addParticle(
@@ -41,7 +41,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity {
 						this.getDeltaMovement().z() / 3f * Math.random()
 				);
 			}
-			timer = this.level().getBlockState(this.blockPosition()).is(Blocks.POWERED_RAIL)?
+			fpp$timer = this.level().getBlockState(this.blockPosition()).is(Blocks.POWERED_RAIL)?
 					(int) (FPPClient.CONFIG.getSecPerPrint() * 3.33f):
 					(int) (FPPClient.CONFIG.getSecPerPrint() * 6.66f);
 		}

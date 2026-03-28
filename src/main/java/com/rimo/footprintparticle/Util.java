@@ -1,6 +1,6 @@
 package com.rimo.footprintparticle;
 
-import net.fabricmc.fabric.api.client.particle.v1.FabricSpriteProvider;
+import net.fabricmc.fabric.api.client.particle.v1.FabricSpriteSet;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.entity.EntityType;
@@ -48,7 +48,7 @@ public class Util {
 			}
 		}
 		List<String> finalSpriteNames = Arrays.asList(spriteNames);
-		return ((FabricSpriteProvider) spriteProvider).getSprites().stream().filter(sprite ->
+		return ((FabricSpriteSet) spriteProvider).getSprites().stream().filter(sprite ->
 				finalSpriteNames.stream().anyMatch(str ->
 						sprite.contents().name().getPath().contentEquals(str)
 				)

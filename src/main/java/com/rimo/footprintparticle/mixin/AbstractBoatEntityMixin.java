@@ -24,7 +24,7 @@ public abstract class AbstractBoatEntityMixin extends Entity {
 	protected abstract boolean checkInWater();
 
 	@Inject(method = "tick", at = @At("TAIL"))
-	public void tick(CallbackInfo ci) {
+	public void fpp$tick(CallbackInfo ci) {
 		if (FPPClient.CONFIG.isEnableBoatTrail()) {
 			int k = (int)(this.getDeltaMovement().horizontalDistance() * 10);
 			while (Math.random() < k-- / 5f) {

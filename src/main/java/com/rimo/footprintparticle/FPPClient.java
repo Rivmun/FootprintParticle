@@ -5,7 +5,7 @@ import com.rimo.footprintparticle.particle.*;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
+import net.fabricmc.fabric.api.client.particle.v1.ParticleProviderRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import org.slf4j.Logger;
@@ -22,7 +22,7 @@ public class FPPClient implements ClientModInitializer {
 	public static final WaterSplashParticleType WATERSPLASH = Registry.register(BuiltInRegistries.PARTICLE_TYPE, MOD_ID + ":watersplash", new WaterSplashParticleType(true));
 
 	public void onInitializeClient() {
-		ParticleFactoryRegistry registry = ParticleFactoryRegistry.getInstance();
+		ParticleProviderRegistry registry = ParticleProviderRegistry.getInstance();
 		registry.register(FPPClient.FOOTPRINT, FootprintParticle.DefaultFactory::new);
 		registry.register(FPPClient.WATERMARK, WatermarkParticle.DefaultFactory::new);
 		registry.register(FPPClient.SNOWDUST, SnowDustParticle.DefaultFactory::new);

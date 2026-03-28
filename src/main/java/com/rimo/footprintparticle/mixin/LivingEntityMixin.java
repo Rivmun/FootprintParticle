@@ -34,37 +34,37 @@ public abstract class LivingEntityMixin extends Entity {
 	}
 
 	@Unique
-	private final ResourceKey<@NotNull Block> AIR = ResourceKey.create(Registries.BLOCK, Identifier.withDefaultNamespace("air"));
+	private final ResourceKey<@NotNull Block> fpp$AIR = ResourceKey.create(Registries.BLOCK, Identifier.withDefaultNamespace("air"));
 	@Unique
-	private int timer = 0;
+	private int fpp$timer = 0;
 	@Unique
-	private boolean wasOnGround = true;
+	private boolean fpp$wasOnGround = true;
 	@Unique
-	private int wetTimer = CONFIG.getWetDuration() * 20;
+	private int fpp$wetTimer = CONFIG.getWetDuration() * 20;
 
 	@Inject(method = "jumpFromGround", at = @At("TAIL"))
-	protected void jump(CallbackInfo ci) {
-		this.footprintGenerator();
+	protected void fpp$jump(CallbackInfo ci) {
+		this.fpp$footprintGenerator();
 	}
 
 	@Inject(method = "tick", at = @At("TAIL"))
-	public void tick(CallbackInfo ci) {
-		if (timer <= 0) {
+	public void fpp$tick(CallbackInfo ci) {
+		if (fpp$timer <= 0) {
 			if (!this.isShiftKeyDown() && !this.isUnderWater()) {
 				// Either on ground moving or landing
-				if ((this.getDeltaMovement().horizontalDistance() != 0 && this.onGround()) || (!wasOnGround && this.onGround())) {
-					this.footprintGenerator();
+				if ((this.getDeltaMovement().horizontalDistance() != 0 && this.onGround()) || (! fpp$wasOnGround && this.onGround())) {
+					this.fpp$footprintGenerator();
 				}
-				wasOnGround = this.onGround();
+				fpp$wasOnGround = this.onGround();
 			}
 		} else {
-			timer--;
+			fpp$timer--;
 		}
 
 		if (this.isInWaterOrRain()) {
-			wetTimer = 0;
-		} else if (wetTimer <= CONFIG.getWetDuration() * 20){
-			wetTimer++;
+			fpp$wetTimer = 0;
+		} else if (fpp$wetTimer <= CONFIG.getWetDuration() * 20){
+			fpp$wetTimer++;
 		}
 
 		// Swim Pop
@@ -85,7 +85,7 @@ public abstract class LivingEntityMixin extends Entity {
 	}
 
 	@Unique
-	public void footprintGenerator() {
+	public void fpp$footprintGenerator() {
 		if (CONFIG.isEnable() == 0 ||
 				(CONFIG.isEnable() == 1 && !this.isAlwaysTicking()))
 			return;
@@ -95,12 +95,12 @@ public abstract class LivingEntityMixin extends Entity {
 			return;
 
 		// Set Interval
-		timer = this.isSprinting() ? (int) (CONFIG.getSecPerPrint() * 13.33f) : (int) (CONFIG.getSecPerPrint() * 20);
+		fpp$timer = this.isSprinting() ? (int) (CONFIG.getSecPerPrint() * 13.33f) : (int) (CONFIG.getSecPerPrint() * 20);
 		for (String stream : CONFIG.getMobInterval()) {
 			String[] str = stream.split(",");
 			if (str[0].equals(EntityType.getKey(this.getType()).toString())) {
 				try {
-					timer *= Float.parseFloat(str[1]);
+					fpp$timer *= Float.parseFloat(str[1]);
 				} catch (Exception e) {
 					//
 				}
@@ -127,7 +127,7 @@ public abstract class LivingEntityMixin extends Entity {
 				} catch (Exception e) {
 					//
 				}
-				timer = (int) (this.getControllingPassenger() != null ? this.getControllingPassenger().isAlwaysTicking() ? timer * 0.5f : timer * 1.33f : timer * 1.33f);
+				fpp$timer = (int) (this.getControllingPassenger() != null ? this.getControllingPassenger().isAlwaysTicking() ? fpp$timer * 0.5f : fpp$timer * 1.33f : fpp$timer * 1.33f);
 				break;
 			}
 		}
@@ -155,10 +155,10 @@ public abstract class LivingEntityMixin extends Entity {
 
 		// Check block type...
 		var pos = new BlockPos(Mth.floor(px), Mth.floor(py), Mth.floor(pz));
-		var canGen = isPrintCanGen(pos) && this.level().getBlockState(pos).canOcclude();
+		var canGen = fpp$isPrintCanGen(pos) && this.level().getBlockState(pos).canOcclude();
 		if (!canGen) {
 			pos = new BlockPos(Mth.floor(px), Mth.floor(py) - 1, Mth.floor(pz));
-			canGen = isPrintCanGen(pos) && this.level().getBlockState(pos).canOcclude() && Block.isShapeFullBlock(this.level().getBlockState(pos).getCollisionShape(this.level(), pos));
+			canGen = fpp$isPrintCanGen(pos) && this.level().getBlockState(pos).canOcclude() && Block.isShapeFullBlock(this.level().getBlockState(pos).getCollisionShape(this.level(), pos));
 		} else {
 			// Fix height by blocks if in...
 			try {
@@ -166,13 +166,13 @@ public abstract class LivingEntityMixin extends Entity {
 				for (String str : CONFIG.getBlockHeight()) {
 					String[] str2 = str.split(",");
 					if (str2[0].charAt(0) == '#') {
-						for (TagKey<Block> tag : block.getTags().toList()) {
+						for (TagKey<Block> tag : block.tags().toList()) {
 							if (str2[0].equals("#" + tag.location().toString())) {
 								py += Float.parseFloat(str2[1]);
 								break;
 							}
 						}
-					} else if (str2[0].contentEquals(block.getBlockHolder().unwrapKey().orElse(AIR).identifier().toString())) {
+					} else if (str2[0].contentEquals(block.typeHolder().unwrapKey().orElse(fpp$AIR).identifier().toString())) {
 						py += Float.parseFloat(str2[1]);
 						break;
 					}
@@ -211,17 +211,17 @@ public abstract class LivingEntityMixin extends Entity {
 		if (canGen) {       // footprint
 			FootprintParticleType footprint = FPPClient.FOOTPRINT;
 			this.level().addParticle(footprint.setData((LivingEntity) (Object) this), px, py, pz, dx, 0, dz);
-		} else if (wetTimer <= CONFIG.getWetDuration() * 20) {        // waterprint (gen when footprint not gen)
+		} else if (fpp$wetTimer <= CONFIG.getWetDuration() * 20) {        // waterprint (gen when footprint not gen)
 			WatermarkParticleType watermark = FPPClient.WATERMARK;
 			var i = Math.random() > 0.5f ? 1 : -1;
-			this.level().addParticle(watermark.setData((LivingEntity) (Object) this), px, py, pz, dx * i, wetTimer, dz * i);		// push timer to calc alpha
+			this.level().addParticle(watermark.setData((LivingEntity) (Object) this), px, py, pz, dx * i, fpp$wetTimer, dz * i);		// push timer to calc alpha
 		}
 		// water splash (gen whatever print gen)
-		if (wetTimer <= CONFIG.getWetDuration() * 20 &&
+		if (fpp$wetTimer <= CONFIG.getWetDuration() * 20 &&
 				(CONFIG.getWaterSplashLevel() == 2 ||
 						(CONFIG.getWaterSplashLevel() == 1 && this.isAlwaysTicking()))) {
 			float range = Util.getEntityScale((LivingEntity) (Object) this);
-			int i = (int)((this.isSprinting() ? 18 : 10) * Math.max((0.7f - (float) wetTimer / (CONFIG.getWetDuration() * 20)), 0));
+			int i = (int)((this.isSprinting() ? 18 : 10) * Math.max((0.7f - (float) fpp$wetTimer / (CONFIG.getWetDuration() * 20)), 0));
 			int v = this.isSprinting() ? 3 : 6;
 			while (--i > 0) {
 				this.level().addParticle(
@@ -238,11 +238,11 @@ public abstract class LivingEntityMixin extends Entity {
 	}
 
 	@Unique
-	private boolean isPrintCanGen(BlockPos pos) {
+	private boolean fpp$isPrintCanGen(BlockPos pos) {
 		var block = this.level().getBlockState(pos);
-		var canGen = CONFIG.getApplyBlocks().contains(block.getBlockHolder().unwrapKey().orElse(AIR).identifier().toString());
+		var canGen = CONFIG.getApplyBlocks().contains(block.typeHolder().unwrapKey().orElse(fpp$AIR).identifier().toString());
 		if (!canGen) {
-			for (TagKey<Block> tag : block.getTags().toList()) {
+			for (TagKey<Block> tag : block.tags().toList()) {
 				canGen = CONFIG.getApplyBlocks().contains("#" + tag.location());
 				if (canGen)
 					break;
@@ -251,9 +251,9 @@ public abstract class LivingEntityMixin extends Entity {
 				// Hardness Filter. See on https://minecraft.fandom.com/wiki/Breaking#Blocks_by_hardness
 				canGen = CONFIG.getHardnessGate() > 0 && Mth.abs(block.getBlock().defaultDestroyTime()) < CONFIG.getHardnessGate();
 				if (canGen) {
-					canGen = !CONFIG.getExcludedBlocks().contains(block.getBlockHolder().unwrapKey().orElse(AIR).identifier().toString());
+					canGen = !CONFIG.getExcludedBlocks().contains(block.typeHolder().unwrapKey().orElse(fpp$AIR).identifier().toString());
 					if (canGen) {
-						for (TagKey<Block> tag : block.getTags().toList()) {
+						for (TagKey<Block> tag : block.tags().toList()) {
 							canGen = !CONFIG.getExcludedBlocks().contains("#" + tag.location());
 							if (!canGen)
 								break;
