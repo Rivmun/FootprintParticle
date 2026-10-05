@@ -53,7 +53,7 @@ public class FootprintParticle extends SingleQuadParticle {
 			List<TextureAtlasSprite> spriteList = Util.getCustomSprites(parameters.entity, spriteProvider, defName);
 			this.setSprite(spriteList.get((int) (Math.random() * spriteList.size())));
 		} catch (Exception e) {
-			Client.LOGGER.error("Wrong custom texture for " + EntityType.getKey(parameters.entity.getType()) + ", please check.");
+			Client.LOGGER.error("Wrong custom texture for " + EntityType.getKey(parameters.entity.getType()) + ", please check.", e);
 		}
 	}
 

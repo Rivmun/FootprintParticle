@@ -2,7 +2,9 @@
 /*package com.rimo.footprintparticle.loaders.neoforge;
 
 import com.rimo.footprintparticle.Client;
+import com.rimo.footprintparticle.PlatformUtil;
 import com.rimo.footprintparticle.config.Config;
+import com.rimo.footprintparticle.mixin.ParticleSpriteSetAccessor;
 import com.rimo.footprintparticle.particle.FootprintParticle;
 import com.rimo.footprintparticle.particle.SnowDustParticle;
 import com.rimo.footprintparticle.particle.WaterSplashParticle;
@@ -25,11 +27,17 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 // 所以 RegisterEvent / RegisterParticleProvidersEvent / FMLClientSetupEvent 三个事件
 // 统一挂在 @EventBusSubscriber(value = Dist.CLIENT) 下，服务端不会解析任何客户端类。
 //
-// 由于 Neoforge 未提供对于粒子 SpriteSet 成员的直接访问，
-// Sprite 枚举能力由 mixin ParticleSpriteSetAccessor 走 SpongePowered Mixin 双端统一提供，
-// 本类不再需要 <clinit> 注册 IPlatform 实现。
+// 由于 NeoForge 未提供对于粒子 SpriteSet 成员的直接访问，
+// Sprite 枚举能力通过 mixin ParticleSpriteSetAccessor 暴露 @Accessor("sprites") 生成的
+// fpp$getSprites()；本类 <clinit> 把 accessor 强转 lambda 注册给 PlatformUtil.PLATFORM，
+// 供公共代码 Util.getCustomSprites 调用。Fabric 侧则走官方 FabricSpriteSet API，见 fabric/Platform。
 @Mod(Client.MOD_ID)
 public class Platform {
+	static {
+		// NeoForge 侧 SpriteSet 实例即原版 ParticleResources$MutableSpriteSet，mixin accessor 直接命中。
+		PlatformUtil.PLATFORM = spriteSet -> ((ParticleSpriteSetAccessor) spriteSet).fpp$getSprites();
+	}
+
 	public Platform() {
 		// @Mod 构造器双端都会跑，无需再手动 addListener；事件由 @EventBusSubscriber 自动路由。
 	}

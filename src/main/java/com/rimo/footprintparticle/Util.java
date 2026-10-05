@@ -1,6 +1,5 @@
 package com.rimo.footprintparticle;
 
-import com.rimo.footprintparticle.mixin.ParticleSpriteSetAccessor;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.entity.EntityType;
@@ -48,7 +47,7 @@ public class Util {
 			}
 		}
 		List<String> finalSpriteNames = Arrays.asList(spriteNames);
-		return ((ParticleSpriteSetAccessor) spriteProvider).fpp$getSprites().stream().filter(sprite ->
+		return PlatformUtil.PLATFORM.getSprites(spriteProvider).stream().filter(sprite ->
 				finalSpriteNames.stream().anyMatch(str ->
 						sprite.contents().name().getPath().contentEquals(str)
 				)
