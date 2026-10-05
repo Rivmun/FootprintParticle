@@ -1,6 +1,6 @@
 package com.rimo.footprintparticle.mixin;
 
-import com.rimo.footprintparticle.FPPClient;
+import com.rimo.footprintparticle.Client;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
@@ -29,7 +29,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity {
 	@Inject(method = "tick", at = @At("HEAD"))
 	public void fpp$tick(CallbackInfo ci) {
 		if (fpp$timer-- <= 0 && this.getDeltaMovement().horizontalDistance() != 0) {
-			if (this.level().getBlockState(this.blockPosition()).is(BlockTags.RAILS) && Math.random() <= FPPClient.CONFIG.getRailFlameRange()) {
+			if (this.level().getBlockState(this.blockPosition()).is(BlockTags.RAILS) && Math.random() <= Client.CONFIG.getRailFlameRange()) {
 				var i = Math.random() > 0.5f ? 1 : -1;
 				this.level().addParticle(
 						ParticleTypes.ELECTRIC_SPARK,
@@ -42,8 +42,8 @@ public abstract class AbstractMinecartEntityMixin extends Entity {
 				);
 			}
 			fpp$timer = this.level().getBlockState(this.blockPosition()).is(Blocks.POWERED_RAIL)?
-					(int) (FPPClient.CONFIG.getSecPerPrint() * 3.33f):
-					(int) (FPPClient.CONFIG.getSecPerPrint() * 6.66f);
+					(int) (Client.CONFIG.getSecPerPrint() * 3.33f):
+					(int) (Client.CONFIG.getSecPerPrint() * 6.66f);
 		}
 	}
 }

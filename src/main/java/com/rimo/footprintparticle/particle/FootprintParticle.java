@@ -1,9 +1,7 @@
 package com.rimo.footprintparticle.particle;
 
-import com.rimo.footprintparticle.FPPClient;
+import com.rimo.footprintparticle.Client;
 import com.rimo.footprintparticle.Util;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
@@ -33,7 +31,7 @@ public class FootprintParticle extends SingleQuadParticle {
 		pos = new BlockPos(Mth.floor(this.x), Mth.floor(this.y - 0.02f), Mth.floor(this.z));
 
 		this.setParticleSpeed(0, 0, 0);
-		this.setAlpha(FPPClient.CONFIG.getFootprintAlpha());
+		this.setAlpha(Client.CONFIG.getFootprintAlpha());
 		this.roll = (float) Mth.atan2(vx, vz);
 
 		/*
@@ -46,8 +44,8 @@ public class FootprintParticle extends SingleQuadParticle {
 		double cf = Mth.cos(halfAngle) * factor;
 		this.q = new Quaternionf(-cf, sf, sf, cf).rotateLocalY(Mth.PI);
 
-		this.lifetime = (int) (FPPClient.CONFIG.getPrintLifetime() * 20);
-		this.quadSize = FPPClient.CONFIG.getFootprintSize() * 0.03125f;
+		this.lifetime = (int) (Client.CONFIG.getPrintLifetime() * 20);
+		this.quadSize = Client.CONFIG.getFootprintSize() * 0.03125f;
 
 		this.quadSize *= Util.getEntityScale((parameters.entity));
 
@@ -55,7 +53,7 @@ public class FootprintParticle extends SingleQuadParticle {
 			List<TextureAtlasSprite> spriteList = Util.getCustomSprites(parameters.entity, spriteProvider, defName);
 			this.setSprite(spriteList.get((int) (Math.random() * spriteList.size())));
 		} catch (Exception e) {
-			FPPClient.LOGGER.error("Wrong custom texture for " + EntityType.getKey(parameters.entity.getType()) + ", please check.");
+			Client.LOGGER.error("Wrong custom texture for " + EntityType.getKey(parameters.entity.getType()) + ", please check.");
 		}
 	}
 
@@ -76,8 +74,8 @@ public class FootprintParticle extends SingleQuadParticle {
 		this.yo = this.y;
 
 		if (this.level.isRaining() && this.level.getHeight(Heightmap.Types.MOTION_BLOCKING, pos) <= this.y)
-			if (this.age + FPPClient.CONFIG.getLifeTimeAcc() < this.lifetime)
-				this.age += FPPClient.CONFIG.getLifeTimeAcc();
+			if (this.age + Client.CONFIG.getLifeTimeAcc() < this.lifetime)
+				this.age += Client.CONFIG.getLifeTimeAcc();
 
 		if (this.age++ >= this.lifetime || this.level.isEmptyBlock(pos))
 			this.remove();
@@ -91,7 +89,6 @@ public class FootprintParticle extends SingleQuadParticle {
 		this.extractRotatedQuad(renderState, camera, this.q, tickDelta);
 	}
 
-	@Environment(EnvType.CLIENT)
 	public static class DefaultFactory implements ParticleProvider<@NotNull SimpleParticleType> {
 		private final SpriteSet spriteProvider;
 

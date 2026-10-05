@@ -1,7 +1,5 @@
 package com.rimo.footprintparticle.particle;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
@@ -24,7 +22,6 @@ public class WaterSplashParticle extends WaterDropParticle {
 		this.lifetime *= 10;
 	}
 
-	@Environment(EnvType.CLIENT)
 	public static class DefaultFactory implements ParticleProvider<@NotNull SimpleParticleType> {
 		private final SpriteSet spriteProvider;
 

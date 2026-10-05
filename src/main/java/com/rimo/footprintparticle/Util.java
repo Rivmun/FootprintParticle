@@ -1,6 +1,6 @@
 package com.rimo.footprintparticle;
 
-import net.fabricmc.fabric.api.client.particle.v1.FabricSpriteSet;
+import com.rimo.footprintparticle.mixin.ParticleSpriteSetAccessor;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.entity.EntityType;
@@ -13,7 +13,7 @@ public class Util {
 	public static float getEntityScale(LivingEntity entity) {
 		float scale = 1f;
 
-		for (String str : FPPClient.CONFIG.getSizePerMob()) {
+		for (String str : Client.CONFIG.getSizePerMob()) {
 			String[] str2 = str.split(",");
 			try {
 				if (str2[0].contentEquals(EntityType.getKey(entity.getType()).toString())) {
@@ -36,7 +36,7 @@ public class Util {
 
 	public static List<TextureAtlasSprite> getCustomSprites(LivingEntity entity, SpriteSet spriteProvider, String def) {
 		String[] spriteNames = {def};
-		for (String str : FPPClient.CONFIG.getCustomPrint()) {
+		for (String str : Client.CONFIG.getCustomPrint()) {
 			String[] str2 = str.split(",");
 			try {
 				if (str2[0].contentEquals(EntityType.getKey(entity.getType()).toString())) {
@@ -48,7 +48,7 @@ public class Util {
 			}
 		}
 		List<String> finalSpriteNames = Arrays.asList(spriteNames);
-		return ((FabricSpriteSet) spriteProvider).getSprites().stream().filter(sprite ->
+		return ((ParticleSpriteSetAccessor) spriteProvider).fpp$getSprites().stream().filter(sprite ->
 				finalSpriteNames.stream().anyMatch(str ->
 						sprite.contents().name().getPath().contentEquals(str)
 				)

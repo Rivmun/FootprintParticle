@@ -1,7 +1,5 @@
 package com.rimo.footprintparticle.particle;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
@@ -10,7 +8,7 @@ import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.NotNull;
 
-import static com.rimo.footprintparticle.FPPClient.CONFIG;
+import static com.rimo.footprintparticle.Client.CONFIG;
 
 public class WatermarkParticle extends FootprintParticle {
 
@@ -20,7 +18,6 @@ public class WatermarkParticle extends FootprintParticle {
 		this.lifetime = (int) (CONFIG.getWatermarkLifetime() * 20);
 	}
 
-	@Environment(EnvType.CLIENT)
 	public static class DefaultFactory implements ParticleProvider<@NotNull SimpleParticleType> {
 		private final SpriteSet spriteProvider;
 

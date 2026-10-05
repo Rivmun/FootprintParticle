@@ -1,6 +1,6 @@
 package com.rimo.footprintparticle.mixin;
 
-import com.rimo.footprintparticle.FPPClient;
+import com.rimo.footprintparticle.Client;
 import com.rimo.footprintparticle.Util;
 import com.rimo.footprintparticle.particle.FootprintParticleType;
 import com.rimo.footprintparticle.particle.SnowDustParticleType;
@@ -25,7 +25,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static com.rimo.footprintparticle.FPPClient.CONFIG;
+import static com.rimo.footprintparticle.Client.CONFIG;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
@@ -185,7 +185,7 @@ public abstract class LivingEntityMixin extends Entity {
 					int i = this.isSprinting() ? 4 : 2;
 					int v = this.isSprinting() ? 3 : 10;
 					while (--i >= 0) {
-						SnowDustParticleType snowdust = FPPClient.SNOWDUST;
+						SnowDustParticleType snowdust = Client.SNOWDUST;
 						this.level().addParticle(snowdust.setData(scale), px, py, pz,
 								(Math.random() - 0.5f) / v,
 								0,
@@ -209,10 +209,10 @@ public abstract class LivingEntityMixin extends Entity {
 			dz = this.getDeltaMovement().z();
 		}
 		if (canGen) {       // footprint
-			FootprintParticleType footprint = FPPClient.FOOTPRINT;
+			FootprintParticleType footprint = Client.FOOTPRINT;
 			this.level().addParticle(footprint.setData((LivingEntity) (Object) this), px, py, pz, dx, 0, dz);
 		} else if (fpp$wetTimer <= CONFIG.getWetDuration() * 20) {        // waterprint (gen when footprint not gen)
-			WatermarkParticleType watermark = FPPClient.WATERMARK;
+			WatermarkParticleType watermark = Client.WATERMARK;
 			var i = Math.random() > 0.5f ? 1 : -1;
 			this.level().addParticle(watermark.setData((LivingEntity) (Object) this), px, py, pz, dx * i, fpp$wetTimer, dz * i);		// push timer to calc alpha
 		}
@@ -225,7 +225,7 @@ public abstract class LivingEntityMixin extends Entity {
 			int v = this.isSprinting() ? 3 : 6;
 			while (--i > 0) {
 				this.level().addParticle(
-						FPPClient.WATERSPLASH,
+					Client.WATERSPLASH,
 						px - 0.25f * range + Math.random() / 4,
 						py,
 						pz - 0.25f * range + Math.random() / 4,

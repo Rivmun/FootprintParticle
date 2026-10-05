@@ -1,47 +1,48 @@
 {
-	"schemaVersion": 1,
-	"id": "footprintparticle",
-	"version": "${version}",
-	"name": "Footprint Particle",
-	"description": "A simply mod that adds footprint for all mobs (and players).",
-	"authors": [
-		"Rimo"
-	],
-	"contact": {
-		"homepage": "https://www.curseforge.com/minecraft/mc-mods/footprintparticle",
-		"sources": "https://github.com/Rivmun/FootprintParticle",
-		"issues": "https://github.com.Rivemun/FootprintParticle/issues"
-	},
-	"license": "GPL v3",
-	"icon": "icon.png",
-	"environment": "client",
-	"entrypoints": {
-		"client": [
-			"com.rimo.footprintparticle.FPPClient"
-		],
-		"modmenu": [
-			"com.rimo.footprintparticle.config.ModMenuIntegration"
-		]
-	},
-	"mixins": [
-		"footprintparticle.mixins.json"
-	],
-	"depends": {
-		"fabricloader": ">=0.18.4",
-		"minecraft": ">=26.1",
-		"java": ">=25",
-		"fabric-api": "*",
-		"cloth-config2":"*"
-	},
-	"suggests": {
-		"modmenu": "*"
-	},
-	"custom": {
-		"modmenu": {
-			"links": {
-				"modmenu.modrinth": "https://modrinth.com/mod/footprintparticle",
-				"MCMOD.cn": "https://www.mcmod.cn/class/9454.html"
-			}
-		}
-	}
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${mod_version}",
+  "name": "${mod_name}",
+  "description": "${mod_description}",
+  "authors": [
+    "${mod_author}"
+  ],
+  "contributors": [
+    "${mod_contributor}"
+  ],
+  "contact": {
+    "homepage": "${mod_homepage}",
+    "sources": "${mod_sources}",
+    "issues": "${mod_issues}"
+  },
+  "license": "${mod_license}",
+  "icon": "${mod_icon}",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "${mod_group}.${mod_id}.loaders.fabric.Platform"
+    ],
+    "modmenu": [
+      "${mod_group}.${mod_id}.loaders.fabric.ModMenuIntegration"
+    ]
+  },
+  "mixins": [
+    "${mod_id}.mixins.json"
+  ],
+  "depends": {
+    "fabric-api": "*",
+    "cloth-config2": "*",
+    "minecraft": "${version_range}"
+  },
+  "suggests": {
+    "modmenu": "*"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.modrinth": "${mod_modrinth}",
+        "MCMOD.cn": "${mod_mcmod}"
+      }
+    }
+  }
 }

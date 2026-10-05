@@ -1,0 +1,16 @@
+# 默认：Git 自动识别文本文件，仓库内与签出均统一为 LF
+* text=auto eol=lf
+
+# Windows 批处理必须保持 CRLF，否则 cmd 解析异常
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+
+# 二进制文件禁止换行转换（含 MC 资源与 jar/贴图）
+*.jar   binary
+*.png   binary
+*.gif   binary
+*.icns  binary
+*.ttf   binary
+*.zip   binary
+*.dat   binary
+*.class binary

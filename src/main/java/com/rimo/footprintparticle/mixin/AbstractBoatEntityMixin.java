@@ -1,6 +1,6 @@
 package com.rimo.footprintparticle.mixin;
 
-import com.rimo.footprintparticle.FPPClient;
+import com.rimo.footprintparticle.Client;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -25,7 +25,7 @@ public abstract class AbstractBoatEntityMixin extends Entity {
 
 	@Inject(method = "tick", at = @At("TAIL"))
 	public void fpp$tick(CallbackInfo ci) {
-		if (FPPClient.CONFIG.isEnableBoatTrail()) {
+		if (Client.CONFIG.isEnableBoatTrail()) {
 			int k = (int)(this.getDeltaMovement().horizontalDistance() * 10);
 			while (Math.random() < k-- / 5f) {
 				var i = Math.random() > 0.5f ? 1 : -1;		//TODO: boat's yaw is 90 degrees more than other entity, strange.
@@ -41,7 +41,7 @@ public abstract class AbstractBoatEntityMixin extends Entity {
 					);
 					for (int j = 0; j < 2; j++) {
 						this.level().addParticle(        // at paddle
-								FPPClient.WATERSPLASH,
+								Client.WATERSPLASH,
 								this.getX() + i * Mth.cos((float) Math.toRadians(this.getRotationVector().y - 10 + Math.random() * 20)),
 								(int) this.getY() + 1f,
 								this.getZ() + i * Mth.sin((float) Math.toRadians(this.getRotationVector().y - 10 + Math.random() * 20)),
