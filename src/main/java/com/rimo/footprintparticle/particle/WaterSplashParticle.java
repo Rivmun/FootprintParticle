@@ -8,7 +8,7 @@ import net.minecraft.client.particle.WaterDropParticle;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.RandomSource;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 public class WaterSplashParticle extends WaterDropParticle {
 
@@ -22,14 +22,14 @@ public class WaterSplashParticle extends WaterDropParticle {
 		this.lifetime *= 10;
 	}
 
-	public static class DefaultFactory implements ParticleProvider<@NotNull SimpleParticleType> {
+	public static class DefaultFactory implements ParticleProvider<@NonNull SimpleParticleType> {
 		private final SpriteSet spriteProvider;
 
 		public DefaultFactory(SpriteSet spriteProvider) {
 			this.spriteProvider = spriteProvider;
 		}
 
-		public Particle createParticle(SimpleParticleType defaultParticleType, @NotNull ClientLevel clientWorld, double d, double e, double f, double g, double h, double i, @NotNull RandomSource random) {
+		public Particle createParticle(@NonNull SimpleParticleType defaultParticleType, @NonNull ClientLevel clientWorld, double d, double e, double f, double g, double h, double i, @NonNull RandomSource random) {
 			return new WaterSplashParticle(clientWorld, d, e, f, g, h, i, this.spriteProvider.get(random));
 		}
 	}

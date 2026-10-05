@@ -7,7 +7,7 @@ import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.RandomSource;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 // Copy from net.minecraft.client.particle.PlayerCloudParticle
 public class SnowDustParticle extends SingleQuadParticle {
@@ -43,11 +43,11 @@ public class SnowDustParticle extends SingleQuadParticle {
     }
 
     @Override
-    public @NotNull Layer getLayer() {
+    public @NonNull Layer getLayer() {
         return Layer.TRANSLUCENT;
     }
 
-    public static class DefaultFactory implements ParticleProvider<@NotNull SimpleParticleType> {
+    public static class DefaultFactory implements ParticleProvider<@NonNull SimpleParticleType> {
         private final SpriteSet spriteProvider;
 
         public DefaultFactory(SpriteSet spriteProvider) {
@@ -55,7 +55,7 @@ public class SnowDustParticle extends SingleQuadParticle {
         }
 
         @Override
-        public Particle createParticle(SimpleParticleType parameters, @NotNull ClientLevel world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, RandomSource random) {
+        public Particle createParticle(@NonNull SimpleParticleType parameters, @NonNull ClientLevel world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, @NonNull RandomSource random) {
             Particle particle = new SnowDustParticle(world, x, y, z, velocityX, velocityY, velocityZ, this.spriteProvider);
             if (parameters instanceof SnowDustParticleType snowdust)
                 particle.scale(snowdust.size);

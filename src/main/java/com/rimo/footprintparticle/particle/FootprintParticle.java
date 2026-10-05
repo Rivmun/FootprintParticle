@@ -16,8 +16,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.levelgen.Heightmap;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
@@ -53,12 +53,12 @@ public class FootprintParticle extends SingleQuadParticle {
 			List<TextureAtlasSprite> spriteList = Util.getCustomSprites(parameters.entity, spriteProvider, defName);
 			this.setSprite(spriteList.get((int) (Math.random() * spriteList.size())));
 		} catch (Exception e) {
-			Client.LOGGER.error("Wrong custom texture for " + EntityType.getKey(parameters.entity.getType()) + ", please check.", e);
+			Client.LOGGER.error("Wrong custom texture for {}, please check.", EntityType.getKey(parameters.entity.getType()));
 		}
 	}
 
     @Override
-    protected @NotNull Layer getLayer() {
+    protected @NonNull Layer getLayer() {
         return Layer.TRANSLUCENT;
     }
 
@@ -85,11 +85,11 @@ public class FootprintParticle extends SingleQuadParticle {
 	}
 
 	@Override
-	public void extract(@NotNull QuadParticleRenderState renderState, @NotNull Camera camera, float tickDelta) {
+	public void extract(@NonNull QuadParticleRenderState renderState, @NonNull Camera camera, float tickDelta) {
 		this.extractRotatedQuad(renderState, camera, this.q, tickDelta);
 	}
 
-	public static class DefaultFactory implements ParticleProvider<@NotNull SimpleParticleType> {
+	public static class DefaultFactory implements ParticleProvider<SimpleParticleType> {
 		private final SpriteSet spriteProvider;
 
 		public DefaultFactory(SpriteSet spriteProvider) {
@@ -97,7 +97,7 @@ public class FootprintParticle extends SingleQuadParticle {
 		}
 
 		@Override
-		public Particle createParticle(SimpleParticleType parameters, @NotNull ClientLevel world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, @NotNull RandomSource random) {
+		public Particle createParticle(@NonNull SimpleParticleType parameters, @NonNull ClientLevel world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, @NonNull RandomSource random) {
 			return new FootprintParticle(world, x, y, z, velocityX, velocityY, velocityZ, this.spriteProvider, (FootprintParticleType) parameters, "footprint");
 		}
 	}

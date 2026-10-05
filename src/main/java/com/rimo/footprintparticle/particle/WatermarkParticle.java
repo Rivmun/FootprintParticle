@@ -6,7 +6,7 @@ import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.RandomSource;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import static com.rimo.footprintparticle.Client.CONFIG;
 
@@ -18,7 +18,7 @@ public class WatermarkParticle extends FootprintParticle {
 		this.lifetime = (int) (CONFIG.getWatermarkLifetime() * 20);
 	}
 
-	public static class DefaultFactory implements ParticleProvider<@NotNull SimpleParticleType> {
+	public static class DefaultFactory implements ParticleProvider<@NonNull SimpleParticleType> {
 		private final SpriteSet spriteProvider;
 
 		public DefaultFactory(SpriteSet spriteProvider) {
@@ -26,7 +26,7 @@ public class WatermarkParticle extends FootprintParticle {
 		}
 
 		@Override
-		public Particle createParticle(SimpleParticleType parameters, @NotNull ClientLevel world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, @NotNull RandomSource random) {
+		public Particle createParticle(@NonNull SimpleParticleType parameters, @NonNull ClientLevel world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, @NonNull RandomSource random) {
 			return new WatermarkParticle(world, x, y, z, velocityX, velocityY, velocityZ, this.spriteProvider, (WatermarkParticleType) parameters, "watermark");
 		}
 	}

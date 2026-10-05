@@ -13,10 +13,7 @@ import java.util.List;
  * {@code net.minecraft.client.particle.ParticleResources$MutableSpriteSet}（源码级不可见），
  * 因此 target 用字符串形式；字段名保持 {@code sprites}（{@code List<TextureAtlasSprite>}）。</p>
  *
- * <p>Fabric 与 NeoForge 都走 SpongePowered Mixin 运行时，本 accessor 双端等价生效：Fabric 侧不必
- * 强转 {@code FabricSpriteSet}，NeoForge 侧也不必反射 + 采样兜底。</p>
- *
- * <p>调用方式：{@code ((ParticleSpriteSetAccessor) spriteSet).fpp$getSprites()}。</p>
+ * <p>Fabric 侧接管了原版 SpriteSet 实现，运行时粒子内部不使用该类，所以此处目前只由 Neoforge 侧调用。</p>
  */
 @Mixin(targets = "net.minecraft.client.particle.ParticleResources$MutableSpriteSet")
 public interface ParticleSpriteSetAccessor {
