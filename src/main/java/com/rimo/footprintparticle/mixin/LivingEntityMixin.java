@@ -6,6 +6,7 @@ import com.rimo.footprintparticle.particle.FootprintParticleType;
 import com.rimo.footprintparticle.particle.SnowDustParticleType;
 import com.rimo.footprintparticle.particle.WatermarkParticleType;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 //~ if < 1.21.11 'Identifier' -> 'ResourceLocation'
@@ -33,45 +34,53 @@ public abstract class LivingEntityMixin extends Entity {
 		super(type, world);
 	}
 
-	@Unique
 	//~ if < 1.21.11 'Identifier' -> 'ResourceLocation'
-	private final ResourceKey<Block> fpp$AIR = ResourceKey.create(Registries.BLOCK, Identifier.withDefaultNamespace("air"));
-	@Unique
-	private int fpp$timer = 0;
-	@Unique
-	private boolean fpp$wasOnGround = true;
-	@Unique
-	private int fpp$wetTimer = CONFIG.getWetDuration() * 20;
-
-	@Inject(method = "jumpFromGround", at = @At("TAIL"))
-	protected void fpp$jump(CallbackInfo ci) {
-		this.fpp$footprintGenerator();
-	}
+	@Unique private final ResourceKey<Block> fpp$AIR = ResourceKey.create(Registries.BLOCK, Identifier.withDefaultNamespace("air"));
+	@Unique private int fpp$timer = 0;
+	@Unique private boolean fpp$wasFalling;
+	@Unique private int fpp$wetTimer = CONFIG.getWetDuration() * 20;
+	@Unique private double fpp$lastX, fpp$lastZ, fpp$lastY;  // 上一 tick 位置：水平位移判定移动（远程玩家 getDeltaMovement() 恒≈ 0），竖直位移判定跳跃/落地（远程玩家 onGround() 连跳时不可靠）。
 
 	@Inject(method = "tick", at = @At("TAIL"))
 	public void fpp$tick(CallbackInfo ci) {
-		if (fpp$timer <= 0) {
-			if (!this.isShiftKeyDown() && !this.isUnderWater()) {
-				// Either on ground moving or landing
-				if ((this.getDeltaMovement().horizontalDistance() != 0 && this.onGround()) || (! fpp$wasOnGround && this.onGround())) {
-					this.fpp$footprintGenerator();
-				}
-				fpp$wasOnGround = this.onGround();
-			}
-		} else {
+		double x = this.getX();
+		double y = this.getY();
+		double z = this.getZ();
+		boolean moved = Math.abs(x - this.fpp$lastX) + Math.abs(z - this.fpp$lastZ) > 1.0E-4;
+		// 竖直位移：远程玩家连跳时 onGround() 在客户端始终采不到那一两 tick 的贴地瞬间，
+		// 但其插值后的 Y 会随每次起跳/落地明显地升-降波动，故用“下落→停”的竖直速度符号翻转判定触地。
+		// 阈值 -0.25：按 MC 落体递推 s_k=(s_{k-1}+0.08)*0.98，自由下落约 0.5 格时本 tick dy≈ 0.25。
+		// 因此只把下落距离≥～0.5 格计为 falling，排除下台阶/雪层/半砖回落等小降幅误入落地分支（应走带 feetFrac 安全闸的走路分支），
+		// 而普通跳跃/远程连跳滞空超过 1 格、落地前速度远超 0.25，仍稳定触发 landed。
+		double dy = y - this.fpp$lastY;
+		this.fpp$lastX = x;
+		this.fpp$lastY = y;
+		this.fpp$lastZ = z;
+		boolean falling = dy < -0.25;
+		boolean landed = fpp$wasFalling && !falling;
+		fpp$wasFalling = falling;
+
+		boolean generated = false;
+		if (!this.isShiftKeyDown() && !this.isUnderWater()) {
+			if (landed || (fpp$timer <= 0 && moved && this.onGround()))
+				generated = this.fpp$footprintGenerator(landed);
+		}
+		if (!generated && fpp$timer > 0) {
 			fpp$timer--;
 		}
 
 		if (this.isInWaterOrRain()) {
 			fpp$wetTimer = 0;
-		} else if (fpp$wetTimer <= CONFIG.getWetDuration() * 20){
+		} else if (fpp$wetTimer <= CONFIG.getWetDuration() * 20) {
 			fpp$wetTimer++;
 		}
 
 		// Swim Pop
-		if (this.isSwimming() &&
-				(CONFIG.getSwimPopLevel() == 2 ||
-						(CONFIG.getSwimPopLevel() == 1 && this.isAlwaysTicking()))) {
+		if (this.isSwimming() && (
+				CONFIG.getSwimPopLevel() == 2 || (
+						CONFIG.getSwimPopLevel() == 1 && this.isAlwaysTicking()
+				)
+		)) {
 			float range = Util.getEntityScale((LivingEntity) (Object) this);
 			this.level().addParticle(
 					ParticleTypes.BUBBLE,
@@ -86,14 +95,14 @@ public abstract class LivingEntityMixin extends Entity {
 	}
 
 	@Unique
-	public void fpp$footprintGenerator() {
+	public boolean fpp$footprintGenerator(boolean landedOrJump) {
 		if (CONFIG.isEnable() == 0 ||
 				(CONFIG.isEnable() == 1 && !this.isAlwaysTicking()))
-			return;
+			return false;
 		if (CONFIG.getExcludedMobs().contains(EntityType.getKey(this.getType()).toString()))
-			return;
+			return false;
 		if (!CONFIG.getCanGenWhenInvisible() && this.isInvisible())
-			return;
+			return false;
 
 		// Set Interval
 		fpp$timer = this.isSprinting() ? (int) (CONFIG.getSecPerPrint() * 13.33f) : (int) (CONFIG.getSecPerPrint() * 20);
@@ -111,7 +120,7 @@ public abstract class LivingEntityMixin extends Entity {
 
 		// Fix pos...
 		var px = this.getX();
-		var py = this.getY() + 0.01f + CONFIG.getPrintHeight();
+		var py = this.getY();
 		var pz = this.getZ();
 		var scale = Util.getEntityScale((LivingEntity) (Object) this);
 
@@ -128,7 +137,12 @@ public abstract class LivingEntityMixin extends Entity {
 				} catch (Exception e) {
 					//
 				}
-				fpp$timer = (int) (this.getControllingPassenger() != null ? this.getControllingPassenger().isAlwaysTicking() ? fpp$timer * 0.5f : fpp$timer * 1.33f : fpp$timer * 1.33f);
+				fpp$timer = (int) (this.getControllingPassenger() != null ?
+						this.getControllingPassenger().isAlwaysTicking() ?
+								fpp$timer * 0.5f :
+								fpp$timer * 1.33f :
+						fpp$timer * 1.33f
+				);
 				break;
 			}
 		}
@@ -154,14 +168,47 @@ public abstract class LivingEntityMixin extends Entity {
 		px = px - hOffset * side * Mth.sin((float) Math.toRadians(this.getRotationVector().y + 90));
 		pz = pz + hOffset * side * Mth.cos((float) Math.toRadians(this.getRotationVector().y + 90));
 
-		// Check block type...
-		var pos = new BlockPos(Mth.floor(px), Mth.floor(py), Mth.floor(pz));
-		var canGen = fpp$isPrintCanGen(pos) && this.level().getBlockState(pos).canOcclude();
-		if (!canGen) {
-			pos = new BlockPos(Mth.floor(px), Mth.floor(py) - 1, Mth.floor(pz));
-			canGen = fpp$isPrintCanGen(pos) && this.level().getBlockState(pos).canOcclude() && Block.isShapeFullBlock(this.level().getBlockState(pos).getCollisionShape(this.level(), pos));
+		// 只考察“脚所在格”与“脚下一格”这两格，不再向下深扫（避免落在方块边缘时把脚印隔空贴到下方格外的方块上）。
+		// 三分支：脚格有碰撞→贴脚格顶面；脚格无碰撞但非空气且脚踩其顶(feetFrac≥0.05，如雪层)→以精确脚Y为面并归属该方块；否则(脚格空气或贴地装饰)用脚下一格作支撑。
+		// 各分支都把便宜的配置剔除(isPrintCanGen)放在复杂碰撞体度量(canOcclude/isShapeFullBlock/横向跨度)之前短路。
+		int colX = Mth.floor(px), colZ = Mth.floor(pz), feetY = Mth.floor(py);
+		BlockPos pos;
+		boolean canGen;
+
+		var feetPos = new BlockPos(colX, feetY, colZ);
+		var feetState = this.level().getBlockState(feetPos);
+		var feetShape = feetState.getCollisionShape(this.level(), feetPos);
+		if (!feetShape.isEmpty()) {
+			// 脚格有碰撞箱：直接贴脚格顶面。
+			pos = feetPos;
+			py = feetY + feetShape.max(Direction.Axis.Y) + 0.01f + CONFIG.getPrintHeight();
+			canGen = fpp$isPrintCanGen(pos);
+		} else if (!feetState.isAir() && feetState.canOcclude()) {
+			// 脚格无碰撞箱但非空气、且脚踩在其顶面(feetFrac≥～0.05)＝实心却碰撞极薄的扁平方块(雪层等)：脚正压在它顶面。
+			// 以精确脚Y作面(=feetY+feetFrac，已含雪实际厚度，勿再叠加配置雪偏移否则双重抬高)，并把 pos 归到该方块，
+			// 使 isPrintCanGen / 高度修正 / 雪尘都按雪层而非下方泥土触发。feetFrac<0.05 不进来：草/花/树苗等贴地装饰脚 Y 为整数(踩在下方块顶)，落到 else 分支归属下方支撑方块。
+			pos = feetPos;
+			py = feetY + 0.01f + CONFIG.getPrintHeight();
+			canGen = fpp$isPrintCanGen(pos);
 		} else {
-			// Fix height by blocks if in...
+			// 脚格是空气，才用脚下一格作支撑：走路须贴地整数Y(feetFrac≈0，防止走到非完整方块边缘时脚悬空在旁边空气、误判到下方一格而隔空)，且须完整不透明方块；
+			// 跳跃/落地只要有碰撞箱即可(兼容半砖/雪片)，但排除两类：①“完整方块却不遮光”的透明方块(玻璃/树叶)；②横向铺不满整格的窄碰撞体(栏杆/玻璃板/墙)。
+			// 草/花这类贴地装饰(feetFrac≈0)也走这里：脚压在下方块顶、其上方一格为空气，故归属下方支撑方块，行为不变。
+			pos = new BlockPos(colX, feetY - 1, colZ);
+			var belowState = this.level().getBlockState(pos);
+			var belowShape = belowState.getCollisionShape(this.level(), pos);
+			double feetFrac = py - feetY;   // 脚在其格内的离地高度：走路贴地时应≈0（Y 为整数），非零说明脚悬空在非完整方块的高度上。
+			py = feetY - 1 + (belowShape.isEmpty() ? 0.0 : belowShape.max(Direction.Axis.Y)) + 0.01f + CONFIG.getPrintHeight();
+			canGen = !belowShape.isEmpty() && fpp$isPrintCanGen(pos)
+					&& (landedOrJump
+							? (belowShape.max(Direction.Axis.X) - belowShape.min(Direction.Axis.X) > 0.999
+									&& belowShape.max(Direction.Axis.Z) - belowShape.min(Direction.Axis.Z) > 0.999
+									&& !(Block.isShapeFullBlock(belowShape) && !belowState.canOcclude()))
+							: (feetFrac < 0.05 && belowState.canOcclude() && Block.isShapeFullBlock(belowShape)));
+		}
+
+		if (canGen) {
+			// Fix height by blocks if in...（保留原有按方块/标签修正 y 的配置逻辑，现作用于实际站立的支撑方块）
 			try {
 				var block = this.level().getBlockState(pos);
 				for (String str : CONFIG.getBlockHeight()) {
@@ -239,6 +286,8 @@ public abstract class LivingEntityMixin extends Entity {
 				);
 			}
 		}
+
+		return canGen;
 	}
 
 	//~ if < 26.1 '.tags()' -> '.getTags()' {
