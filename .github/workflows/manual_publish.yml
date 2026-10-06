@@ -1,0 +1,198 @@
+name: Manual Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      mc_versions:
+        description: '混合输入：merged(26.1) | 整版本自动展开(1.21.11) | 精确子工程(1.21.11-fabric)'
+        required: true
+        type: string
+        default: '26.1'
+
+jobs:
+  prepare-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.expand.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: expand
+        name: Expand versions into per-loader entries
+        run: |
+          IFS=',' read -ra VERSIONS <<< "${{ github.event.inputs.mc_versions }}"
+          ENTRIES=""
+          for mc in "${VERSIONS[@]}"; do
+            mc=$(echo "$mc" | tr -d ' ')
+            [ -z "$mc" ] && continue
+            case "$mc" in
+              *-fabric|*-neoforge|*-forge)
+                # 精确子工程名，校验存在性后直接传递（优先匹配，避免 26.x-<loader> 误入 merged 分支）
+                if awk -v name="$mc" '
+                  /^\["/ {
+                    s=$0; gsub(/[\[\]"]/,"",s)
+                    if (s==name) { found=1; exit }
+                  }
+                  END { exit !found }
+                ' stonecutter.properties.toml; then
+                  ENTRIES="$ENTRIES\"$mc\","
+                else
+                  echo "::error::Subproject '$mc' not found in stonecutter.properties.toml"
+                  exit 1
+                fi
+                ;;
+              26.*)
+                # 26.x 走 Forgix 跨 loader 合并（对应 settings.gradle.kts 的 >=26.1 unobf 规则），原样传递
+                ENTRIES="$ENTRIES\"$mc\","
+                ;;
+              *)
+                # 纯版本号（如 1.21.11），从 toml 展开全部 loader
+                LOADERS=$(awk -v mc="$mc" '
+                  /^\["/ {
+                    name=$0
+                    gsub(/[\[\]"]/,"",name)
+                    if (index(name, mc "-")==1) print name
+                  }
+                ' stonecutter.properties.toml)
+                if [ -z "$LOADERS" ]; then
+                  echo "::error::No subprojects found for '$mc' in stonecutter.properties.toml"
+                  exit 1
+                fi
+                for sub in $LOADERS; do
+                  ENTRIES="$ENTRIES\"$sub\","
+                done
+                ;;
+            esac
+          done
+          if [ -z "$ENTRIES" ]; then
+            echo "::error::No valid entries after expansion"
+            exit 1
+          fi
+          ENTRIES="[${ENTRIES%,}]"
+          echo "matrix=$ENTRIES" >> $GITHUB_OUTPUT
+          echo "Expanded matrix: $ENTRIES"
+
+  release:
+    needs: prepare-matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        sub: ${{ fromJson(needs.prepare-matrix.outputs.matrix) }}
+      fail-fast: false
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@v3
+
+      - uses: burrunan/gradle-cache-action@v1
+        with:
+          gradle-distribution-sha-256-sum-warning: false
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          cache: gradle
+          java-version: 25
+
+      - run: chmod +x gradlew
+
+      # 解析 matrix.sub → mc / loader / is_merged
+      - name: Derive build info
+        id: info
+        run: |
+          SUB="${{ matrix.sub }}"
+          # 矩阵条目要么是完整子工程名 <ver>-<loader>（per-loader），要么是无 loader 后缀的合并基版本
+          case "$SUB" in
+            *-fabric|*-neoforge|*-forge)
+              echo "mc=${SUB%-*}" >> $GITHUB_OUTPUT
+              echo "loader=${SUB##*-}" >> $GITHUB_OUTPUT
+              echo "is_merged=false" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "mc=$SUB" >> $GITHUB_OUTPUT
+              echo "loader=" >> $GITHUB_OUTPUT
+              echo "is_merged=true" >> $GITHUB_OUTPUT
+              ;;
+          esac
+
+      - name: Get mod version from stonecutter.properties.toml
+        id: get_version
+        run: |
+          VERSION=$(grep "^mod.version=" stonecutter.properties.toml | head -1 | cut -d'=' -f2 | tr -d '"')
+          if [ -z "$VERSION" ]; then
+            echo "mod.version not found in stonecutter.properties.toml"
+            exit 1
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Detected mod version: $VERSION"
+
+      # 真实游戏版本号取自 stonecutter.properties.toml（如 26.1 -> 26.1.2）
+      - name: Resolve real MC version
+        id: mc_version
+        run: |
+          MC="${{ steps.info.outputs.mc }}"
+          REAL_MC=$(awk -v mc="$MC" '
+            index($0, "[\"" mc "-")==1 {insec=1; next}
+            /^\[/ {insec=0}
+            insec && /^deps\.minecraft=/ { sub(/^deps\.minecraft=/,""); gsub(/[";]/,""); print; exit }
+          ' stonecutter.properties.toml)
+          if [ -z "$REAL_MC" ]; then
+            echo "No deps.minecraft found for $MC in stonecutter.properties.toml"
+            exit 1
+          fi
+          echo "real_mc=$REAL_MC" >> $GITHUB_OUTPUT
+          echo "Real MC version: $REAL_MC"
+
+      - name: Extract Current Version Changelog
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}"
+          awk -v ver="$VERSION" '/^# / {if($0 ~ "# " ver) {flag=1} else {flag=0}} flag {print}' CHANGELOG.md > temp-changelog.md
+          echo "prepared changelog："
+          cat temp-changelog.md
+
+      # ---------- Merged (26.x): Forgix 合并为单个跨 loader 产物 ----------
+      - name: Merge build ${{ steps.info.outputs.mc }} (forgix)
+        if: steps.info.outputs.is_merged == 'true'
+        run: ./gradlew mergeJars -Pforgix.mc=${{ steps.info.outputs.mc }} --no-daemon
+
+      - name: Publish merged ${{ steps.info.outputs.mc }} to Modrinth & CurseForge
+        if: steps.info.outputs.is_merged == 'true'
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: xZQOoOaY
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          curseforge-id: 832070
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          github-enabled: false
+          files: build/merged/*.jar
+          name: ${{ steps.get_version.outputs.version }} for ${{ steps.info.outputs.mc }}-neobric
+          version: ${{ steps.get_version.outputs.version }}+${{ steps.info.outputs.mc }}-neobric
+          loaders: |
+            fabric
+            neoforge
+          game-versions: ${{ steps.mc_version.outputs.real_mc }}
+          changelog-file: temp-changelog.md
+
+      # ---------- Per-loader: 每个 版本-加载器 独立构建推送 ----------
+      - name: Build ${{ matrix.sub }}
+        if: steps.info.outputs.is_merged == 'false'
+        run: ./gradlew "${{ matrix.sub }}:build" --no-daemon
+
+      - name: Publish ${{ matrix.sub }} to Modrinth & CurseForge
+        if: steps.info.outputs.is_merged == 'false'
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: xZQOoOaY
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          curseforge-id: 832070
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          github-enabled: false
+          files: 'versions/${{ matrix.sub }}/build/libs/*.jar'
+          name: ${{ steps.get_version.outputs.version }} for ${{ matrix.sub }}
+          version: ${{ steps.get_version.outputs.version }}+${{ matrix.sub }}
+          loaders: ${{ steps.info.outputs.loader }}
+          game-versions: ${{ steps.mc_version.outputs.real_mc }}
+          changelog-file: temp-changelog.md
