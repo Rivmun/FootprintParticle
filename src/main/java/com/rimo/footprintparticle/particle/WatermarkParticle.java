@@ -5,6 +5,7 @@ import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.core.particles.SimpleParticleType;
+//? if > 1.21.1
 import net.minecraft.util.RandomSource;
 import org.jspecify.annotations.NonNull;
 
@@ -26,6 +27,7 @@ public class WatermarkParticle extends FootprintParticle {
 		}
 
 		@Override
+		//~ if < 1.21.11 'velocityZ, @NonNull RandomSource random' -> 'velocityZ'
 		public Particle createParticle(@NonNull SimpleParticleType parameters, @NonNull ClientLevel world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, @NonNull RandomSource random) {
 			return new WatermarkParticle(world, x, y, z, velocityX, velocityY, velocityZ, this.spriteProvider, (WatermarkParticleType) parameters, "watermark");
 		}

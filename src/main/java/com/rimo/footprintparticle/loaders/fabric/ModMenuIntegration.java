@@ -4,6 +4,7 @@ package com.rimo.footprintparticle.loaders.fabric;
 import com.rimo.footprintparticle.config.Config;
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
+//~ if < 1.21.11 '.AutoConfigClient' -> '.AutoConfig'
 import me.shedaniel.autoconfig.AutoConfigClient;
 
 /**
@@ -13,6 +14,7 @@ import me.shedaniel.autoconfig.AutoConfigClient;
 public class ModMenuIntegration implements ModMenuApi {
 	@Override
 	public ConfigScreenFactory<?> getModConfigScreenFactory() {
+		//~ if < 1.21.11 'AutoConfigClient' -> 'AutoConfig'
 		return parent -> AutoConfigClient.getConfigScreen(Config.class, parent).get();
 	}
 }

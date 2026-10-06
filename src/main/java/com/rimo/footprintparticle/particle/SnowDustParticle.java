@@ -1,19 +1,20 @@
 package com.rimo.footprintparticle.particle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.particle.*;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.core.particles.SimpleParticleType;
+//? if > 1.21.1
 import net.minecraft.util.RandomSource;
 import org.jspecify.annotations.NonNull;
 
 // Copy from net.minecraft.client.particle.PlayerCloudParticle
+//~ if < 1.21.11 'SingleQuadParticle' -> 'TextureSheetParticle'
 public class SnowDustParticle extends SingleQuadParticle {
     private final SpriteSet sprites;
 
     SnowDustParticle(ClientLevel clientLevel, double d, double e, double f, double g, double h, double i, SpriteSet spriteSet) {
+        //~ if < 1.21.11 ', spriteSet.first());' -> ');'
         super(clientLevel, d, e, f, (double) 0.0F, (double) 0.0F, (double) 0.0F, spriteSet.first());
         this.friction = 0.96F;
         this.sprites = spriteSet;
@@ -43,9 +44,15 @@ public class SnowDustParticle extends SingleQuadParticle {
     }
 
     @Override
+    //? if > 1.21.1 {
     public @NonNull Layer getLayer() {
         return Layer.TRANSLUCENT;
     }
+    //? } else {
+    /*public @NonNull ParticleRenderType getRenderType() {
+        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+    }
+    *///? }
 
     public static class DefaultFactory implements ParticleProvider<@NonNull SimpleParticleType> {
         private final SpriteSet spriteProvider;
@@ -55,6 +62,7 @@ public class SnowDustParticle extends SingleQuadParticle {
         }
 
         @Override
+        //~ if < 1.21.11 'velocityZ, @NonNull RandomSource random' -> 'velocityZ'
         public Particle createParticle(@NonNull SimpleParticleType parameters, @NonNull ClientLevel world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, @NonNull RandomSource random) {
             Particle particle = new SnowDustParticle(world, x, y, z, velocityX, velocityY, velocityZ, this.spriteProvider);
             if (parameters instanceof SnowDustParticleType snowdust)

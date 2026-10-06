@@ -8,6 +8,7 @@ import com.rimo.footprintparticle.particle.WatermarkParticleType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
+//~ if < 1.21.11 'Identifier' -> 'ResourceLocation'
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
@@ -33,6 +34,7 @@ public abstract class LivingEntityMixin extends Entity {
 	}
 
 	@Unique
+	//~ if < 1.21.11 'Identifier' -> 'ResourceLocation'
 	private final ResourceKey<Block> fpp$AIR = ResourceKey.create(Registries.BLOCK, Identifier.withDefaultNamespace("air"));
 	@Unique
 	private int fpp$timer = 0;
@@ -165,12 +167,15 @@ public abstract class LivingEntityMixin extends Entity {
 				for (String str : CONFIG.getBlockHeight()) {
 					String[] str2 = str.split(",");
 					if (str2[0].charAt(0) == '#') {
+						//~ if < 26.1 '.tags()' -> '.getTags()'
 						for (TagKey<Block> tag : block.tags().toList()) {
 							if (str2[0].equals("#" + tag.location().toString())) {
 								py += Float.parseFloat(str2[1]);
 								break;
 							}
 						}
+					//~ if < 26.1 '.typeHolder()' -> '.getBlockHolder()'
+					//~ if < 1.21.11 '.identifier()' -> '.location()'
 					} else if (str2[0].contentEquals(block.typeHolder().unwrapKey().orElse(fpp$AIR).identifier().toString())) {
 						py += Float.parseFloat(str2[1]);
 						break;
@@ -236,6 +241,9 @@ public abstract class LivingEntityMixin extends Entity {
 		}
 	}
 
+	//~ if < 26.1 '.tags()' -> '.getTags()' {
+	//~ if < 26.1 '.typeHolder()' -> '.getBlockHolder()' {
+	//~ if < 1.21.11 'identifier().' -> 'location().' {
 	@Unique
 	private boolean fpp$isPrintCanGen(BlockPos pos) {
 		var block = this.level().getBlockState(pos);
@@ -263,5 +271,7 @@ public abstract class LivingEntityMixin extends Entity {
 		}
 		return canGen;
 	}
-
+	//~ }
+	//~ }
+	//~ }
 }

@@ -3,15 +3,16 @@
 
 import com.rimo.footprintparticle.Client;
 import com.rimo.footprintparticle.PlatformUtil;
+import com.rimo.footprintparticle.Util;
 import com.rimo.footprintparticle.config.Config;
 import com.rimo.footprintparticle.mixin.ParticleSpriteSetAccessor;
 import com.rimo.footprintparticle.particle.FootprintParticle;
 import com.rimo.footprintparticle.particle.SnowDustParticle;
 import com.rimo.footprintparticle.particle.WaterSplashParticle;
 import com.rimo.footprintparticle.particle.WatermarkParticle;
+//~ if < 1.21.11 '.AutoConfigClient' -> '.AutoConfig'
 import me.shedaniel.autoconfig.AutoConfigClient;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
@@ -34,7 +35,7 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 @Mod(Client.MOD_ID)
 public class Platform {
 	static {
-		// NeoForge 侧 SpriteSet 实例即原版 ParticleResources$MutableSpriteSet，mixin accessor 直接命中。
+		// 此处在 1.21.1 版本下会有个 Mixin class cannot be referenced directly 的警告，但实测不影响编译和运行，暂不理会。
 		PlatformUtil.PLATFORM = spriteSet -> ((ParticleSpriteSetAccessor) spriteSet).fpp$getSprites();
 	}
 
@@ -48,10 +49,10 @@ public class Platform {
 		public static void onRegister(RegisterEvent event) {
 			// 粒子类型注册：仅客户端，服务端不需要 PARTICLE_TYPE registry 条目。
 			if (event.getRegistryKey().equals(Registries.PARTICLE_TYPE)) {
-				event.register(Registries.PARTICLE_TYPE, Identifier.fromNamespaceAndPath(Client.MOD_ID, "footprint"), () -> Client.FOOTPRINT);
-				event.register(Registries.PARTICLE_TYPE, Identifier.fromNamespaceAndPath(Client.MOD_ID, "watermark"), () -> Client.WATERMARK);
-				event.register(Registries.PARTICLE_TYPE, Identifier.fromNamespaceAndPath(Client.MOD_ID, "snowdust"), () -> Client.SNOWDUST);
-				event.register(Registries.PARTICLE_TYPE, Identifier.fromNamespaceAndPath(Client.MOD_ID, "watersplash"), () -> Client.WATERSPLASH);
+				event.register(Registries.PARTICLE_TYPE, Util.getId("footprint"), () -> Client.FOOTPRINT);
+				event.register(Registries.PARTICLE_TYPE, Util.getId("watermark"), () -> Client.WATERMARK);
+				event.register(Registries.PARTICLE_TYPE, Util.getId("snowdust"), () -> Client.SNOWDUST);
+				event.register(Registries.PARTICLE_TYPE, Util.getId("watersplash"), () -> Client.WATERSPLASH);
 			}
 		}
 
@@ -70,6 +71,7 @@ public class Platform {
 			// 相当于 Fabric 侧 ModMenuIntegration 的替代。AutoConfigClient 由 cloth-config-neoforge 提供。
 			ModList.get().getModContainerById(Client.MOD_ID).ifPresent(container ->
 					container.registerExtensionPoint(IConfigScreenFactory.class, (modContainer, parent) ->
+							//~ if < 1.21.11 'AutoConfigClient' -> 'AutoConfig'
 							AutoConfigClient.getConfigScreen(Config.class, parent).get()));
 		}
 	}

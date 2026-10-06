@@ -1,19 +1,20 @@
 package com.rimo.footprintparticle.particle;
 
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.rimo.footprintparticle.Client;
 import com.rimo.footprintparticle.Util;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.SingleQuadParticle;
-import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.particle.*;
+//? if > 1.21.1 {
+//~ if < 26.1 '.level.QuadParticleRenderState' -> '.QuadParticleRenderState'
 import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
+import net.minecraft.util.RandomSource;
+//? }
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.levelgen.Heightmap;
 import org.joml.Quaternionf;
@@ -21,12 +22,14 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
+//~ if < 1.21.11 'SingleQuadParticle' -> 'TextureSheetParticle'
 public class FootprintParticle extends SingleQuadParticle {
 	protected float startAlpha;
 	private final Quaternionf q;
 	private final BlockPos pos;
 
 	protected FootprintParticle(ClientLevel clientWorld, double x, double y, double z, double vx, double vy, double vz, SpriteSet spriteProvider, FootprintParticleType parameters, String defName) {
+		//~ if < 1.21.11 'vz, spriteProvider.get(RandomSource.create())' -> 'vz'
 		super(clientWorld, x, y, z, vx, vy, vz, spriteProvider.get(RandomSource.create()));
 		pos = new BlockPos(Mth.floor(this.x), Mth.floor(this.y - 0.02f), Mth.floor(this.z));
 
@@ -58,11 +61,6 @@ public class FootprintParticle extends SingleQuadParticle {
 	}
 
     @Override
-    protected @NonNull Layer getLayer() {
-        return Layer.TRANSLUCENT;
-    }
-
-    @Override
 	public void setAlpha(float a) {
 		super.setAlpha(a);
 		this.startAlpha = a;
@@ -73,6 +71,7 @@ public class FootprintParticle extends SingleQuadParticle {
 		this.y -= 0.01f / this.lifetime;
 		this.yo = this.y;
 
+		//~ if < 1.21.11 ', pos' -> ', pos.getX(), pos.getZ()'
 		if (this.level.isRaining() && this.level.getHeight(Heightmap.Types.MOTION_BLOCKING, pos) <= this.y)
 			if (this.age + Client.CONFIG.getLifeTimeAcc() < this.lifetime)
 				this.age += Client.CONFIG.getLifeTimeAcc();
@@ -84,10 +83,27 @@ public class FootprintParticle extends SingleQuadParticle {
 			this.alpha = this.startAlpha - (this.startAlpha * (this.age - this.lifetime / 2f) / (this.lifetime / 2f));
 	}
 
+	//? if > 1.21.1 {
+	@Override
+	protected @NonNull Layer getLayer() {
+		return Layer.TRANSLUCENT;
+	}
+
 	@Override
 	public void extract(@NonNull QuadParticleRenderState renderState, @NonNull Camera camera, float tickDelta) {
 		this.extractRotatedQuad(renderState, camera, this.q, tickDelta);
 	}
+	//? } else {
+	/*@Override
+	public @NonNull ParticleRenderType getRenderType() {
+		return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+	}
+
+	@Override
+	public void render(@NonNull VertexConsumer vertexConsumer, @NonNull Camera camera, float tickDelta) {
+		this.renderRotatedQuad(vertexConsumer, camera, this.q, tickDelta);
+	}
+	*///? }
 
 	public static class DefaultFactory implements ParticleProvider<SimpleParticleType> {
 		private final SpriteSet spriteProvider;
@@ -97,6 +113,7 @@ public class FootprintParticle extends SingleQuadParticle {
 		}
 
 		@Override
+		//~ if < 1.21.11 'velocityZ, @NonNull RandomSource random' -> 'velocityZ'
 		public Particle createParticle(@NonNull SimpleParticleType parameters, @NonNull ClientLevel world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, @NonNull RandomSource random) {
 			return new FootprintParticle(world, x, y, z, velocityX, velocityY, velocityZ, this.spriteProvider, (FootprintParticleType) parameters, "footprint");
 		}

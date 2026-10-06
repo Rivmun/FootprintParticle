@@ -12,6 +12,19 @@ stonecutter parameters {
     constants.match(node.metadata.project.substringAfterLast('-'), "fabric", "neoforge", "forge")
 }
 
+// forgix 隐式向根工程应用了 java 插件，使根工程声明 src/main/java 作为 source root。
+// 然而根工程本身没有 loom 依赖，IntelliJ 将 src/main/java 中的文件分配给根模块，
+// 造成所有 Minecraft / Fabric 引用全部标红。
+// 解决：清空根工程的 source set 源目录，让文件归属给有 loom 依赖的 :26.1-fabric 模块。
+sourceSets.main {
+    java.setSrcDirs(emptyList<String>())
+    resources.setSrcDirs(emptyList<String>())
+}
+sourceSets.test {
+    java.setSrcDirs(emptyList<String>())
+    resources.setSrcDirs(emptyList<String>())
+}
+
 // ===================== Forgix 合并配置 =====================
 // Stonecutter 不会把 stonecutter.properties.toml 的顶层全局属性注入根工程（仅注入各子工程节点），
 // 因此根构建脚本无法用 providers.gradleProperty/findProperty 取到 mod.id、mod.version，

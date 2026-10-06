@@ -15,6 +15,7 @@ import java.util.List;
  *
  * <p>Fabric 侧接管了原版 SpriteSet 实现，运行时粒子内部不使用该类，所以此处目前只由 Neoforge 侧调用。</p>
  */
+//~ if < 1.21.11 'ParticleResources' -> 'ParticleEngine'
 @Mixin(targets = "net.minecraft.client.particle.ParticleResources$MutableSpriteSet")
 public interface ParticleSpriteSetAccessor {
 	@Accessor("sprites")

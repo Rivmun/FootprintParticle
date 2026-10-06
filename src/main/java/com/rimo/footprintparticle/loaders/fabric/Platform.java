@@ -8,7 +8,9 @@ import com.rimo.footprintparticle.particle.SnowDustParticle;
 import com.rimo.footprintparticle.particle.WaterSplashParticle;
 import com.rimo.footprintparticle.particle.WatermarkParticle;
 import net.fabricmc.api.ClientModInitializer;
+//~ if < 26.1 'FabricSpriteSet' -> 'FabricSpriteProvider'
 import net.fabricmc.fabric.api.client.particle.v1.FabricSpriteSet;
+//~ if < 26.1 'ParticleProviderRegistry' -> 'ParticleFactoryRegistry'
 import net.fabricmc.fabric.api.client.particle.v1.ParticleProviderRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -25,6 +27,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 public class Platform implements ClientModInitializer {
 	static {
 		// Fabric-api 的 SpriteSet 实现同时是 FabricSpriteSet，直接强转拿全部 sprite。
+		//~ if < 26.1 'FabricSpriteSet' -> 'FabricSpriteProvider'
 		PlatformUtil.PLATFORM = spriteSet -> ((FabricSpriteSet) spriteSet).getSprites();
 	}
 
@@ -38,6 +41,7 @@ public class Platform implements ClientModInitializer {
 
 		Client.init();
 
+		//~ if < 26.1 'ParticleProviderRegistry' -> 'ParticleFactoryRegistry'
 		ParticleProviderRegistry registry = ParticleProviderRegistry.getInstance();
 		registry.register(Client.FOOTPRINT, FootprintParticle.DefaultFactory::new);
 		registry.register(Client.WATERMARK, WatermarkParticle.DefaultFactory::new);

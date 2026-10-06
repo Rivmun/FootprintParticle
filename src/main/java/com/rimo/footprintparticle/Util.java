@@ -2,6 +2,8 @@ package com.rimo.footprintparticle;
 
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+//~ if < 1.21.11 '.Identifier' -> '.ResourceLocation'
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 
@@ -53,4 +55,18 @@ public class Util {
 				)
 		).toList();
 	}
+
+	//? if > 1.21.1 {
+	public static Identifier getId(String path) {
+		return Identifier.fromNamespaceAndPath(Client.MOD_ID, path);
+	}
+	//? } else {
+	/*public static ResourceLocation getId(String path) {
+		//? if <= 1.20.1 {
+		/^return new ResourceLocation(MOD_ID, path);
+		 ^///? } else {
+		return ResourceLocation.fromNamespaceAndPath(Client.MOD_ID, path);
+		//? }
+	}
+	*///? }
 }
