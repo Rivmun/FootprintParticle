@@ -28,5 +28,6 @@ public final class PlatformUtil {
 		 * {@code ParticleSpriteSetAccessor} 的 {@code fpp$getSprites()}（{@code @Accessor("sprites")} 生成）。</p>
 		 */
 		List<TextureAtlasSprite> getSprites(SpriteSet spriteSet);
+		boolean isModLoaded(String id);
 	}
 }

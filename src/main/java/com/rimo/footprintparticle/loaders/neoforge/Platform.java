@@ -11,7 +11,9 @@ import com.rimo.footprintparticle.particle.SnowDustParticle;
 import com.rimo.footprintparticle.particle.WaterSplashParticle;
 import com.rimo.footprintparticle.particle.WatermarkParticle;
 //~ if < 1.21.11 '.AutoConfigClient' -> '.AutoConfig'
-import me.shedaniel.autoconfig.AutoConfigClient;
+import me.shedaniel.autoconfig.AutoConfig;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.registries.Registries;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -22,6 +24,8 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.registries.RegisterEvent;
+
+import java.util.List;
 
 // NeoForge 侧入口。 META-INF/neoforge.mods.toml 声明 modId，本类靠 @Mod 被 FML 实例化。
 // 本项目是仅客户端粒子模组：ParticleType 与 ParticleProvider 都只在客户端注册，
@@ -35,8 +39,18 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 @Mod(Client.MOD_ID)
 public class Platform {
 	static {
-		// 此处在 1.21.1 版本下会有个 Mixin class cannot be referenced directly 的警告，但实测不影响编译和运行，暂不理会。
-		PlatformUtil.PLATFORM = spriteSet -> ((ParticleSpriteSetAccessor) spriteSet).fpp$getSprites();
+		PlatformUtil.PLATFORM = new PlatformUtil.IPlatform() {
+			@Override
+			public List<TextureAtlasSprite> getSprites(SpriteSet spriteSet) {
+				// 此处在 1.21.1 版本下会有个 Mixin class cannot be referenced directly 的警告，但实测不影响编译和运行，暂不理会。
+				return ((ParticleSpriteSetAccessor) spriteSet).fpp$getSprites();
+			}
+
+			@Override
+			public boolean isModLoaded(String id) {
+				return ModList.get().isLoaded(id);
+			}
+		};
 	}
 
 	public Platform() {
@@ -72,7 +86,7 @@ public class Platform {
 			ModList.get().getModContainerById(Client.MOD_ID).ifPresent(container ->
 					container.registerExtensionPoint(IConfigScreenFactory.class, (modContainer, parent) ->
 							//~ if < 1.21.11 'AutoConfigClient' -> 'AutoConfig'
-							AutoConfigClient.getConfigScreen(Config.class, parent).get()));
+							AutoConfig.getConfigScreen(Config.class, parent).get()));
 		}
 	}
 }

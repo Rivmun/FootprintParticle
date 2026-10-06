@@ -48,6 +48,7 @@ repositories {
     maven("https://maven.architectury.dev/")
     maven("https://maven.shedaniel.me/")
     maven("https://api.modrinth.com/maven")
+//    maven("https://cursemaven.com")
 }
 
 dependencies {
@@ -60,6 +61,13 @@ dependencies {
 
     modApi("me.shedaniel.cloth:cloth-config-neoforge:${property("deps.cloth")}") {
         exclude(group = "net.fabricmc.fabric-api")
+    }
+
+    if (sc.current.parsed < "1.21.11") {
+        // pehkui
+        modCompileOnly("maven.modrinth:pehkui:${property("deps.pehkui")}")
+        // random-mob-sizes
+//        modCompileOnly("curse.maven:random-mob-sizes-555230:${property("deps.random-mob-sizes")}")
     }
 }
 

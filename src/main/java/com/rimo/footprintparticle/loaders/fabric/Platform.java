@@ -12,8 +12,13 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.particle.v1.FabricSpriteSet;
 //~ if < 26.1 'ParticleProviderRegistry' -> 'ParticleFactoryRegistry'
 import net.fabricmc.fabric.api.client.particle.v1.ParticleProviderRegistry;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+
+import java.util.List;
 
 /**
  * Fabric 侧入口。 {@code fabric.mod.json} 的 {@code client} entrypoint 指向本类。
@@ -26,9 +31,19 @@ import net.minecraft.core.registries.BuiltInRegistries;
  */
 public class Platform implements ClientModInitializer {
 	static {
-		// Fabric-api 的 SpriteSet 实现同时是 FabricSpriteSet，直接强转拿全部 sprite。
-		//~ if < 26.1 'FabricSpriteSet' -> 'FabricSpriteProvider'
-		PlatformUtil.PLATFORM = spriteSet -> ((FabricSpriteSet) spriteSet).getSprites();
+		PlatformUtil.PLATFORM = new PlatformUtil.IPlatform() {
+			@Override
+			public List<TextureAtlasSprite> getSprites(SpriteSet spriteSet) {
+				// Fabric-api 的 SpriteSet 实现同时是 FabricSpriteSet，直接强转拿全部 sprite。
+				//~ if < 26.1 'FabricSpriteSet' -> 'FabricSpriteProvider'
+				return ((FabricSpriteSet) spriteSet).getSprites();
+			}
+
+			@Override
+			public boolean isModLoaded(String id) {
+				return FabricLoader.getInstance().isModLoaded(id);
+			}
+		};
 	}
 
 	@Override
