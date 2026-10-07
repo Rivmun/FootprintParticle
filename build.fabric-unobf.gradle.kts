@@ -65,7 +65,7 @@ dependencies {
 
 tasks {
     processResources {
-        exclude("**/neoforge.mods.toml", "**/mods.toml", "**/*.accesswidener")
+        exclude("**/neoforge.mods.toml", "**/mods.toml", "**/*.accesswidener", "**/*.mcmeta", "**/*-forge.mixins.json")
     }
 }
 

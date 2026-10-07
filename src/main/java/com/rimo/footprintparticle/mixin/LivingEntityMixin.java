@@ -8,6 +8,7 @@ import com.rimo.footprintparticle.particle.WatermarkParticleType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
+//~ if < 1.19.3 'net.minecraft.core.registries.Registries' -> 'net.minecraft.core.Registry'
 import net.minecraft.core.registries.Registries;
 //~ if < 1.21.11 'Identifier' -> 'ResourceLocation'
 import net.minecraft.resources.Identifier;
@@ -28,6 +29,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static com.rimo.footprintparticle.Client.CONFIG;
 
+//~ if < 1.20.1 'this.level()' -> 'this.level' {
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
 	public LivingEntityMixin(EntityType<?> type, Level world) {
@@ -36,6 +38,7 @@ public abstract class LivingEntityMixin extends Entity {
 
 	//~ if < 1.21.11 'Identifier' -> 'ResourceLocation'
 	//~ if < 1.21.1 '.withDefaultNamespace' -> '.tryParse'
+	//~ if < 1.19.3 'Registries.BLOCK' -> 'Registry.BLOCK_REGISTRY'
 	@Unique private final ResourceKey<Block> fpp$AIR = ResourceKey.create(Registries.BLOCK, Identifier.withDefaultNamespace("air"));
 	@Unique private int fpp$timer = 0;
 	@Unique private boolean fpp$wasFalling;
@@ -63,6 +66,7 @@ public abstract class LivingEntityMixin extends Entity {
 
 		boolean generated = false;
 		if (!this.isShiftKeyDown() && !this.isUnderWater()) {
+			//~ if < 1.20.1 'this.onGround()' -> 'this.onGround'
 			if (landed || (fpp$timer <= 0 && moved && this.onGround()))
 				generated = this.fpp$footprintGenerator(landed);
 		}
@@ -307,3 +311,4 @@ public abstract class LivingEntityMixin extends Entity {
 	//~ }
 	//~ }
 }
+//~ }

@@ -57,7 +57,7 @@ dependencies {
 tasks {
     processResources {
         // neoforge 构建包里剔除 fabric 元数据和其他 loader 的 mods.toml。
-        exclude("**/fabric.mod.json", "**/mods.toml", "**/*.accesswidener")
+        exclude("**/fabric.mod.json", "**/mods.toml", "**/*.accesswidener", "**/*.mcmeta", "**/*-forge.mixins.json")
     }
 
     jar {

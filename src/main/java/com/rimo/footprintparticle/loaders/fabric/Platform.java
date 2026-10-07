@@ -16,6 +16,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Registry;
+//? if > 1.19.2
 import net.minecraft.core.registries.BuiltInRegistries;
 
 import java.util.List;
@@ -49,10 +50,12 @@ public class Platform implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		// 粒子类型注册：写入原版 BuiltInRegistries.PARTICLE_TYPE（Fabric 走副作用式 Registry.register）。
+		//~ if < 1.20.1 'BuiltInRegistries.PARTICLE_TYPE' -> 'Registry.PARTICLE_TYPE' {
 		Registry.register(BuiltInRegistries.PARTICLE_TYPE, Client.MOD_ID + ":footprint", Client.FOOTPRINT);
 		Registry.register(BuiltInRegistries.PARTICLE_TYPE, Client.MOD_ID + ":watermark", Client.WATERMARK);
 		Registry.register(BuiltInRegistries.PARTICLE_TYPE, Client.MOD_ID + ":snowdust", Client.SNOWDUST);
 		Registry.register(BuiltInRegistries.PARTICLE_TYPE, Client.MOD_ID + ":watersplash", Client.WATERSPLASH);
+		//~ }
 
 		Client.init();
 

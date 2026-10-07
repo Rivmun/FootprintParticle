@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+//~ if < 1.20.1 'this.level()' -> 'this.level' {
 @Mixin(AbstractMinecart.class)
 public abstract class AbstractMinecartEntityMixin extends Entity {
 
@@ -48,3 +49,4 @@ public abstract class AbstractMinecartEntityMixin extends Entity {
 		}
 	}
 }
+//~ }

@@ -3,16 +3,14 @@
 
 import com.rimo.footprintparticle.Client;
 import com.rimo.footprintparticle.PlatformUtil;
-import com.rimo.footprintparticle.Util;
 import com.rimo.footprintparticle.config.Config;
 import com.rimo.footprintparticle.mixin.ParticleSpriteSetAccessor;
 import com.rimo.footprintparticle.particle.*;
 //~ if < 1.21.11 '.AutoConfigClient' -> '.AutoConfig'
-import me.shedaniel.autoconfig.AutoConfigClient;
+import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.core.registries.Registries;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
@@ -20,7 +18,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.registries.RegisterEvent;
 
 import java.util.List;
 
@@ -39,7 +36,8 @@ import java.util.List;
 @Mod(Client.MOD_ID)
 public class Platform {
 	public Platform() {
-		// 注册类事件均由下方 ClientEvents（mod bus）自动路由，构造器无需 addListener。
+		// 粒子类型对象在共享 Client 里构造；Forge 侧的私有登记由 ForgeParticleRegistry（静态映射）
+		// 完成，provider 注入由下方 onRegisterParticleProviders 完成，构造器无需额外挂线。
 	}
 
 	@Mod.EventBusSubscriber(modid = Client.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -59,23 +57,18 @@ public class Platform {
 			};
 		}
 
-		@SubscribeEvent
-		public static void onRegister(RegisterEvent event) {
-			// 粒子类型注册：仅客户端，服务端不需要 PARTICLE_TYPE registry 条目。
-			if (event.getRegistryKey().equals(Registries.PARTICLE_TYPE)) {
-				event.register(Registries.PARTICLE_TYPE, Util.getId("footprint"), () -> Client.FOOTPRINT);
-				event.register(Registries.PARTICLE_TYPE, Util.getId("watermark"), () -> Client.WATERMARK);
-				event.register(Registries.PARTICLE_TYPE, Util.getId("snowdust"), () -> Client.SNOWDUST);
-				event.register(Registries.PARTICLE_TYPE, Util.getId("watersplash"), () -> Client.WATERSPLASH);
-			}
-		}
-
+		// 不再走原版 RegisterEvent / RegisterParticleProvidersEvent.registerSpriteSet：那两条路径
+		// 都依赖会被 server→client 同步重建的原版 minecraft:particle_type 表，纯客户端条目登录后即失效。
+		// 改由 ForgeParticleRegistry 的私有不同步映射 + ParticleEngine 本地注入实现。
 		@SubscribeEvent
 		public static void onRegisterParticleProviders(RegisterParticleProvidersEvent event) {
-			event.registerSpriteSet(Client.FOOTPRINT, FootprintParticle.DefaultFactory::new);
-			event.registerSpriteSet(Client.WATERMARK, WatermarkParticle.DefaultFactory::new);
-			event.registerSpriteSet(Client.SNOWDUST, SnowDustParticle.DefaultFactory::new);
-			event.registerSpriteSet(Client.WATERSPLASH, WaterSplashParticle.DefaultFactory::new);
+			// 该事件在客户端 ParticleEngine 已构造后派发，此处借其时序把 provider 直接注入引擎内部表；
+			// 引擎实例由 ParticleEngineMixin 混入 ParticleEngineLocal 接口方法 fpp$registerLocal。
+			ParticleEngineLocal engine = (ParticleEngineLocal) (Object) Minecraft.getInstance().particleEngine;
+			engine.fpp$registerLocal(ForgeParticleRegistry.FOOTPRINT, FootprintParticle.DefaultFactory::new);
+			engine.fpp$registerLocal(ForgeParticleRegistry.WATERMARK, WatermarkParticle.DefaultFactory::new);
+			engine.fpp$registerLocal(ForgeParticleRegistry.SNOWDUST, SnowDustParticle.DefaultFactory::new);
+			engine.fpp$registerLocal(ForgeParticleRegistry.WATERSPLASH, WaterSplashParticle.DefaultFactory::new);
 		}
 
 		@SubscribeEvent
@@ -87,7 +80,7 @@ public class Platform {
 					container.registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class,
 							() -> new ConfigScreenHandler.ConfigScreenFactory((mc, parent) -> {
 								//~ if < 1.21.11 'AutoConfigClient' -> 'AutoConfig'
-								var screen = AutoConfigClient.getConfigScreen(Config.class, parent).get();
+								var screen = AutoConfig.getConfigScreen(Config.class, parent).get();
 								// 配置屏异常时兜底返回原版游戏屏，避免 Forge 直接崩溃
 								if (screen == null)
 									screen = Minecraft.getInstance().screen;

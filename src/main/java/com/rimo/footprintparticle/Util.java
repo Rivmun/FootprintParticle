@@ -31,7 +31,11 @@ public class Util {
 		//? if < 1.21.1 && > 1.16.5 {
 		/*if (PlatformUtil.PLATFORM.isModLoaded("random_mob_sizes") && entity instanceof Mob) {
 			try {
+				//? if ! 1.19.2 {
 				scale *= ((com.tristankechlo.random_mob_sizes.mixin_helper.MobMixinAddon) entity).getMobScaling$RandomMobSizes();
+				//? } else {
+				/^scale *= ((com.tristankechlo.random_mob_sizes.mixin_access.MobMixinAddon) entity).getMobScaling();  // randommobsizes version < 2.0
+				^///? }
 			} catch (Exception ignored) {}
 		}
 		*///? }
@@ -48,7 +52,11 @@ public class Util {
 		List<String> finalSpriteNames = Arrays.asList(spriteNames);
 		return PlatformUtil.PLATFORM.getSprites(spriteProvider).stream().filter(sprite ->
 				finalSpriteNames.stream().anyMatch(str ->
+						//? if <= 1.19.2 {
+						/*sprite.getName().getPath().contentEquals(str)
+						*///? } else {
 						sprite.contents().name().getPath().contentEquals(str)
+						//? }
 				)
 		).toList();
 	}

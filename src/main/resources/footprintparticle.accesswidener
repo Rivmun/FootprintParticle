@@ -1,0 +1,7 @@
+accessWidener	v2	named
+
+# Forge 侧粒子本地工厂需要在 mixin 里直接 new 原版私有的 MutableSpriteSet，
+# 并把它塞进 ParticleEngine 的 spriteSets 表（见 loaders/forge/mixin/ParticleEngineMixin）。
+# 该嵌套类与其构造器在原版为私有；forge 构建通过 convertAccessWideners 把本文件转成 AT 应用。
+accessible	class	net/minecraft/client/particle/ParticleEngine$MutableSpriteSet
+accessible	method	net/minecraft/client/particle/ParticleEngine$MutableSpriteSet	<init>	()V

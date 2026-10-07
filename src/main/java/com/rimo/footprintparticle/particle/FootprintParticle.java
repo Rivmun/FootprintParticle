@@ -13,6 +13,7 @@ import net.minecraft.util.RandomSource;
 /*import com.mojang.blaze3d.vertex.VertexConsumer;
 //? if < 1.21.1 {
 /^import net.minecraft.world.phys.Vec3;
+//? if > 1.19.2
 import org.joml.Vector3f;
 ^///? }
 *///? }
@@ -22,7 +23,12 @@ import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.levelgen.Heightmap;
+//? if > 1.19.2 {
 import org.joml.Quaternionf;
+//? } else {
+/*import com.mojang.math.Quaternion;
+import com.mojang.math.Vector3f;
+*///? }
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
@@ -30,6 +36,7 @@ import java.util.List;
 //~ if < 1.21.11 'SingleQuadParticle' -> 'TextureSheetParticle'
 public class FootprintParticle extends SingleQuadParticle {
 	protected float startAlpha;
+	//~ if < 1.20.1 'Quaternionf' -> 'Quaternion'
 	private final Quaternionf q;
 	private final BlockPos pos;
 
@@ -50,7 +57,11 @@ public class FootprintParticle extends SingleQuadParticle {
 		double factor = Mth.SQRT_OF_TWO / 2;
 		double sf = Mth.sin(halfAngle) * factor;
 		double cf = Mth.cos(halfAngle) * factor;
+		//? if > 1.19.2 {
 		this.q = new Quaternionf(-cf, sf, sf, cf).rotateLocalY(Mth.PI);
+		//? } else {
+		/*this.q = new Quaternion((float) -sf, (float) cf, (float) -cf, (float) -sf);  // com.mojang.math.Quaternion 没有 rotateLocalY，等价于 (-cf,sf,sf,cf) 右乘 Ry(PI)
+		*///? }
 
 		this.lifetime = (int) (Client.CONFIG.getPrintLifetime() * 20);
 		this.quadSize = Client.CONFIG.getFootprintSize() * 0.03125f;
@@ -119,6 +130,7 @@ public class FootprintParticle extends SingleQuadParticle {
 
 		for(int k = 0; k < 4; ++k) {
 			Vector3f vector3f = vector3fs[k];
+			//~ if < 1.20.1 '.rotate' -> '.transform'
 			vector3f.rotate(this.q);
 			vector3f.mul(j);
 			vector3f.add(g, h, i);
@@ -129,10 +141,11 @@ public class FootprintParticle extends SingleQuadParticle {
 		float n = this.getV0();
 		float o = this.getV1();
 		int p = this.getLightColor(tickDelta);
-		vertexConsumer.vertex(vector3fs[0].x(), vector3fs[0].y(), vector3fs[0].z()).uv(m, o).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
-		vertexConsumer.vertex(vector3fs[1].x(), vector3fs[1].y(), vector3fs[1].z()).uv(m, n).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
-		vertexConsumer.vertex(vector3fs[2].x(), vector3fs[2].y(), vector3fs[2].z()).uv(l, n).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
+		// 反向遍历四角（每角 UV 不变）→ 绕序翻转，使贴地四边形正面朝上，避免 Forge 1.20.1 粒子 pass 的背面剔除。
 		vertexConsumer.vertex(vector3fs[3].x(), vector3fs[3].y(), vector3fs[3].z()).uv(l, o).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
+		vertexConsumer.vertex(vector3fs[2].x(), vector3fs[2].y(), vector3fs[2].z()).uv(l, n).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
+		vertexConsumer.vertex(vector3fs[1].x(), vector3fs[1].y(), vector3fs[1].z()).uv(m, n).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
+		vertexConsumer.vertex(vector3fs[0].x(), vector3fs[0].y(), vector3fs[0].z()).uv(m, o).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
 		^///? }
 	}
 	*///? }

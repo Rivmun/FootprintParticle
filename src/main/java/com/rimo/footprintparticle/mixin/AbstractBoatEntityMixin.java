@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+//~ if < 1.20.1 'this.level()' -> 'this.level' {
 //~ if < 1.21.11 'AbstractBoat.class' -> 'Boat.class'
 @Mixin(AbstractBoat.class)
 public abstract class AbstractBoatEntityMixin extends Entity {
@@ -88,3 +89,4 @@ public abstract class AbstractBoatEntityMixin extends Entity {
 		}
 	}
 }
+//~ }

@@ -6,17 +6,26 @@ val minecraft = property("deps.minecraft") as String
 
 loom {
     silentMojangMappingsLicense()
-//    accessWidenerPath = rootProject.file("src/main/resources/sfcr.accesswidener")
+    // Forge 粒子本地工厂需在 mixin 里 new 原版私有的 ParticleEngine$MutableSpriteSet，靠下面 AW 放开可见性。
+    accessWidenerPath = rootProject.file("src/main/resources/${property("mod.id")}.accesswidener")
 
     forge {
-//        convertAccessWideners = true
-//        extraAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
+        // 把上面的 accesswidener 转成 Forge 的 accesstransformer.cfg（dev 编译期 + 运行期均生效）。
+        convertAccessWideners = true
+        extraAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
 
         mixinConfig("${property("mod.id")}.mixins.json")
+        // forge 专用 mixin 配置：ParticleEngineMixin（本地粒子工厂劫持），仅此加载器需要。
+        mixinConfig("${property("mod.id")}-forge.mixins.json")
     }
 
     if (sc.current.parsed < "1.20") {
-        mixin.useLegacyMixinAp = true
+        // 必须关闭 legacy mixin AP：开启后 MixinAPMappingService 会通过 GradleUtils.allLoomProjects
+        // 遍历整个 Stonecutter 多版本构建的所有 loom 子工程，对 26.x 非混淆(no-remap)工程调用
+        // getMappingConfiguration() 抛 UnsupportedOperationException（跨 Loom 版本时还会抛
+        // ClassCastException），导致 remapJar 失败（表现为构建期或配置缓存写入期报错）。
+        // 关闭后由 tiny-remapper 直接把 mixin 注解重映射为 SRG 名（jar 无需 refmap），避开该全局扫描。
+        mixin.useLegacyMixinAp = false
         mixin.defaultRefmapName = "${property("mod.id")}-${minecraft}-forge-refmap.json"
     }
 }
@@ -71,9 +80,14 @@ dependencies {
     mappings(loom.officialMojangMappings())
     forge("net.minecraftforge:forge:${property("deps.forge")}")
 
-    if (sc.current.parsed < "1.20") {
-        annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
-    }
+    // <1.20 不挂 mixin 注解处理器：上方 loom.forge 已设 useLegacyMixinAp = false，
+    // mixin 注解改由 tiny-remapper 在 remapJar 阶段直接重映射为 SRG 名。
+    // 若仍保留 org.spongepowered:mixin:processor，javac 会照常调用它生成 refmap，
+    // 而此时没有 srg 映射数据喂给它，会把 "Unable to locate obfuscation mapping for
+    // @Inject target tick / @Accessor sprites" 当作编译错误抛出，导致 clean 构建失败。
+//    if (sc.current.parsed < "1.20") {
+//        annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
+//    }
 
     // @NonNull 注解（org.jspecify）：新版由映射自带，1.20.1 forge 映射不含 jspecify，需显式提供
     compileOnly("org.jspecify:jspecify:1.0.0")
@@ -101,7 +115,8 @@ dependencies {
 
 tasks {
     processResources {
-        exclude("**/fabric.mod.json", "**/*.accesswidener", "**/neoforge.mods.toml")
+        // 保留 *.accesswidener：forge 侧需在 remapJar 阶段把本模组 AW 转成 accesstransformer.cfg（供运行时私有类访问）。
+        exclude("**/fabric.mod.json", "**/neoforge.mods.toml")
     }
 
     register<Copy>("buildAndCollect") {
@@ -112,7 +127,7 @@ tasks {
     }
 
     jar {
-        manifest.attributes["MixinConfigs"] = "${project.property("mod.id")}.mixins.json"
+        manifest.attributes["MixinConfigs"] = "${project.property("mod.id")}.mixins.json,${project.property("mod.id")}-forge.mixins.json"
     }
 
     // resolve 1.16.5 mixinextras classDefNotFound / JIJ load failure issue, powered by https://www.doubao.com/

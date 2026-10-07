@@ -1,10 +1,16 @@
 modLoader="javafml"
-loaderVersion="[47,)"
+loaderVersion="[${forge_min_version},)"
 license="${mod_license}"
 issueTrackerURL="${mod_issues}"
 
 [[mixins]]
 config="${mod_id}.mixins.json"
+
+# Forge 专用：粒子本地工厂劫持（ParticleEngineMixin）只在 forge 侧存在，
+# 其类位于 loaders/forge 包、由独立的 footprintparticle-forge.mixins.json 声明，
+# 不并入共享 mixins.json，避免 Fabric/NeoForge 因找不到该类而加载失败。
+[[mixins]]
+config="${mod_id}-forge.mixins.json"
 
 [[mods]]
 modId="${mod_id}"

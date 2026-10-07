@@ -73,7 +73,7 @@ dependencies {
 
 tasks {
     processResources {
-        exclude("**/fabric.mod.json", "**/mods.toml", "**/*.accesswidener")
+        exclude("**/fabric.mod.json", "**/mods.toml", "**/*.accesswidener", "**/*.mcmeta", "**/*-forge.mixins.json")
     }
 
     register<Copy>("buildAndCollect") {
