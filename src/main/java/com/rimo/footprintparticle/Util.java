@@ -15,14 +15,9 @@ public class Util {
 	public static float getEntityScale(LivingEntity entity) {
 		float scale = 1f;
 
-		for (String str : Client.CONFIG.getSizePerMob()) {
-			String[] str2 = str.split(",");
-			try {
-				if (str2[0].contentEquals(EntityType.getKey(entity.getType()).toString())) {
-					scale *= Float.parseFloat(str2[1]);
-				}
-			} catch (Exception ignored) {}
-		}
+		Float configured = Client.SIZE_PER_MOB.get(EntityType.getKey(entity.getType()).toString());
+		if (configured != null)
+			scale *= configured;
 
 		//? if < 1.21.11 {
 		/*if (PlatformUtil.PLATFORM.isModLoaded("pehkui")) {
@@ -45,18 +40,8 @@ public class Util {
 	}
 
 	public static List<TextureAtlasSprite> getCustomSprites(LivingEntity entity, SpriteSet spriteProvider, String def) {
-		String[] spriteNames = {def};
-		for (String str : Client.CONFIG.getCustomPrint()) {
-			String[] str2 = str.split(",");
-			try {
-				if (str2[0].contentEquals(EntityType.getKey(entity.getType()).toString())) {
-					spriteNames = Arrays.copyOfRange(str2, 1, str2.length);
-					break;
-				}
-			} catch (Exception e) {
-				//
-			}
-		}
+		String[] spriteNames = Client.CUSTOM_PRINT.getOrDefault(
+				EntityType.getKey(entity.getType()).toString(), new String[]{def});
 		List<String> finalSpriteNames = Arrays.asList(spriteNames);
 		return PlatformUtil.PLATFORM.getSprites(spriteProvider).stream().filter(sprite ->
 				finalSpriteNames.stream().anyMatch(str ->

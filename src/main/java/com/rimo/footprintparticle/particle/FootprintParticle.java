@@ -1,6 +1,5 @@
 package com.rimo.footprintparticle.particle;
 
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.rimo.footprintparticle.Client;
 import com.rimo.footprintparticle.Util;
 import net.minecraft.client.Camera;
@@ -10,7 +9,9 @@ import net.minecraft.client.particle.*;
 //~ if < 26.1 '.level.QuadParticleRenderState' -> '.QuadParticleRenderState'
 import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
 import net.minecraft.util.RandomSource;
-//? }
+//? } else {
+/*import com.mojang.blaze3d.vertex.VertexConsumer;
+*///? }
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.SimpleParticleType;

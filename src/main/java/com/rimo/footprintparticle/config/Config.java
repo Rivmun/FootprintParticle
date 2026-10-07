@@ -11,7 +11,6 @@ import java.util.List;
 
 @me.shedaniel.autoconfig.annotation.Config(name = Client.MOD_ID)
 public class Config implements ConfigData {
-
 	@EnumHandler(option = EnumDisplayOption.BUTTON)
 	private WorkMode enableMod = WorkMode.ALL;
 
@@ -96,7 +95,6 @@ public class Config implements ConfigData {
 	public List<String> getCustomPrint() {return customPrint;}
 	public float getHardnessGate() {return hardnessGate;}
 
-
 	@Category("misc")
 	@BoundedDiscrete(max = 10)
 	private int railFlameRange = 2;
@@ -121,24 +119,6 @@ public class Config implements ConfigData {
 	public int getSwimPopLevel() {return swimPopLevel.ordinal();}
 	public int getSnowDustLevel() {return snowDustLevel.ordinal();}
 	public int getWaterSplashLevel() {return waterSplashLevel.ordinal();}
-
-
-	public enum WorkMode {
-		DISABLED("text.footprintparticle.disabled"),
-		PLAYER_ONLY("text.footprintparticle.player_only"),
-		ALL("text.footprintparticle.all");
-
-		private final String key;
-
-		WorkMode(String key) {
-			this.key = key;
-		}
-
-		@Override
-		public String toString() {
-			return this.key;
-		}
-	}
 
 	@Excluded
 	private static final List<String> DEF_APPLYBLOCKS = Arrays.asList(
@@ -224,4 +204,32 @@ public class Config implements ConfigData {
 			"mod_id:mob_id,fileName_NoExtend"
 	);
 
+	public enum WorkMode {
+		DISABLED("text.footprintparticle.disabled"),
+		PLAYER_ONLY("text.footprintparticle.player_only"),
+		ALL("text.footprintparticle.all");
+
+		private final String key;
+
+		WorkMode(String key) {
+			this.key = key;
+		}
+
+		@Override
+		public String toString() {
+			return this.key;
+		}
+	}
+
+	/**
+	 * AutoConfig 的 {@code load()} 与 {@code resetToDefault()} 会用<strong>新实例</strong>替换 holder 内部
+	 * 持有的配置对象，而且不触发任何序列化监听；{@code validatePostLoad()} 是这段时间里唯一能拿到新实例的钩子，
+	 * 因此由它把 {@code Client.CONFIG} 重新指向自己并重建派生索引。
+	 *
+	 * <p>配置屏保存不走这里：那是在同一个实例上反射改字段，由 {@code Client} 注册的 save 监听负责重建索引。</p>
+	 */
+	@Override
+	public void validatePostLoad() {
+		Client.applyConfig(this);
+	}
 }

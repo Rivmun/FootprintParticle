@@ -99,24 +99,18 @@ public abstract class LivingEntityMixin extends Entity {
 		if (CONFIG.isEnable() == 0 ||
 				(CONFIG.isEnable() == 1 && !this.isAlwaysTicking()))
 			return false;
-		if (CONFIG.getExcludedMobs().contains(EntityType.getKey(this.getType()).toString()))
+		// 实体 ID 只需算一次，后面的排除名单/间隔/偏移/尺寸全部直接查 Client 里由配置预建的索引。
+		String id = EntityType.getKey(this.getType()).toString();
+		if (Client.EXCLUDED_MOBS.contains(id))
 			return false;
 		if (!CONFIG.getCanGenWhenInvisible() && this.isInvisible())
 			return false;
 
 		// Set Interval
 		fpp$timer = this.isSprinting() ? (int) (CONFIG.getSecPerPrint() * 13.33f) : (int) (CONFIG.getSecPerPrint() * 20);
-		for (String stream : CONFIG.getMobInterval()) {
-			String[] str = stream.split(",");
-			if (str[0].equals(EntityType.getKey(this.getType()).toString())) {
-				try {
-					fpp$timer *= Float.parseFloat(str[1]);
-				} catch (Exception e) {
-					//
-				}
-				break;
-			}
-		}
+		Float interval = Client.MOB_INTERVAL.get(id);
+		if (interval != null)
+			fpp$timer *= interval;
 
 		// Fix pos...
 		var px = this.getX();
@@ -128,23 +122,16 @@ public abstract class LivingEntityMixin extends Entity {
 		// Front and back
 		var side = Math.random() > 0.5f ? 1 : -1;
 		var hOffset = 0.0625f;
-		for (String stream : CONFIG.getHorseLikeMobs()) {
-			String[] str = stream.split(",");
-			if (str[0].equals(EntityType.getKey(this.getType()).toString())) {
-				hOffset = 0.75f;
-				try {
-					hOffset = Float.parseFloat(str[1]);
-				} catch (Exception e) {
-					//
-				}
-				fpp$timer = (int) (this.getControllingPassenger() != null ?
-						this.getControllingPassenger().isAlwaysTicking() ?
-								fpp$timer * 0.5f :
-								fpp$timer * 1.33f :
+		// 四足：命中即换成配置的前后偏移（索引里已把缺多数值的行补成 0.75），并按骑乘情况调整间隔。
+		Float front = Client.HORSE_LIKE_MOBS.get(id);
+		if (front != null) {
+			hOffset = front;
+			fpp$timer = (int) (this.getControllingPassenger() != null ?
+					this.getControllingPassenger().isAlwaysTicking() ?
+							fpp$timer * 0.5f :
+							fpp$timer * 1.33f :
 						fpp$timer * 1.33f
-				);
-				break;
-			}
+			);
 		}
 		hOffset *= scale;
 		px = px - hOffset * side * Mth.sin((float) Math.toRadians(this.getRotationVector().y));
@@ -152,18 +139,10 @@ public abstract class LivingEntityMixin extends Entity {
 		// Left and right
 		side = Math.random() > 0.5f ? 1 : -1;
 		hOffset = 0.125f;
-		for (String stream : CONFIG.getSpiderLikeMobs()) {
-			String[] str = stream.split(",");
-			if (str[0].equals(EntityType.getKey(this.getType()).toString())) {
-				hOffset = 0.9f;
-				try {
-					hOffset = Float.parseFloat(str[1]);
-				} catch (Exception e) {
-					//
-				}
-				break;
-			}
-		}
+		// 多足：同上，缺多数值时索引里已补成 0.9。
+		Float lateral = Client.SPIDER_LIKE_MOBS.get(id);
+		if (lateral != null)
+			hOffset = lateral;
 		hOffset *= scale;
 		px = px - hOffset * side * Mth.sin((float) Math.toRadians(this.getRotationVector().y + 90));
 		pz = pz + hOffset * side * Mth.cos((float) Math.toRadians(this.getRotationVector().y + 90));
@@ -211,21 +190,20 @@ public abstract class LivingEntityMixin extends Entity {
 			// Fix height by blocks if in...（保留原有按方块/标签修正 y 的配置逻辑，现作用于实际站立的支撑方块）
 			try {
 				var block = this.level().getBlockState(pos);
-				for (String str : CONFIG.getBlockHeight()) {
-					String[] str2 = str.split(",");
-					if (str2[0].charAt(0) == '#') {
-						//~ if < 26.1 '.tags()' -> '.getTags()'
-						for (TagKey<Block> tag : block.tags().toList()) {
-							if (str2[0].equals("#" + tag.location().toString())) {
-								py += Float.parseFloat(str2[1]);
-								break;
-							}
-						}
-					//~ if < 26.1 '.typeHolder()' -> '.getBlockHolder()'
-					//~ if < 1.21.11 '.identifier()' -> '.location()'
-					} else if (str2[0].contentEquals(block.typeHolder().unwrapKey().orElse(fpp$AIR).identifier().toString())) {
-						py += Float.parseFloat(str2[1]);
-						break;
+				//~ if < 26.1 '.typeHolder()' -> '.getBlockHolder()'
+				//~ if < 1.21.11 '.identifier()' -> '.location()'
+				var blockId = block.typeHolder().unwrapKey().orElse(fpp$AIR).identifier().toString();
+				// 高度修正走索引：方块 ID 命中就只用它；否则叠加该方块所属标签命中的偏移。
+				// 与旧写法的细微差别：旧版在配置里同时写了 ID 和标签时按行序可能叠加，现在固定为“ID 优先、标签可叠加”。
+				Float height = Client.BLOCK_HEIGHT.get(blockId);
+				if (height != null) {
+					py += height;
+				} else {
+					//~ if < 26.1 '.tags()' -> '.getTags()'
+					for (TagKey<Block> tag : block.tags().toList()) {
+						Float tagHeight = Client.BLOCK_HEIGHT_BY_TAG.get("#" + tag.location());
+						if (tagHeight != null)
+							py += tagHeight;
 					}
 				}
 
@@ -296,21 +274,25 @@ public abstract class LivingEntityMixin extends Entity {
 	@Unique
 	private boolean fpp$isPrintCanGen(BlockPos pos) {
 		var block = this.level().getBlockState(pos);
-		var canGen = CONFIG.getApplyBlocks().contains(block.typeHolder().unwrapKey().orElse(fpp$AIR).identifier().toString());
+		// 名单已从 List 换成 Set：contains 由 O(n) 降为 O(1)，匹配字符串与旧写法完全一致。
+		var blockId = block.typeHolder().unwrapKey().orElse(fpp$AIR).identifier().toString();
+		var canGen = Client.APPLY_BLOCKS.contains(blockId);
 		if (!canGen) {
 			for (TagKey<Block> tag : block.tags().toList()) {
-				canGen = CONFIG.getApplyBlocks().contains("#" + tag.location());
+				canGen = Client.APPLY_BLOCKS.contains("#" + tag.location());
 				if (canGen)
 					break;
 			}
 			if (!canGen) {
 				// Hardness Filter. See on https://minecraft.fandom.com/wiki/Breaking#Blocks_by_hardness
-				canGen = CONFIG.getHardnessGate() > 0 && Mth.abs(block.getBlock().defaultDestroyTime()) < CONFIG.getHardnessGate();
+				float hardness = block.getBlock().defaultDestroyTime();
+				float hardnessGate = CONFIG.getHardnessGate();
+				canGen = hardnessGate > 0 && hardness >= 0 && Mth.abs(hardness) < hardnessGate;
 				if (canGen) {
-					canGen = !CONFIG.getExcludedBlocks().contains(block.typeHolder().unwrapKey().orElse(fpp$AIR).identifier().toString());
+					canGen = !Client.EXCLUDED_BLOCKS.contains(blockId);
 					if (canGen) {
 						for (TagKey<Block> tag : block.tags().toList()) {
-							canGen = !CONFIG.getExcludedBlocks().contains("#" + tag.location());
+							canGen = !Client.EXCLUDED_BLOCKS.contains("#" + tag.location());
 							if (!canGen)
 								break;
 						}
