@@ -50,15 +50,21 @@ public class Util {
 		String[] spriteNames = Client.CUSTOM_PRINT.getOrDefault(
 				EntityType.getKey(entity.getType()).toString(), new String[]{def});
 		List<String> finalSpriteNames = Arrays.asList(spriteNames);
-		return PlatformUtil.PLATFORM.getSprites(spriteProvider).stream().filter(sprite ->
+		List<TextureAtlasSprite> sprites = PlatformUtil.PLATFORM.getSprites(spriteProvider);
+		List<TextureAtlasSprite> result = sprites.stream().filter(sprite ->
 				finalSpriteNames.stream().anyMatch(str ->
 						//? if <= 1.19.2 {
-						/*sprite.getName().getPath().contentEquals(str)
+						/*sprite.getName().getPath().substring(9).contentEquals(str)  // remove 'particle/'
 						*///? } else {
 						sprite.contents().name().getPath().contentEquals(str)
 						//? }
 				)
 		).toList();
+		if (result.isEmpty()) {
+			Client.LOGGER.error("Wrong custom texture for {}, please check.", EntityType.getKey(entity.getType()));
+			return sprites;
+		}
+		return result;
 	}
 
 	//? if > 1.21.1 {

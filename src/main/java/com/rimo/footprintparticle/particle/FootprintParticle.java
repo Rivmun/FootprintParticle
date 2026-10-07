@@ -68,12 +68,8 @@ public class FootprintParticle extends SingleQuadParticle {
 
 		this.quadSize *= Util.getEntityScale((parameters.entity));
 
-		try {
-			List<TextureAtlasSprite> spriteList = Util.getCustomSprites(parameters.entity, spriteProvider, defName);
-			this.setSprite(spriteList.get((int) (Math.random() * spriteList.size())));
-		} catch (Exception e) {
-			Client.LOGGER.error("Wrong custom texture for {}, please check.", EntityType.getKey(parameters.entity.getType()));
-		}
+		List<TextureAtlasSprite> spriteList = Util.getCustomSprites(parameters.entity, spriteProvider, defName);
+		this.setSprite(spriteList.get((int) (Math.random() * spriteList.size())));
 	}
 
     @Override
@@ -141,11 +137,19 @@ public class FootprintParticle extends SingleQuadParticle {
 		float n = this.getV0();
 		float o = this.getV1();
 		int p = this.getLightColor(tickDelta);
-		// 反向遍历四角（每角 UV 不变）→ 绕序翻转，使贴地四边形正面朝上，避免 Forge 1.20.1 粒子 pass 的背面剔除。
+
+		// 难蚌 1.20.1 顶点要反向提交，否则粒子面会朝下渲染，然后被法线剔除。
+		//? if > 1.19.2 {
 		vertexConsumer.vertex(vector3fs[3].x(), vector3fs[3].y(), vector3fs[3].z()).uv(l, o).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
 		vertexConsumer.vertex(vector3fs[2].x(), vector3fs[2].y(), vector3fs[2].z()).uv(l, n).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
 		vertexConsumer.vertex(vector3fs[1].x(), vector3fs[1].y(), vector3fs[1].z()).uv(m, n).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
 		vertexConsumer.vertex(vector3fs[0].x(), vector3fs[0].y(), vector3fs[0].z()).uv(m, o).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
+		//? } else {
+		/^¹vertexConsumer.vertex(vector3fs[0].x(), vector3fs[0].y(), vector3fs[0].z()).uv(m, o).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
+		vertexConsumer.vertex(vector3fs[1].x(), vector3fs[1].y(), vector3fs[1].z()).uv(m, n).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
+		vertexConsumer.vertex(vector3fs[2].x(), vector3fs[2].y(), vector3fs[2].z()).uv(l, n).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
+		vertexConsumer.vertex(vector3fs[3].x(), vector3fs[3].y(), vector3fs[3].z()).uv(l, o).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
+		¹^///? }
 		^///? }
 	}
 	*///? }

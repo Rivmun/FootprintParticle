@@ -53,7 +53,14 @@ public class ParticleEngineMixin implements ParticleEngineLocal {
 			ResourceLocation id,
 			Function<ParticleEngine.MutableSpriteSet, ? extends ParticleProvider<O>> providerFactory) {
 		ParticleEngine.MutableSpriteSet spriteSet = new ParticleEngine.MutableSpriteSet();
+		// >1.19.2：放入原版 spriteSets，粒子图集烘焙会由 vanilla bake 回填 sprites（1.20.1 即靠此显示）。
+		// ≤1.19.2：vanilla bake 无法为未注册类型解析贴图，且 ParticleEngine.reloadSprites 会在我们
+		// TextureStitchEvent.Post 回填之后又对 spriteSets 里的 set 调 bake 把 sprites 清空；故这里
+		// 【不】放入 spriteSets，改由 ForgeParticleAtlas 在 Post 手动回填并持有该 set。
+		//? if > 1.19.2 {
 		this.spriteSets.put(id, spriteSet);
+		//? }
+		ForgeParticleRegistry.putSpriteSet(id, spriteSet);
 		this.providers.put(id, providerFactory.apply(spriteSet));
 	}
 

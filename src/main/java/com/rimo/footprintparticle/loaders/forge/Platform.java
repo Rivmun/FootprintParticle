@@ -7,7 +7,7 @@ import com.rimo.footprintparticle.config.Config;
 import com.rimo.footprintparticle.mixin.ParticleSpriteSetAccessor;
 import com.rimo.footprintparticle.particle.*;
 //~ if < 1.21.11 '.AutoConfigClient' -> '.AutoConfig'
-import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.AutoConfigClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -55,6 +55,13 @@ public class Platform {
 					return ModList.get().isLoaded(id);
 				}
 			};
+			//? if forge&& <= 1.19.2 {
+			/^// ≤1.19.2-forge：TextureStitchEvent 属加载期事件，在 Forge 派发于 MOD 总线（挂 game 总线 /
+			// MinecraftForge.EVENT_BUS 与 bus=FORGE 实测都无回调）。故把缝合/回填监听器注册到本 mod 的
+			// MOD 总线；register(Class) 依方法上的 @SubscribeEvent 解析事件类型，比方法引用更稳。
+			net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus()
+					.register(ForgeParticleAtlas.class);
+			^///? }
 		}
 
 		// 不再走原版 RegisterEvent / RegisterParticleProvidersEvent.registerSpriteSet：那两条路径
@@ -80,7 +87,7 @@ public class Platform {
 					container.registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class,
 							() -> new ConfigScreenHandler.ConfigScreenFactory((mc, parent) -> {
 								//~ if < 1.21.11 'AutoConfigClient' -> 'AutoConfig'
-								var screen = AutoConfig.getConfigScreen(Config.class, parent).get();
+								var screen = AutoConfigClient.getConfigScreen(Config.class, parent).get();
 								// 配置屏异常时兜底返回原版游戏屏，避免 Forge 直接崩溃
 								if (screen == null)
 									screen = Minecraft.getInstance().screen;

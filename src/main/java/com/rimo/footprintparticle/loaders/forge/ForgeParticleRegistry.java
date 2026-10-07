@@ -3,10 +3,14 @@
 
 import com.rimo.footprintparticle.Client;
 import com.rimo.footprintparticle.Util;
+import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 
 /^*
@@ -36,6 +40,10 @@ public final class ForgeParticleRegistry {
 	// 用标识（==）而非 equals 比较粒子对象：我们的类型都是可变单例，hashCode 不可靠。
 	private static final Map<ParticleType<?>, ResourceLocation> TYPE_TO_ID = new IdentityHashMap<>();
 
+	// id -> 由 ParticleEngineMixin 注入引擎内部的那个空 MutableSpriteSet。≤1.19.2 forge 的粒子图集烘焙不会
+	// 自动回填未注册类型的 set，需由 ForgeParticleAtlas 在 TextureStitchEvent 里手动 setSprites（见该类）。
+	private static final Map<ResourceLocation, ParticleEngine.MutableSpriteSet> SPRITE_SETS = new HashMap<>();
+
 	static {
 		register(Client.FOOTPRINT, FOOTPRINT);
 		register(Client.WATERMARK, WATERMARK);
@@ -56,6 +64,21 @@ public final class ForgeParticleRegistry {
 	 ^/
 	public static ResourceLocation keyOf(ParticleType<?> type) {
 		return TYPE_TO_ID.get(type);
+	}
+
+	/^* 本模组全部私有粒子 id（与 resources 里 assets/footprintparticle/particles/^.json 一一对应）。 ^/
+	public static List<ResourceLocation> localIds() {
+		return Arrays.asList(FOOTPRINT, WATERMARK, SNOWDUST, WATERSPLASH);
+	}
+
+	/^* 记录注入引擎的 MutableSpriteSet，供图集缝合回填。仅在客户端调用。 ^/
+	public static void putSpriteSet(ResourceLocation id, ParticleEngine.MutableSpriteSet set) {
+		SPRITE_SETS.put(id, set);
+	}
+
+	/^* 取回之前注入的 MutableSpriteSet；不存在时返回 null。 ^/
+	public static ParticleEngine.MutableSpriteSet spriteSetOf(ResourceLocation id) {
+		return SPRITE_SETS.get(id);
 	}
 }
 *///? }

@@ -20,4 +20,9 @@ import java.util.List;
 public interface ParticleSpriteSetAccessor {
 	@Accessor("sprites")
 	List<TextureAtlasSprite> fpp$getSprites();
+
+	// ≤ 1.19.2 forge 的粒子图集烘焙不回填未注册类型的 MutableSpriteSet，由 ForgeParticleAtlas 直接写 sprites 字段
+	// （该版本的原版 setSprites 方法非 public，不便经 AT 放开；字段各版本均为 List<TextureAtlasSprite>）。
+	@Accessor("sprites")
+	void fpp$setSprites(List<TextureAtlasSprite> sprites);
 }
