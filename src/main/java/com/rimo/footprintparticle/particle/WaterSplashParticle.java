@@ -11,6 +11,8 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 //? }
 import org.jspecify.annotations.NonNull;
+//? if < 1.21.1
+//import org.jspecify.annotations.Nullable;
 
 public class WaterSplashParticle extends WaterDropParticle {
 

@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+//? if < 1.21.1
 //import net.minecraft.world.entity.Mob;
 
 import java.util.Arrays;
@@ -27,11 +28,13 @@ public class Util {
 		}
 		*///? }
 		// seems randommobsizes do not have its own scaling since vanilla makes one on 1.21+
-//		if (PlatformUtil.PLATFORM.isModLoaded("randommobsizes") && entity instanceof Mob) {
-//			try {
-//				scale *= ((com.tristankechlo.random_mob_sizes.mixin_helper.MobMixinAddon) entity).getMobScaling$RandomMobSizes();
-//			} catch (Exception ignored) {}
-//		}
+		//? if < 1.21.1 && > 1.16.5 {
+		/*if (PlatformUtil.PLATFORM.isModLoaded("random_mob_sizes") && entity instanceof Mob) {
+			try {
+				scale *= ((com.tristankechlo.random_mob_sizes.mixin_helper.MobMixinAddon) entity).getMobScaling$RandomMobSizes();
+			} catch (Exception ignored) {}
+		}
+		*///? }
 
 		if (entity.isBaby())
 			scale *= 0.66f;
@@ -57,7 +60,7 @@ public class Util {
 	//? } else {
 	/*public static ResourceLocation getId(String path) {
 		//? if <= 1.20.1 {
-		/^return new ResourceLocation(MOD_ID, path);
+		/^return new ResourceLocation(Client.MOD_ID, path);
 		 ^///? } else {
 		return ResourceLocation.fromNamespaceAndPath(Client.MOD_ID, path);
 		//? }

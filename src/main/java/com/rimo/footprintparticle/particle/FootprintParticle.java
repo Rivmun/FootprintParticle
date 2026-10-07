@@ -11,6 +11,10 @@ import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
 import net.minecraft.util.RandomSource;
 //? } else {
 /*import com.mojang.blaze3d.vertex.VertexConsumer;
+//? if < 1.21.1 {
+/^import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3f;
+^///? }
 *///? }
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
@@ -102,7 +106,34 @@ public class FootprintParticle extends SingleQuadParticle {
 
 	@Override
 	public void render(@NonNull VertexConsumer vertexConsumer, @NonNull Camera camera, float tickDelta) {
+		//? if > 1.20.1 {
 		this.renderRotatedQuad(vertexConsumer, camera, this.q, tickDelta);
+		//? } else {
+		/^Vec3 vec3 = camera.getPosition();
+		float g = (float)(Mth.lerp(tickDelta, this.xo, this.x) - vec3.x());
+		float h = (float)(Mth.lerp(tickDelta, this.yo, this.y) - vec3.y());
+		float i = (float)(Mth.lerp(tickDelta, this.zo, this.z) - vec3.z());
+
+		Vector3f[] vector3fs = new Vector3f[]{new Vector3f(-1.0F, -1.0F, 0.0F), new Vector3f(-1.0F, 1.0F, 0.0F), new Vector3f(1.0F, 1.0F, 0.0F), new Vector3f(1.0F, -1.0F, 0.0F)};
+		float j = this.getQuadSize(tickDelta);
+
+		for(int k = 0; k < 4; ++k) {
+			Vector3f vector3f = vector3fs[k];
+			vector3f.rotate(this.q);
+			vector3f.mul(j);
+			vector3f.add(g, h, i);
+		}
+
+		float l = this.getU0();
+		float m = this.getU1();
+		float n = this.getV0();
+		float o = this.getV1();
+		int p = this.getLightColor(tickDelta);
+		vertexConsumer.vertex(vector3fs[0].x(), vector3fs[0].y(), vector3fs[0].z()).uv(m, o).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
+		vertexConsumer.vertex(vector3fs[1].x(), vector3fs[1].y(), vector3fs[1].z()).uv(m, n).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
+		vertexConsumer.vertex(vector3fs[2].x(), vector3fs[2].y(), vector3fs[2].z()).uv(l, n).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
+		vertexConsumer.vertex(vector3fs[3].x(), vector3fs[3].y(), vector3fs[3].z()).uv(l, o).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
+		^///? }
 	}
 	*///? }
 

@@ -49,7 +49,6 @@ repositories {
     maven("https://maven.shedaniel.me/")
     maven("https://api.modrinth.com/maven")
     maven("https://maven.terraformersmc.com/")
-//    maven("https://cursemaven.com")
 }
 
 dependencies {
@@ -72,7 +71,8 @@ dependencies {
         // pehkui
         modCompileOnly("maven.modrinth:pehkui:${property("deps.pehkui")}")
         // random-mob-sizes
-//        modCompileOnly("curse.maven:random-mob-sizes-555230:${property("deps.random-mob-sizes")}")
+        if (sc.current.parsed < "1.21.1")
+            modCompileOnly("maven.modrinth:random-mob-sizes:${property("deps.random-mob-sizes")}")
     }
 }
 

@@ -35,6 +35,7 @@ public abstract class LivingEntityMixin extends Entity {
 	}
 
 	//~ if < 1.21.11 'Identifier' -> 'ResourceLocation'
+	//~ if < 1.21.1 '.withDefaultNamespace' -> '.tryParse'
 	@Unique private final ResourceKey<Block> fpp$AIR = ResourceKey.create(Registries.BLOCK, Identifier.withDefaultNamespace("air"));
 	@Unique private int fpp$timer = 0;
 	@Unique private boolean fpp$wasFalling;
