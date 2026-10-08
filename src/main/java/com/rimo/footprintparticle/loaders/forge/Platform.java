@@ -7,13 +7,15 @@ import com.rimo.footprintparticle.config.Config;
 import com.rimo.footprintparticle.mixin.ParticleSpriteSetAccessor;
 import com.rimo.footprintparticle.particle.*;
 //~ if < 1.21.11 '.AutoConfigClient' -> '.AutoConfig'
-import me.shedaniel.autoconfig.AutoConfigClient;
+import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.ConfigScreenHandler;
-import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
+//~ if < 1.19.2 '.ConfigScreenHandler' -> '.ConfigGuiHandler'
+import net.minecraftforge.client.ConfigGuiHandler;
+//~ if < 1.19.2 'RegisterParticleProvidersEvent' -> 'ParticleFactoryRegisterEvent'
+import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
@@ -68,7 +70,8 @@ public class Platform {
 		// 都依赖会被 server→client 同步重建的原版 minecraft:particle_type 表，纯客户端条目登录后即失效。
 		// 改由 ForgeParticleRegistry 的私有不同步映射 + ParticleEngine 本地注入实现。
 		@SubscribeEvent
-		public static void onRegisterParticleProviders(RegisterParticleProvidersEvent event) {
+		//~ if < 1.19.2 'RegisterParticleProvidersEvent' -> 'ParticleFactoryRegisterEvent'
+		public static void onRegisterParticleProviders(ParticleFactoryRegisterEvent event) {
 			// 该事件在客户端 ParticleEngine 已构造后派发，此处借其时序把 provider 直接注入引擎内部表；
 			// 引擎实例由 ParticleEngineMixin 混入 ParticleEngineLocal 接口方法 fpp$registerLocal。
 			ParticleEngineLocal engine = (ParticleEngineLocal) (Object) Minecraft.getInstance().particleEngine;
@@ -84,16 +87,17 @@ public class Platform {
 			// 注册配置屏扩展点：Forge 内建模组列表只有在注册后才显示「Config」按钮，
 			// 相当于 Fabric 侧 ModMenuIntegration 的替代。AutoConfig 静态 API 由 cloth-config (forge) 提供。
 			ModList.get().getModContainerById(Client.MOD_ID).ifPresent(container ->
-					container.registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class,
-							() -> new ConfigScreenHandler.ConfigScreenFactory((mc, parent) -> {
+					//~ if < 1.19.2 'ConfigScreenHandler.ConfigScreenFactory' -> 'ConfigGuiHandler.ConfigGuiFactory' {
+					container.registerExtensionPoint(ConfigGuiHandler.ConfigGuiFactory.class,
+							() -> new ConfigGuiHandler.ConfigGuiFactory((mc, parent) -> {
 								//~ if < 1.21.11 'AutoConfigClient' -> 'AutoConfig'
-								var screen = AutoConfigClient.getConfigScreen(Config.class, parent).get();
-								// 配置屏异常时兜底返回原版游戏屏，避免 Forge 直接崩溃
-								if (screen == null)
+								var screen = AutoConfig.getConfigScreen(Config.class, parent).get();
+								if (screen == null)  // 配置屏异常时兜底返回原版游戏屏，避免 Forge 直接崩溃
 									screen = Minecraft.getInstance().screen;
 								return screen;
 							})
 					)
+					//~ }
 			);
 		}
 	}

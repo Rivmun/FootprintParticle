@@ -197,9 +197,8 @@ public abstract class LivingEntityMixin extends Entity {
 				var block = this.level().getBlockState(pos);
 				//~ if < 26.1 '.typeHolder()' -> '.getBlockHolder()'
 				//~ if < 1.21.11 '.identifier()' -> '.location()'
-				var blockId = block.typeHolder().unwrapKey().orElse(fpp$AIR).identifier().toString();
-				// 高度修正走索引：方块 ID 命中就只用它；否则叠加该方块所属标签命中的偏移。
-				// 与旧写法的细微差别：旧版在配置里同时写了 ID 和标签时按行序可能叠加，现在固定为“ID 优先、标签可叠加”。
+				//~ if < 1.19.2 'block.getBlockHolder().unwrapKey().orElse(fpp$AIR).location()' -> 'Registry.BLOCK.getKey(block.getBlock())'
+				var blockId = block.getBlockHolder().unwrapKey().orElse(fpp$AIR).location().toString();
 				Float height = Client.BLOCK_HEIGHT.get(blockId);
 				if (height != null) {
 					py += height;
@@ -279,8 +278,8 @@ public abstract class LivingEntityMixin extends Entity {
 	@Unique
 	private boolean fpp$isPrintCanGen(BlockPos pos) {
 		var block = this.level().getBlockState(pos);
-		// 名单已从 List 换成 Set：contains 由 O(n) 降为 O(1)，匹配字符串与旧写法完全一致。
-		var blockId = block.typeHolder().unwrapKey().orElse(fpp$AIR).identifier().toString();
+		//~ if < 1.19.2 'block.getBlockHolder().unwrapKey().orElse(fpp$AIR).location()' -> 'Registry.BLOCK.getKey(block.getBlock())'
+		var blockId = block.getBlockHolder().unwrapKey().orElse(fpp$AIR).location().toString();
 		var canGen = Client.APPLY_BLOCKS.contains(blockId);
 		if (!canGen) {
 			for (TagKey<Block> tag : block.tags().toList()) {

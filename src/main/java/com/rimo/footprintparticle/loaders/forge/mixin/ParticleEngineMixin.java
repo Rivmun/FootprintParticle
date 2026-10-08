@@ -58,8 +58,8 @@ public class ParticleEngineMixin implements ParticleEngineLocal {
 		// TextureStitchEvent.Post 回填之后又对 spriteSets 里的 set 调 bake 把 sprites 清空；故这里
 		// 【不】放入 spriteSets，改由 ForgeParticleAtlas 在 Post 手动回填并持有该 set。
 		//? if > 1.19.2 {
-		this.spriteSets.put(id, spriteSet);
-		//? }
+		/^this.spriteSets.put(id, spriteSet);
+		^///? }
 		ForgeParticleRegistry.putSpriteSet(id, spriteSet);
 		this.providers.put(id, providerFactory.apply(spriteSet));
 	}

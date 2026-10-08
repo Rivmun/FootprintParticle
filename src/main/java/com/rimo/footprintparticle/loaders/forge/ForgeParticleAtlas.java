@@ -62,7 +62,7 @@ public class ForgeParticleAtlas {
 			for (ResourceLocation texture : descriptionTextures(id))
 				sprites.add(atlas.getSprite(texture));
 			if (!sprites.isEmpty())
-				((ParticleSpriteSetAccessor) (Object) set).fpp$setSprites(sprites);
+				((ParticleSpriteSetAccessor) set).fpp$setSprites(sprites);
 		}
 	}
 
@@ -82,23 +82,28 @@ public class ForgeParticleAtlas {
 		List<ResourceLocation> out = new ArrayList<>();
 		ResourceLocation json = new ResourceLocation(
 				particleId.getNamespace(), "particles/" + particleId.getPath() + ".json");
-		Optional<Resource> optional = Minecraft.getInstance().getResourceManager().getResource(json);
-		if (optional.isEmpty())
-			return out;
-		try (InputStream is = optional.get().open();
-		     InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
-			JsonElement root = JsonParser.parseReader(reader);
-			JsonArray textures = root.getAsJsonObject().getAsJsonArray("textures");
-			if (textures == null)
+		// 整体 try 包裹：≤ 1.18.2 的 getResource 直接返回 Resource 且缺资源时抛 IOException，需在此吞掉；
+		// 1.19.2 返回 Optional 并改用 open() 读流。两版本靠下面两条替换指令归一为同一形态。
+		try {
+			//~ if < 1.19.2 'Minecraft.getInstance().getResourceManager().getResource(json);' -> 'Optional.of(Minecraft.getInstance().getResourceManager().getResource(json));'
+			Optional<Resource> optional = Optional.of(Minecraft.getInstance().getResourceManager().getResource(json));
+			if (optional.isEmpty())
 				return out;
-			for (JsonElement el : textures) {
-				String name = el.isJsonObject()
-						? el.getAsJsonObject().get("file").getAsString()
-						: el.getAsString();
-				out.add(toParticleAtlasSprite(new ResourceLocation(name)));
+			//~ if < 1.19.2 '.open()' -> '.getInputStream()'
+			try (InputStream is = optional.get().getInputStream();
+			     InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+				JsonElement root = JsonParser.parseReader(reader);
+				JsonArray textures = root.getAsJsonObject().getAsJsonArray("textures");
+				if (textures == null)
+					return out;
+				for (JsonElement el : textures) {
+					String name = el.isJsonObject()
+							? el.getAsJsonObject().get("file").getAsString()
+							: el.getAsString();
+					out.add(toParticleAtlasSprite(new ResourceLocation(name)));
+				}
 			}
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 		return out;
 	}
 }

@@ -36,16 +36,15 @@ import java.util.List;
 // @EventBusSubscriber(value = Dist.CLIENT) 下，服务端不会解析任何客户端类。
 //
 // 由于 NeoForge 未提供对于粒子 SpriteSet 成员的直接访问，
-// Sprite 枚举能力通过 mixin ParticleSpriteSetAccessor 暴露 @Accessor("sprites") 生成的
-// fpp$getSprites()；本类 <clinit> 把 accessor 强转 lambda 注册给 PlatformUtil.PLATFORM，
-// 供公共代码 Util.getCustomSprites 调用。Fabric 侧则走官方 FabricSpriteSet API，见 fabric/Platform。
+// 通过 mixin 注入 ParticleSpriteSetAccessor 的 Accessor 暴露 MutableSpriteSet 的 sprites 字段
+// （运行时实例即该原生类，强转即可调用 fpp$getSprites()）；本类 <clinit> 把强转 lambda
+// 注册给 PlatformUtil.PLATFORM，供公共代码 Util.getCustomSprites 调用。Fabric 侧走官方 FabricSpriteSet API，见 fabric/Platform。
 @Mod(value = Client.MOD_ID, dist = Dist.CLIENT)
 public class Platform {
 	static {
 		PlatformUtil.PLATFORM = new PlatformUtil.IPlatform() {
 			@Override
 			public List<TextureAtlasSprite> getSprites(SpriteSet spriteSet) {
-				// 此处在 1.21.1 版本下会有个 Mixin class cannot be referenced directly 的警告，但实测不影响编译和运行，暂不理会。
 				return ((ParticleSpriteSetAccessor) spriteSet).fpp$getSprites();
 			}
 
