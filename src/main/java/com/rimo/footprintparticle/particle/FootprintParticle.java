@@ -52,6 +52,11 @@ public class FootprintParticle extends SingleQuadParticle {
 		/*
 		 * Quaternion expression powered by Deepseek.ai 👍
 		 * rotating particle to horizontal plane and facing towards to entity moving direction
+		 *
+		 * <= 1.19.2 com.mojang.math.Quaternion 没有 rotateLocalZ，手工展开一次右乘绕面法线 Z 的 180° yaw：
+		 * Hamilton (-sf, cf, -cf, -sf) * (0, 0, 1, 0) = (cf, sf, -sf, cf)，取同代表的 -q = (-cf, -sf, sf, -cf)。
+		 * 这个额外旋转在本地平面上把贴图转 180°，与 >1.19.2 Quaternionf + 反向绕序 + U-swap 的 UV 修复叠加后，
+		 * 两个分支的屏幕朝向完全一致；≤1.19.2 保持正向绕序与 vanilla 风格 UV，无需额外重映射。
 		 */
 		float halfAngle = this.roll / 2;
 		double factor = Mth.SQRT_OF_TWO / 2;
@@ -60,7 +65,7 @@ public class FootprintParticle extends SingleQuadParticle {
 		//? if > 1.19.2 {
 		this.q = new Quaternionf(-cf, sf, sf, cf).rotateLocalY(Mth.PI);
 		//? } else {
-		/*this.q = new Quaternion((float) -sf, (float) cf, (float) -cf, (float) -sf);  // com.mojang.math.Quaternion 没有 rotateLocalY，等价于 (-cf,sf,sf,cf) 右乘 Ry(PI)
+		/*this.q = new Quaternion((float) -cf, (float) -sf, (float) sf, (float) -cf);
 		*///? }
 
 		this.lifetime = (int) (Client.CONFIG.getPrintLifetime() * 20);
@@ -139,11 +144,13 @@ public class FootprintParticle extends SingleQuadParticle {
 		int p = this.getLightColor(tickDelta);
 
 		// 难蚌 1.20.1 顶点要反向提交，否则粒子面会朝下渲染，然后被法线剔除。
+		// 反向提交后贴图会左右颠倒，这里通过交换 U（l/m）把水平镜像翻正。
+		// ≤1.19.2 使用正向提交（与 vanilla renderRotatedQuad 一致），朝向靠四元数保证。
 		//? if > 1.19.2 {
-		vertexConsumer.vertex(vector3fs[3].x(), vector3fs[3].y(), vector3fs[3].z()).uv(l, o).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
-		vertexConsumer.vertex(vector3fs[2].x(), vector3fs[2].y(), vector3fs[2].z()).uv(l, n).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
-		vertexConsumer.vertex(vector3fs[1].x(), vector3fs[1].y(), vector3fs[1].z()).uv(m, n).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
-		vertexConsumer.vertex(vector3fs[0].x(), vector3fs[0].y(), vector3fs[0].z()).uv(m, o).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
+		vertexConsumer.vertex(vector3fs[3].x(), vector3fs[3].y(), vector3fs[3].z()).uv(m, o).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
+		vertexConsumer.vertex(vector3fs[2].x(), vector3fs[2].y(), vector3fs[2].z()).uv(m, n).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
+		vertexConsumer.vertex(vector3fs[1].x(), vector3fs[1].y(), vector3fs[1].z()).uv(l, n).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
+		vertexConsumer.vertex(vector3fs[0].x(), vector3fs[0].y(), vector3fs[0].z()).uv(l, o).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
 		//? } else {
 		/^¹vertexConsumer.vertex(vector3fs[0].x(), vector3fs[0].y(), vector3fs[0].z()).uv(m, o).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
 		vertexConsumer.vertex(vector3fs[1].x(), vector3fs[1].y(), vector3fs[1].z()).uv(m, n).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(p).endVertex();
