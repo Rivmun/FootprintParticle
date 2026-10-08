@@ -2,15 +2,14 @@ package com.rimo.footprintparticle;
 
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-//~ if < 1.21.11 '.Identifier' -> '.ResourceLocation'
-import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-//? if < 1.21.1
+//? if < 1.21.1 && > 1.16.5
 //import net.minecraft.world.entity.Mob;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Util {
 	public static float getEntityScale(LivingEntity entity) {
@@ -59,25 +58,11 @@ public class Util {
 						sprite.contents().name().getPath().contentEquals(str)
 						//? }
 				)
-		).toList();
+		).collect(Collectors.toList());
 		if (result.isEmpty()) {
 			Client.LOGGER.error("Wrong custom texture for {}, please check.", EntityType.getKey(entity.getType()));
 			return sprites;
 		}
 		return result;
 	}
-
-	//? if > 1.21.1 {
-	public static Identifier getId(String path) {
-		return Identifier.fromNamespaceAndPath(Client.MOD_ID, path);
-	}
-	//? } else {
-	/*public static ResourceLocation getId(String path) {
-		//? if <= 1.20.1 {
-		/^return new ResourceLocation(Client.MOD_ID, path);
-		 ^///? } else {
-		return ResourceLocation.fromNamespaceAndPath(Client.MOD_ID, path);
-		//? }
-	}
-	*///? }
 }

@@ -30,10 +30,12 @@ public abstract class AbstractMinecartEntityMixin extends Entity {
 	//TODO: inject at TAIL will do nothing, why?
 	@Inject(method = "tick", at = @At("HEAD"))
 	public void fpp$tick(CallbackInfo ci) {
+		//~ if 1.16.5 'this.getDeltaMovement().horizontalDistance() != 0' -> '(this.getDeltaMovement().x != 0 || this.getDeltaMovement().z != 0)'
 		if (fpp$timer-- <= 0 && this.getDeltaMovement().horizontalDistance() != 0) {
 			if (this.level().getBlockState(this.blockPosition()).is(BlockTags.RAILS) && Math.random() <= Client.CONFIG.getRailFlameRange()) {
-				var i = Math.random() > 0.5f ? 1 : -1;
+				int i = Math.random() > 0.5f ? 1 : -1;
 				this.level().addParticle(
+						//~ if 1.16.5 'ELECTRIC_SPARK' -> 'FALLING_LAVA'
 						ParticleTypes.ELECTRIC_SPARK,
 						this.getX() + i * 0.4f * Mth.cos((float) Math.toRadians(this.getRotationVector().y + 90)),
 						this.getY() + 0.0625f,

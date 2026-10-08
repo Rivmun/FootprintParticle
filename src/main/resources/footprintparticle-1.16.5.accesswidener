@@ -1,0 +1,12 @@
+accessWidener	v2	named
+
+# 仅 MC <= 1.16.5 的 forge 构建使用（由 build.forge.gradle.kts 按版本切换 accessWidenerPath）。
+# 与共用文件 footprintparticle.accesswidener 的唯一差别是那条 <init>	()V 方法条目：
+# 1.16.5 的 ParticleEngine$MutableSpriteSet 是非静态内部类，声明的构造器是
+# <init>(Lnet/minecraft/client/particle/ParticleEngine;)V 与其合成桥
+# <init>(Lnet/minecraft/client/particle/ParticleEngine;Lnet/minecraft/client/particle/ParticleEngine$1;)V，
+# 不存在 ()V 形态，写上去会让 validateAccessWidener 报 "Could not find method"。
+# 该版本的实例改由反射构造（见 loaders/forge/mixin/ParticleEngineMixin 的 //? if 1.16.5 分支，
+# setAccessible 已可绕过 private 构造器），因此这里只需放开嵌套类本身的可见性——
+# mixin 的 @Shadow 字段与代码里的类型引用仍需该类为 public，否则运行期 IllegalAccessError。
+accessible	class	net/minecraft/client/particle/ParticleEngine$MutableSpriteSet

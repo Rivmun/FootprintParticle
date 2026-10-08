@@ -9,16 +9,15 @@ import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigHolder;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.minecraft.world.InteractionResult;
+//? if = 1.16.5 {
+/*import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+*///? } else {
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+//? }
 
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 仅客户端模组的共享入口：MOD_ID / 日志 / 配置单例 / 4 个粒子类型实例。
@@ -30,22 +29,23 @@ import java.util.Set;
  */
 public class Client {
 	public static final String MOD_ID = "footprintparticle";
+	//~if = 1.16.5 'LoggerFactory.' -> 'LogManager.'
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	// Only assign in applyConfig()
 	public static volatile Config CONFIG;
 
 	// Extract CONFIG.List<String> to Map to improved lookup speed.
-	public static volatile Map<String, Float> SIZE_PER_MOB = Map.of();
-	public static volatile Map<String, Float> MOB_INTERVAL = Map.of();
-	public static volatile Map<String, Float> HORSE_LIKE_MOBS = Map.of();
-	public static volatile Map<String, Float> SPIDER_LIKE_MOBS = Map.of();
-	public static volatile Map<String, String[]> CUSTOM_PRINT = Map.of();
-	public static volatile Map<String, Float> BLOCK_HEIGHT = Map.of();
-	public static volatile Map<String, Float> BLOCK_HEIGHT_BY_TAG = Map.of();
-	public static volatile Set<String> APPLY_BLOCKS = Set.of();
-	public static volatile Set<String> EXCLUDED_BLOCKS = Set.of();
-	public static volatile Set<String> EXCLUDED_MOBS = Set.of();
+	public static volatile Map<String, Float> SIZE_PER_MOB = Collections.emptyMap();
+	public static volatile Map<String, Float> MOB_INTERVAL = Collections.emptyMap();
+	public static volatile Map<String, Float> HORSE_LIKE_MOBS = Collections.emptyMap();
+	public static volatile Map<String, Float> SPIDER_LIKE_MOBS = Collections.emptyMap();
+	public static volatile Map<String, String[]> CUSTOM_PRINT = Collections.emptyMap();
+	public static volatile Map<String, Float> BLOCK_HEIGHT = Collections.emptyMap();
+	public static volatile Map<String, Float> BLOCK_HEIGHT_BY_TAG = Collections.emptyMap();
+	public static volatile Set<String> APPLY_BLOCKS = Collections.emptySet();
+	public static volatile Set<String> EXCLUDED_BLOCKS = Collections.emptySet();
+	public static volatile Set<String> EXCLUDED_MOBS = Collections.emptySet();
 
 	// Our Particles...
 	public static final FootprintParticleType FOOTPRINT = new FootprintParticleType(true);
@@ -87,11 +87,11 @@ public class Client {
 			if (value != null)
 				size.merge(parts[0], value, (a, b) -> a * b);
 		}
-		SIZE_PER_MOB = Map.copyOf(size);
+		SIZE_PER_MOB = size;
 
-		MOB_INTERVAL = Map.copyOf(values(config.getMobInterval()));
-		HORSE_LIKE_MOBS = Map.copyOf(offsets(config.getHorseLikeMobs(), 0.75f));
-		SPIDER_LIKE_MOBS = Map.copyOf(offsets(config.getSpiderLikeMobs(), 0.9f));
+		MOB_INTERVAL = values(config.getMobInterval());
+		HORSE_LIKE_MOBS = offsets(config.getHorseLikeMobs(), 0.75f);
+		SPIDER_LIKE_MOBS = offsets(config.getSpiderLikeMobs(), 0.9f);
 
 		Map<String, String[]> custom = new HashMap<>();
 		for (String line : lines(config.getCustomPrint())) {
@@ -100,7 +100,7 @@ public class Client {
 				continue;
 			custom.putIfAbsent(parts[0], Arrays.copyOfRange(parts, 1, parts.length));
 		}
-		CUSTOM_PRINT = Map.copyOf(custom);
+		CUSTOM_PRINT = custom;
 
 		Map<String, Float> height = new HashMap<>();
 		Map<String, Float> heightByTag = new HashMap<>();
@@ -114,8 +114,8 @@ public class Client {
 			else
 				height.putIfAbsent(parts[0], value);
 		}
-		BLOCK_HEIGHT = Map.copyOf(height);
-		BLOCK_HEIGHT_BY_TAG = Map.copyOf(heightByTag);
+		BLOCK_HEIGHT = height;
+		BLOCK_HEIGHT_BY_TAG = heightByTag;
 
 		APPLY_BLOCKS = toSet(config.getApplyBlocks());
 		EXCLUDED_BLOCKS = toSet(config.getExcludedBlocks());
@@ -150,7 +150,7 @@ public class Client {
 	/** 只供读取的过滤副本，不会改动配置对象里那个 List。 */
 	private static List<String> lines(List<String> configured) {
 		if (configured == null || configured.isEmpty())
-			return List.of();
+			return Collections.singletonList("");
 		List<String> copy = new ArrayList<>(configured.size());
 		for (String line : configured)
 			if (line != null && !line.isEmpty())
@@ -159,8 +159,7 @@ public class Client {
 	}
 
 	private static Set<String> toSet(List<String> configured) {
-		Set<String> set = new HashSet<>(lines(configured));
-		return Set.copyOf(set);
+		return new HashSet<>(lines(configured));
 	}
 
 	private static Float parse(String value) {

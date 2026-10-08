@@ -29,9 +29,10 @@ public abstract class AbstractBoatEntityMixin extends Entity {
 	@Inject(method = "tick", at = @At("TAIL"))
 	public void fpp$tick(CallbackInfo ci) {
 		if (Client.CONFIG.isEnableBoatTrail()) {
+			//~ if 1.16.5 '.horizontalDistance' -> '.length'
 			int k = (int)(this.getDeltaMovement().horizontalDistance() * 10);
 			while (Math.random() < k-- / 5f) {
-				var i = Math.random() > 0.5f ? 1 : -1;		//TODO: boat's yaw is 90 degrees more than other entity, strange.
+				int i = Math.random() > 0.5f ? 1 : -1;		//TODO: boat's yaw is 90 degrees more than other entity, strange.
 				if (this.checkInWater()) {
 					this.level().addParticle(		// at head
 							ParticleTypes.RAIN,
@@ -49,6 +50,7 @@ public abstract class AbstractBoatEntityMixin extends Entity {
 								(int) this.getY() + 1f,
 								this.getZ() + i * Mth.sin((float) Math.toRadians(this.getRotationVector().y - 10 + Math.random() * 20)),
 								(Math.random() - 0.5f) / 4f,
+								//~ if 1.16.5 '.horizontalDistance' -> '.length'
 								Math.random() * this.getDeltaMovement().horizontalDistance() / 2f,
 								(Math.random() - 0.5f) / 4f
 						);

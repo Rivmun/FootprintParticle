@@ -3,7 +3,6 @@
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.rimo.footprintparticle.mixin.ParticleSpriteSetAccessor;
 import net.minecraft.client.Minecraft;
@@ -40,6 +39,7 @@ public class ForgeParticleAtlas {
 	// 粒子图集 id：1.18.2/1.19.2 为 SpriteUploader.PARTICLES，字符串即 minecraft:textures/atlas/particles.png。
 	private static final ResourceLocation PARTICLES_ATLAS = new ResourceLocation("textures/atlas/particles.png");
 
+	//~ if 1.16.5 '.getAtlas()' -> '.getMap()' {
 	@SubscribeEvent
 	public static void onStitchPre(TextureStitchEvent.Pre event) {
 		if (!event.getAtlas().location().equals(PARTICLES_ATLAS))
@@ -65,6 +65,7 @@ public class ForgeParticleAtlas {
 				((ParticleSpriteSetAccessor) set).fpp$setSprites(sprites);
 		}
 	}
+	//~ }
 
 	// ≤​1.19.2：粒子图集 sprite 名 = 相对 textures/ 的完整路径，必须含 particle/ 子目录（1.20.1 现代格式会
 	// 自动补，​1.19.2 的原始 addSprite 不会）。json 里写 "ns:footprint"，实际文件在
@@ -86,13 +87,13 @@ public class ForgeParticleAtlas {
 		// 1.19.2 返回 Optional 并改用 open() 读流。两版本靠下面两条替换指令归一为同一形态。
 		try {
 			//~ if < 1.19.2 'Minecraft.getInstance().getResourceManager().getResource(json);' -> 'Optional.of(Minecraft.getInstance().getResourceManager().getResource(json));'
-			Optional<Resource> optional = Optional.of(Minecraft.getInstance().getResourceManager().getResource(json));
-			if (optional.isEmpty())
+			Optional<Resource> optional = Minecraft.getInstance().getResourceManager().getResource(json);
+			if (!optional.isPresent())
 				return out;
 			//~ if < 1.19.2 '.open()' -> '.getInputStream()'
-			try (InputStream is = optional.get().getInputStream();
+			try (InputStream is = optional.get().open();
 			     InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
-				JsonElement root = JsonParser.parseReader(reader);
+				JsonElement root = new JsonParser().parse(reader);
 				JsonArray textures = root.getAsJsonObject().getAsJsonArray("textures");
 				if (textures == null)
 					return out;

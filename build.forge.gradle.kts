@@ -3,11 +3,19 @@ plugins {
 }
 
 val minecraft = property("deps.minecraft") as String
+val modId = property("mod.id") as String
+
+// AW 按版本选型：1.16.5 的 ParticleEngine$MutableSpriteSet 是非静态内部类，构造器描述符带外部实例参数，
+// 共用 AW 里的 <init>()V 条目在 validateAccessWidener 阶段找不到方法（1.18.2+ 它是 static 嵌套类，
+// 有无参构造器，仍走共用那份）。1.16.5 的实例由 ParticleEngineMixin 反射构造，只需 AW 放开类可见性。
+val isLegacyInnerSpriteSet = sc.current.parsed < "1.17"
+val accessWidenerName = if (isLegacyInnerSpriteSet) "$modId-1.16.5.accesswidener" else "$modId.accesswidener"
+val unusedAccessWidenerName = if (isLegacyInnerSpriteSet) "$modId.accesswidener" else "$modId-1.16.5.accesswidener"
 
 loom {
     silentMojangMappingsLicense()
-    // Forge 粒子本地工厂需在 mixin 里 new 原版私有的 ParticleEngine$MutableSpriteSet，靠下面 AW 放开可见性。
-    accessWidenerPath = rootProject.file("src/main/resources/${property("mod.id")}.accesswidener")
+    // Forge 粒子本地工厂需要在 mixin 里拿到原版私有的 ParticleEngine$MutableSpriteSet，靠下面 AW 放开可见性。
+    accessWidenerPath = rootProject.file("src/main/resources/$accessWidenerName")
 
     forge {
         // 把上面的 accesswidener 转成 Forge 的 accesstransformer.cfg（dev 编译期 + 运行期均生效）。
@@ -116,7 +124,8 @@ dependencies {
 tasks {
     processResources {
         // 保留 *.accesswidener：forge 侧需在 remapJar 阶段把本模组 AW 转成 accesstransformer.cfg（供运行时私有类访问）。
-        exclude("**/fabric.mod.json", "**/neoforge.mods.toml")
+        // 只保留当前版本选型的那一份，另一份不进 jar，免得多出一个无效 AW。
+        exclude("**/fabric.mod.json", "**/neoforge.mods.toml", "**/$unusedAccessWidenerName")
     }
 
     register<Copy>("buildAndCollect") {

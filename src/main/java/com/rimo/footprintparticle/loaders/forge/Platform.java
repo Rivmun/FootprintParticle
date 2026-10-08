@@ -7,19 +7,23 @@ import com.rimo.footprintparticle.config.Config;
 import com.rimo.footprintparticle.mixin.ParticleSpriteSetAccessor;
 import com.rimo.footprintparticle.particle.*;
 //~ if < 1.21.11 '.AutoConfigClient' -> '.AutoConfig'
-import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.AutoConfigClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraftforge.api.distmarker.Dist;
-//~ if < 1.19.2 '.ConfigScreenHandler' -> '.ConfigGuiHandler'
-import net.minecraftforge.client.ConfigGuiHandler;
 //~ if < 1.19.2 'RegisterParticleProvidersEvent' -> 'ParticleFactoryRegisterEvent'
-import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
+import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+//? if ! 1.16.5 {
+//~ if < 1.19.2 '.ConfigScreenHandler' -> '.ConfigGuiHandler'
+import net.minecraftforge.client.ConfigScreenHandler;
+//? } else {
+/^import net.minecraftforge.fml.ExtensionPoint;
+^///? }
 
 import java.util.List;
 
@@ -71,7 +75,7 @@ public class Platform {
 		// 改由 ForgeParticleRegistry 的私有不同步映射 + ParticleEngine 本地注入实现。
 		@SubscribeEvent
 		//~ if < 1.19.2 'RegisterParticleProvidersEvent' -> 'ParticleFactoryRegisterEvent'
-		public static void onRegisterParticleProviders(ParticleFactoryRegisterEvent event) {
+		public static void onRegisterParticleProviders(RegisterParticleProvidersEvent event) {
 			// 该事件在客户端 ParticleEngine 已构造后派发，此处借其时序把 provider 直接注入引擎内部表；
 			// 引擎实例由 ParticleEngineMixin 混入 ParticleEngineLocal 接口方法 fpp$registerLocal。
 			ParticleEngineLocal engine = (ParticleEngineLocal) (Object) Minecraft.getInstance().particleEngine;
@@ -84,14 +88,13 @@ public class Platform {
 		@SubscribeEvent
 		public static void onClientSetup(FMLClientSetupEvent event) {
 			Client.init();
-			// 注册配置屏扩展点：Forge 内建模组列表只有在注册后才显示「Config」按钮，
-			// 相当于 Fabric 侧 ModMenuIntegration 的替代。AutoConfig 静态 API 由 cloth-config (forge) 提供。
+			//? if ! 1.16.5 {
 			ModList.get().getModContainerById(Client.MOD_ID).ifPresent(container ->
 					//~ if < 1.19.2 'ConfigScreenHandler.ConfigScreenFactory' -> 'ConfigGuiHandler.ConfigGuiFactory' {
-					container.registerExtensionPoint(ConfigGuiHandler.ConfigGuiFactory.class,
-							() -> new ConfigGuiHandler.ConfigGuiFactory((mc, parent) -> {
+					container.registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class,
+							() -> new ConfigScreenHandler.ConfigScreenFactory((mc, parent) -> {
 								//~ if < 1.21.11 'AutoConfigClient' -> 'AutoConfig'
-								var screen = AutoConfig.getConfigScreen(Config.class, parent).get();
+								var screen = AutoConfigClient.getConfigScreen(Config.class, parent).get();
 								if (screen == null)  // 配置屏异常时兜底返回原版游戏屏，避免 Forge 直接崩溃
 									screen = Minecraft.getInstance().screen;
 								return screen;
@@ -99,6 +102,15 @@ public class Platform {
 					)
 					//~ }
 			);
+			//? } else {
+			/^ModList.get().getModContainerById(Client.MOD_ID).ifPresent(container ->
+					container.registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY,
+							() -> (client, parent) -> {
+								return AutoConfig.getConfigScreen(Config.class, parent).get();
+							}
+					)
+			);
+			^///? }
 		}
 	}
 }

@@ -3,5 +3,9 @@ accessWidener	v2	named
 # Forge 侧粒子本地工厂需要在 mixin 里直接 new 原版私有的 MutableSpriteSet，
 # 并把它塞进 ParticleEngine 的 spriteSets 表（见 loaders/forge/mixin/ParticleEngineMixin）。
 # 该嵌套类与其构造器在原版为私有；forge 构建通过 convertAccessWideners 把本文件转成 AT 应用。
+#
+# 仅适用 MC >= 1.18.2：那时 MutableSpriteSet 是 static 嵌套类，有无参构造器。
+# 1.16.5 它是非静态内部类，不存在 <init>()V，本文件那条方法条目会让 validateAccessWidener 失败，
+# 故该版本由 build.forge.gradle.kts 改选 footprintparticle-1.16.5.accesswidener。
 accessible	class	net/minecraft/client/particle/ParticleEngine$MutableSpriteSet
 accessible	method	net/minecraft/client/particle/ParticleEngine$MutableSpriteSet	<init>	()V

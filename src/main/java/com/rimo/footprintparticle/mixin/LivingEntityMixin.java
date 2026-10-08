@@ -2,18 +2,15 @@ package com.rimo.footprintparticle.mixin;
 
 import com.rimo.footprintparticle.Client;
 import com.rimo.footprintparticle.Util;
+import com.rimo.footprintparticle.VersionUtil;
 import com.rimo.footprintparticle.particle.FootprintParticleType;
 import com.rimo.footprintparticle.particle.SnowDustParticleType;
 import com.rimo.footprintparticle.particle.WatermarkParticleType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
-//~ if < 1.19.3 'net.minecraft.core.registries.Registries' -> 'net.minecraft.core.Registry'
-import net.minecraft.core.registries.Registries;
 //~ if < 1.21.11 'Identifier' -> 'ResourceLocation'
 import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -21,25 +18,29 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+//? if 1.16.5 {
+/*import net.minecraft.world.entity.player.Player;
+*///? } else {
+import net.minecraft.tags.TagKey;
+//? }
 
 import static com.rimo.footprintparticle.Client.CONFIG;
 
 //~ if < 1.20.1 'this.level()' -> 'this.level' {
+//~ if 1.16.5 'this.isAlwaysTicking()' -> '(((LivingEntity) (Object) this) instanceof Player)' {
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
 	public LivingEntityMixin(EntityType<?> type, Level world) {
 		super(type, world);
 	}
 
-	//~ if < 1.21.11 'Identifier' -> 'ResourceLocation'
-	//~ if < 1.21.1 '.withDefaultNamespace' -> '.tryParse'
-	//~ if < 1.19.3 'Registries.BLOCK' -> 'Registry.BLOCK_REGISTRY'
-	@Unique private final ResourceKey<Block> fpp$AIR = ResourceKey.create(Registries.BLOCK, Identifier.withDefaultNamespace("air"));
 	@Unique private int fpp$timer = 0;
 	@Unique private boolean fpp$wasFalling;
 	@Unique private int fpp$wetTimer = CONFIG.getWetDuration() * 20;
@@ -118,20 +119,21 @@ public abstract class LivingEntityMixin extends Entity {
 			fpp$timer *= interval;
 
 		// Fix pos...
-		var px = this.getX();
-		var py = this.getY();
-		var pz = this.getZ();
-		var scale = Util.getEntityScale((LivingEntity) (Object) this);
+		double px = this.getX();
+		double py = this.getY();
+		double pz = this.getZ();
+		float scale = Util.getEntityScale((LivingEntity) (Object) this);
 
 		// Horizontal Offset
 		// Front and back
-		var side = Math.random() > 0.5f ? 1 : -1;
-		var hOffset = 0.0625f;
+		int side = Math.random() > 0.5f ? 1 : -1;
+		double hOffset = 0.0625f;
 		// 四足：命中即换成配置的前后偏移（索引里已把缺多数值的行补成 0.75），并按骑乘情况调整间隔。
 		Float front = Client.HORSE_LIKE_MOBS.get(id);
 		if (front != null) {
 			hOffset = front;
 			fpp$timer = (int) (this.getControllingPassenger() != null ?
+					//~ if 1.16.5 '.isAlwaysTicking()' -> ' instanceof Player'
 					this.getControllingPassenger().isAlwaysTicking() ?
 							fpp$timer * 0.5f :
 							fpp$timer * 1.33f :
@@ -159,9 +161,9 @@ public abstract class LivingEntityMixin extends Entity {
 		BlockPos pos;
 		boolean canGen;
 
-		var feetPos = new BlockPos(colX, feetY, colZ);
-		var feetState = this.level().getBlockState(feetPos);
-		var feetShape = feetState.getCollisionShape(this.level(), feetPos);
+		BlockPos feetPos = new BlockPos(colX, feetY, colZ);
+		BlockState feetState = this.level().getBlockState(feetPos);
+		VoxelShape feetShape = feetState.getCollisionShape(this.level(), feetPos);
 		if (!feetShape.isEmpty()) {
 			// 脚格有碰撞箱：直接贴脚格顶面。
 			pos = feetPos;
@@ -179,8 +181,8 @@ public abstract class LivingEntityMixin extends Entity {
 			// 跳跃/落地只要有碰撞箱即可(兼容半砖/雪片)，但排除两类：①“完整方块却不遮光”的透明方块(玻璃/树叶)；②横向铺不满整格的窄碰撞体(栏杆/玻璃板/墙)。
 			// 草/花这类贴地装饰(feetFrac≈0)也走这里：脚压在下方块顶、其上方一格为空气，故归属下方支撑方块，行为不变。
 			pos = new BlockPos(colX, feetY - 1, colZ);
-			var belowState = this.level().getBlockState(pos);
-			var belowShape = belowState.getCollisionShape(this.level(), pos);
+			BlockState belowState = this.level().getBlockState(pos);
+			VoxelShape belowShape = belowState.getCollisionShape(this.level(), pos);
 			double feetFrac = py - feetY;   // 脚在其格内的离地高度：走路贴地时应≈0（Y 为整数），非零说明脚悬空在非完整方块的高度上。
 			py = feetY - 1 + (belowShape.isEmpty() ? 0.0 : belowShape.max(Direction.Axis.Y)) + 0.01f + CONFIG.getPrintHeight();
 			canGen = !belowShape.isEmpty() && fpp$isPrintCanGen(pos)
@@ -194,17 +196,15 @@ public abstract class LivingEntityMixin extends Entity {
 		if (canGen) {
 			// Fix height by blocks if in...（保留原有按方块/标签修正 y 的配置逻辑，现作用于实际站立的支撑方块）
 			try {
-				var block = this.level().getBlockState(pos);
-				//~ if < 26.1 '.typeHolder()' -> '.getBlockHolder()'
-				//~ if < 1.21.11 '.identifier()' -> '.location()'
-				//~ if < 1.19.2 'block.getBlockHolder().unwrapKey().orElse(fpp$AIR).location()' -> 'Registry.BLOCK.getKey(block.getBlock())'
-				var blockId = block.getBlockHolder().unwrapKey().orElse(fpp$AIR).location().toString();
+				BlockState block = this.level().getBlockState(pos);
+				String blockId = VersionUtil.getBlockName(block);
 				Float height = Client.BLOCK_HEIGHT.get(blockId);
 				if (height != null) {
 					py += height;
 				} else {
-					//~ if < 26.1 '.tags()' -> '.getTags()'
-					for (TagKey<Block> tag : block.tags().toList()) {
+					//~ if 1.16.5 'TagKey<Block>' -> 'ResourceLocation'
+					for (TagKey<Block> tag : VersionUtil.getBlockTags(block)) {
+						//~ if 1.16.5 '.location' -> '.getPath'
 						Float tagHeight = Client.BLOCK_HEIGHT_BY_TAG.get("#" + tag.location());
 						if (tagHeight != null)
 							py += tagHeight;
@@ -234,7 +234,8 @@ public abstract class LivingEntityMixin extends Entity {
 
 		// Generate
 		double dx, dz;      // get facing
-		if (this.getDeltaMovement().horizontalDistance() == 0) {
+		//~ if 1.16.5 'this.getDeltaMovement().horizontalDistance()' -> 'this.getDeltaMovement().x == 0 && this.getDeltaMovement().z == 0'
+		if (this.getDeltaMovement().horizontalDistance()) {
 			dx = -Mth.sin((float) Math.toRadians(this.getRotationVector().y));
 			dz =  Mth.cos((float) Math.toRadians(this.getRotationVector().y));
 		} else {
@@ -246,13 +247,13 @@ public abstract class LivingEntityMixin extends Entity {
 			this.level().addParticle(footprint.setData((LivingEntity) (Object) this), px, py, pz, dx, 0, dz);
 		} else if (fpp$wetTimer <= CONFIG.getWetDuration() * 20) {        // waterprint (gen when footprint not gen)
 			WatermarkParticleType watermark = Client.WATERMARK;
-			var i = Math.random() > 0.5f ? 1 : -1;
+			int i = Math.random() > 0.5f ? 1 : -1;
 			this.level().addParticle(watermark.setData((LivingEntity) (Object) this), px, py, pz, dx * i, fpp$wetTimer, dz * i);		// push timer to calc alpha
 		}
 		// water splash (gen whatever print gen)
 		if (fpp$wetTimer <= CONFIG.getWetDuration() * 20 &&
 				(CONFIG.getWaterSplashLevel() == 2 ||
-						(CONFIG.getWaterSplashLevel() == 1 && this.isAlwaysTicking()))) {
+						(CONFIG.getWaterSplashLevel() == 1 && ((LivingEntity) (Object) this) instanceof Player))) {
 			float range = Util.getEntityScale((LivingEntity) (Object) this);
 			int i = (int)((this.isSprinting() ? 18 : 10) * Math.max((0.7f - (float) fpp$wetTimer / (CONFIG.getWetDuration() * 20)), 0));
 			int v = this.isSprinting() ? 3 : 6;
@@ -263,6 +264,7 @@ public abstract class LivingEntityMixin extends Entity {
 						py,
 						pz - 0.25f * range + Math.random() / 4,
 						(Math.random() - 0.5f) / v,
+						//~ if 1.16.5 '.horizontalDistance' -> '.length'
 						0.02f + Math.random() * this.getDeltaMovement().horizontalDistance(),
 						(Math.random() - 0.5f) / v
 				);
@@ -272,30 +274,31 @@ public abstract class LivingEntityMixin extends Entity {
 		return canGen;
 	}
 
-	//~ if < 26.1 '.tags()' -> '.getTags()' {
-	//~ if < 26.1 '.typeHolder()' -> '.getBlockHolder()' {
-	//~ if < 1.21.11 'identifier().' -> 'location().' {
 	@Unique
 	private boolean fpp$isPrintCanGen(BlockPos pos) {
-		var block = this.level().getBlockState(pos);
-		//~ if < 1.19.2 'block.getBlockHolder().unwrapKey().orElse(fpp$AIR).location()' -> 'Registry.BLOCK.getKey(block.getBlock())'
-		var blockId = block.getBlockHolder().unwrapKey().orElse(fpp$AIR).location().toString();
-		var canGen = Client.APPLY_BLOCKS.contains(blockId);
+		BlockState block = this.level().getBlockState(pos);
+		String blockId = VersionUtil.getBlockName(block);
+		boolean canGen = Client.APPLY_BLOCKS.contains(blockId);
 		if (!canGen) {
-			for (TagKey<Block> tag : block.tags().toList()) {
+			//~ if 1.16.5 'TagKey<Block>' -> 'ResourceLocation'
+			for (TagKey<Block> tag : VersionUtil.getBlockTags(block)) {
+				//~ if 1.16.5 '.location' -> '.getPath'
 				canGen = Client.APPLY_BLOCKS.contains("#" + tag.location());
 				if (canGen)
 					break;
 			}
 			if (!canGen) {
 				// Hardness Filter. See on https://minecraft.fandom.com/wiki/Breaking#Blocks_by_hardness
+				//~ if 1.16.5 '.defaultDestroyTime' -> '.getExplosionResistance'
 				float hardness = block.getBlock().defaultDestroyTime();
 				float hardnessGate = CONFIG.getHardnessGate();
 				canGen = hardnessGate > 0 && hardness >= 0 && Mth.abs(hardness) < hardnessGate;
 				if (canGen) {
 					canGen = !Client.EXCLUDED_BLOCKS.contains(blockId);
 					if (canGen) {
-						for (TagKey<Block> tag : block.tags().toList()) {
+						//~ if 1.16.5 'TagKey<Block>' -> 'ResourceLocation'
+						for (TagKey<Block> tag : VersionUtil.getBlockTags(block)) {
+							//~ if 1.16.5 '.location' -> '.getPath'
 							canGen = !Client.EXCLUDED_BLOCKS.contains("#" + tag.location());
 							if (!canGen)
 								break;
@@ -306,8 +309,6 @@ public abstract class LivingEntityMixin extends Entity {
 		}
 		return canGen;
 	}
-	//~ }
-	//~ }
-	//~ }
 }
+//~ }
 //~ }

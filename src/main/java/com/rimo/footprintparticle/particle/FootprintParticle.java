@@ -45,7 +45,7 @@ public class FootprintParticle extends SingleQuadParticle {
 		super(clientWorld, x, y, z, vx, vy, vz, spriteProvider.get(RandomSource.create()));
 		pos = new BlockPos(Mth.floor(this.x), Mth.floor(this.y - 0.02f), Mth.floor(this.z));
 
-		this.setParticleSpeed(0, 0, 0);
+		this.xd = this.yd = this.zd = 0;
 		this.setAlpha(Client.CONFIG.getFootprintAlpha());
 		this.roll = (float) Mth.atan2(vx, vz);
 

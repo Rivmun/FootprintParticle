@@ -16,6 +16,7 @@ public class SnowDustParticle extends SingleQuadParticle {
     SnowDustParticle(ClientLevel clientLevel, double d, double e, double f, double g, double h, double i, SpriteSet spriteSet) {
         //~ if < 1.21.11 ', spriteSet.first());' -> ');'
         super(clientLevel, d, e, f, (double) 0.0F, (double) 0.0F, (double) 0.0F, spriteSet.first());
+        //? if ! 1.16.5
         this.friction = 0.96F;
         this.sprites = spriteSet;
         float j = 2.5F;
@@ -65,8 +66,8 @@ public class SnowDustParticle extends SingleQuadParticle {
         //~ if < 1.21.11 'velocityZ, @NonNull RandomSource random' -> 'velocityZ'
         public Particle createParticle(@NonNull SimpleParticleType parameters, @NonNull ClientLevel world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, @NonNull RandomSource random) {
             Particle particle = new SnowDustParticle(world, x, y, z, velocityX, velocityY, velocityZ, this.spriteProvider);
-            if (parameters instanceof SnowDustParticleType snowdust)
-                particle.scale(snowdust.size);
+            if (parameters instanceof SnowDustParticleType)
+                particle.scale(((SnowDustParticleType) parameters).size);
             return particle;
         }
     }

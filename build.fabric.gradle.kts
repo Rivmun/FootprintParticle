@@ -71,7 +71,7 @@ dependencies {
         // pehkui
         modCompileOnly("maven.modrinth:pehkui:${property("deps.pehkui")}")
         // random-mob-sizes
-        if (sc.current.parsed < "1.21.1")
+        if (sc.current.parsed < "1.21.1" && sc.current.parsed > "1.16.5")
             modCompileOnly("maven.modrinth:random-mob-sizes:${property("deps.random-mob-sizes")}")
     }
 }
