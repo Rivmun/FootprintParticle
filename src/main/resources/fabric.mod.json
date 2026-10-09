@@ -31,10 +31,10 @@
   ],
   "depends": {
     "fabric-api": "*",
-    "cloth-config2": "*",
     "minecraft": "${version_range}"
   },
   "suggests": {
+    "cloth-config2": "*",
     "modmenu": "*"
   },
   "custom": {

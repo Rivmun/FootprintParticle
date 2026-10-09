@@ -3,6 +3,7 @@ package com.rimo.footprintparticle;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -29,5 +30,6 @@ public final class PlatformUtil {
 		 */
 		List<TextureAtlasSprite> getSprites(SpriteSet spriteSet);
 		boolean isModLoaded(String id);
+		Path getConfigFolder();
 	}
 }

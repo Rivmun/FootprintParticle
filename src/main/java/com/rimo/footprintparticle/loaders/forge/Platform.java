@@ -3,11 +3,9 @@
 
 import com.rimo.footprintparticle.Client;
 import com.rimo.footprintparticle.PlatformUtil;
-import com.rimo.footprintparticle.config.Config;
+import com.rimo.footprintparticle.config.ConfigScreen;
 import com.rimo.footprintparticle.mixin.ParticleSpriteSetAccessor;
 import com.rimo.footprintparticle.particle.*;
-//~ if < 1.21.11 '.AutoConfigClient' -> '.AutoConfig'
-import me.shedaniel.autoconfig.AutoConfigClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -18,6 +16,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.loading.FMLPaths;
 //? if ! 1.16.5 {
 //~ if < 1.19.2 '.ConfigScreenHandler' -> '.ConfigGuiHandler'
 import net.minecraftforge.client.ConfigScreenHandler;
@@ -25,6 +24,7 @@ import net.minecraftforge.client.ConfigScreenHandler;
 /^import net.minecraftforge.fml.ExtensionPoint;
 ^///? }
 
+import java.nio.file.Path;
 import java.util.List;
 
 // Forge（1.20.1）侧入口。 META-INF/mods.toml 声明 modId，本类靠 @Mod 被 FML 实例化。
@@ -50,15 +50,17 @@ public class Platform {
 	public static class ClientEvents {
 		static {
 			PlatformUtil.PLATFORM = new PlatformUtil.IPlatform() {
-				@Override
 				public List<TextureAtlasSprite> getSprites(SpriteSet spriteSet) {
 					// 此处在 1.21.1 版本下会有个 Mixin class cannot be referenced directly 的警告，但实测不影响编译和运行，暂不理会。
 					return ((ParticleSpriteSetAccessor) spriteSet).fpp$getSprites();
 				}
 
-				@Override
 				public boolean isModLoaded(String id) {
 					return ModList.get().isLoaded(id);
+				}
+
+				public Path getConfigFolder() {
+					return FMLPaths.CONFIGDIR.get();
 				}
 			};
 			//? if forge&& <= 1.19.2 {
@@ -88,29 +90,22 @@ public class Platform {
 		@SubscribeEvent
 		public static void onClientSetup(FMLClientSetupEvent event) {
 			Client.init();
-			//? if ! 1.16.5 {
-			ModList.get().getModContainerById(Client.MOD_ID).ifPresent(container ->
-					//~ if < 1.19.2 'ConfigScreenHandler.ConfigScreenFactory' -> 'ConfigGuiHandler.ConfigGuiFactory' {
-					container.registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class,
-							() -> new ConfigScreenHandler.ConfigScreenFactory((mc, parent) -> {
-								//~ if < 1.21.11 'AutoConfigClient' -> 'AutoConfig'
-								var screen = AutoConfigClient.getConfigScreen(Config.class, parent).get();
-								if (screen == null)  // 配置屏异常时兜底返回原版游戏屏，避免 Forge 直接崩溃
-									screen = Minecraft.getInstance().screen;
-								return screen;
-							})
-					)
-					//~ }
-			);
-			//? } else {
-			/^ModList.get().getModContainerById(Client.MOD_ID).ifPresent(container ->
-					container.registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY,
-							() -> (client, parent) -> {
-								return AutoConfig.getConfigScreen(Config.class, parent).get();
-							}
-					)
-			);
-			^///? }
+			//~ if 1.16.5 'cloth_config' -> 'cloth-config'
+			if (ModList.get().isLoaded("cloth_config")) {
+				ModList.get().getModContainerById(Client.MOD_ID).ifPresent(container ->
+						container.registerExtensionPoint(
+								//? if ! 1.16.5 {
+								//~ if < 1.19.2 'ConfigScreenHandler.ConfigScreenFactory' -> 'ConfigGuiHandler.ConfigGuiFactory' {
+								ConfigScreenHandler.ConfigScreenFactory.class,
+								() -> new ConfigScreenHandler.ConfigScreenFactory((mc, parent) ->
+										new ConfigScreen().build(parent))));
+								//~}
+								//?} else {
+								/^ExtensionPoint.CONFIGGUIFACTORY,
+								() -> (client, parent) ->
+										new ConfigScreen().build(parent)));
+								^///?}
+			}
 		}
 	}
 }

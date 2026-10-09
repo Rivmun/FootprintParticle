@@ -3,14 +3,13 @@ package com.rimo.footprintparticle.mixin;
 import com.rimo.footprintparticle.Client;
 import com.rimo.footprintparticle.Util;
 import com.rimo.footprintparticle.VersionUtil;
+import com.rimo.footprintparticle.config.WorkMode;
 import com.rimo.footprintparticle.particle.FootprintParticleType;
 import com.rimo.footprintparticle.particle.SnowDustParticleType;
 import com.rimo.footprintparticle.particle.WatermarkParticleType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
-//~ if < 1.21.11 'Identifier' -> 'ResourceLocation'
-import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -27,6 +26,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //? if 1.16.5 {
 /*import net.minecraft.world.entity.player.Player;
+import net.minecraft.resources.ResourceLocation;
 *///? } else {
 import net.minecraft.tags.TagKey;
 //? }
@@ -34,7 +34,6 @@ import net.minecraft.tags.TagKey;
 import static com.rimo.footprintparticle.Client.CONFIG;
 
 //~ if < 1.20.1 'this.level()' -> 'this.level' {
-//~ if 1.16.5 'this.isAlwaysTicking()' -> '(((LivingEntity) (Object) this) instanceof Player)' {
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
 	public LivingEntityMixin(EntityType<?> type, Level world) {
@@ -82,11 +81,7 @@ public abstract class LivingEntityMixin extends Entity {
 		}
 
 		// Swim Pop
-		if (this.isSwimming() && (
-				CONFIG.getSwimPopLevel() == 2 || (
-						CONFIG.getSwimPopLevel() == 1 && this.isAlwaysTicking()
-				)
-		)) {
+		if (this.isSwimming() && fpp$isEnable(CONFIG.getSwimPopLevel())) {
 			float range = Util.getEntityScale((LivingEntity) (Object) this);
 			this.level().addParticle(
 					ParticleTypes.BUBBLE,
@@ -102,19 +97,18 @@ public abstract class LivingEntityMixin extends Entity {
 
 	@Unique
 	public boolean fpp$footprintGenerator(boolean landedOrJump) {
-		if (CONFIG.isEnable() == 0 ||
-				(CONFIG.isEnable() == 1 && !this.isAlwaysTicking()))
+		if (!fpp$isEnable(CONFIG.getEnableMod()))
 			return false;
-		// 实体 ID 只需算一次，后面的排除名单/间隔/偏移/尺寸全部直接查 Client 里由配置预建的索引。
+		// 实体 ID 只需算一次，后面的排除名单/间隔/偏移/尺寸全部直接查 CONFIG 里的集合。
 		String id = EntityType.getKey(this.getType()).toString();
-		if (Client.EXCLUDED_MOBS.contains(id))
+		if (CONFIG.getExcludedMobSet().contains(id))
 			return false;
 		if (!CONFIG.getCanGenWhenInvisible() && this.isInvisible())
 			return false;
 
 		// Set Interval
 		fpp$timer = this.isSprinting() ? (int) (CONFIG.getSecPerPrint() * 13.33f) : (int) (CONFIG.getSecPerPrint() * 20);
-		Float interval = Client.MOB_INTERVAL.get(id);
+		Float interval = CONFIG.getMobIntervalMap().get(id);
 		if (interval != null)
 			fpp$timer *= interval;
 
@@ -128,10 +122,11 @@ public abstract class LivingEntityMixin extends Entity {
 		// Front and back
 		int side = Math.random() > 0.5f ? 1 : -1;
 		double hOffset = 0.0625f;
-		// 四足：命中即换成配置的前后偏移（索引里已把缺多数值的行补成 0.75），并按骑乘情况调整间隔。
-		Float front = Client.HORSE_LIKE_MOBS.get(id);
-		if (front != null) {
-			hOffset = front;
+		// 四足：命中即换成配置的前后偏移（无 value 时回到缺省 0.75），并按骑乘情况调整间隔。
+		java.util.Map<String, Float> horseMap = CONFIG.getHorseLikeMobsMap();
+		if (horseMap.containsKey(id)) {
+			Float front = horseMap.get(id);
+			hOffset = front != null ? front : 0.75f;
 			fpp$timer = (int) (this.getControllingPassenger() != null ?
 					//~ if 1.16.5 '.isAlwaysTicking()' -> ' instanceof Player'
 					this.getControllingPassenger().isAlwaysTicking() ?
@@ -146,10 +141,12 @@ public abstract class LivingEntityMixin extends Entity {
 		// Left and right
 		side = Math.random() > 0.5f ? 1 : -1;
 		hOffset = 0.125f;
-		// 多足：同上，缺多数值时索引里已补成 0.9。
-		Float lateral = Client.SPIDER_LIKE_MOBS.get(id);
-		if (lateral != null)
-			hOffset = lateral;
+		// 多足：同上，无 value 时回到缺省 0.9。
+		java.util.Map<String, Float> spiderMap = CONFIG.getSpiderLikeMobsMap();
+		if (spiderMap.containsKey(id)) {
+			Float lateral = spiderMap.get(id);
+			hOffset = lateral != null ? lateral : 0.9f;
+		}
 		hOffset *= scale;
 		px = px - hOffset * side * Mth.sin((float) Math.toRadians(this.getRotationVector().y + 90));
 		pz = pz + hOffset * side * Mth.cos((float) Math.toRadians(this.getRotationVector().y + 90));
@@ -198,23 +195,21 @@ public abstract class LivingEntityMixin extends Entity {
 			try {
 				BlockState block = this.level().getBlockState(pos);
 				String blockId = VersionUtil.getBlockName(block);
-				Float height = Client.BLOCK_HEIGHT.get(blockId);
+				Float height = CONFIG.getBlockHeightMap().get(blockId);
 				if (height != null) {
 					py += height;
 				} else {
 					//~ if 1.16.5 'TagKey<Block>' -> 'ResourceLocation'
 					for (TagKey<Block> tag : VersionUtil.getBlockTags(block)) {
 						//~ if 1.16.5 '.location' -> '.getPath'
-						Float tagHeight = Client.BLOCK_HEIGHT_BY_TAG.get("#" + tag.location());
+						Float tagHeight = CONFIG.getBlockHeightMap().get("#" + tag.location());
 						if (tagHeight != null)
 							py += tagHeight;
 					}
 				}
 
 				// Snow Dust
-				if (block.is(Blocks.SNOW) &&
-						(CONFIG.getSnowDustLevel() == 2 ||
-								(CONFIG.getSnowDustLevel() == 1 && this.isAlwaysTicking()))) {
+				if (block.is(Blocks.SNOW) && fpp$isEnable(CONFIG.getSnowDustLevel())) {
 					int i = this.isSprinting() ? 4 : 2;
 					int v = this.isSprinting() ? 3 : 10;
 					while (--i >= 0) {
@@ -234,8 +229,8 @@ public abstract class LivingEntityMixin extends Entity {
 
 		// Generate
 		double dx, dz;      // get facing
-		//~ if 1.16.5 'this.getDeltaMovement().horizontalDistance()' -> 'this.getDeltaMovement().x == 0 && this.getDeltaMovement().z == 0'
-		if (this.getDeltaMovement().horizontalDistance()) {
+		//~ if 1.16.5 'this.getDeltaMovement().horizontalDistance() == 0' -> 'this.getDeltaMovement().x == 0 && this.getDeltaMovement().z == 0'
+		if (this.getDeltaMovement().horizontalDistance() == 0) {
 			dx = -Mth.sin((float) Math.toRadians(this.getRotationVector().y));
 			dz =  Mth.cos((float) Math.toRadians(this.getRotationVector().y));
 		} else {
@@ -251,9 +246,7 @@ public abstract class LivingEntityMixin extends Entity {
 			this.level().addParticle(watermark.setData((LivingEntity) (Object) this), px, py, pz, dx * i, fpp$wetTimer, dz * i);		// push timer to calc alpha
 		}
 		// water splash (gen whatever print gen)
-		if (fpp$wetTimer <= CONFIG.getWetDuration() * 20 &&
-				(CONFIG.getWaterSplashLevel() == 2 ||
-						(CONFIG.getWaterSplashLevel() == 1 && ((LivingEntity) (Object) this) instanceof Player))) {
+		if (fpp$wetTimer <= CONFIG.getWetDuration() * 20 && fpp$isEnable(CONFIG.getWaterSplashLevel())) {
 			float range = Util.getEntityScale((LivingEntity) (Object) this);
 			int i = (int)((this.isSprinting() ? 18 : 10) * Math.max((0.7f - (float) fpp$wetTimer / (CONFIG.getWetDuration() * 20)), 0));
 			int v = this.isSprinting() ? 3 : 6;
@@ -278,12 +271,12 @@ public abstract class LivingEntityMixin extends Entity {
 	private boolean fpp$isPrintCanGen(BlockPos pos) {
 		BlockState block = this.level().getBlockState(pos);
 		String blockId = VersionUtil.getBlockName(block);
-		boolean canGen = Client.APPLY_BLOCKS.contains(blockId);
+		boolean canGen = CONFIG.getApplyBlockSet().contains(blockId);
 		if (!canGen) {
 			//~ if 1.16.5 'TagKey<Block>' -> 'ResourceLocation'
 			for (TagKey<Block> tag : VersionUtil.getBlockTags(block)) {
 				//~ if 1.16.5 '.location' -> '.getPath'
-				canGen = Client.APPLY_BLOCKS.contains("#" + tag.location());
+				canGen = CONFIG.getApplyBlockSet().contains("#" + tag.location());
 				if (canGen)
 					break;
 			}
@@ -294,12 +287,12 @@ public abstract class LivingEntityMixin extends Entity {
 				float hardnessGate = CONFIG.getHardnessGate();
 				canGen = hardnessGate > 0 && hardness >= 0 && Mth.abs(hardness) < hardnessGate;
 				if (canGen) {
-					canGen = !Client.EXCLUDED_BLOCKS.contains(blockId);
+					canGen = !CONFIG.getExcludedBlockSet().contains(blockId);
 					if (canGen) {
 						//~ if 1.16.5 'TagKey<Block>' -> 'ResourceLocation'
 						for (TagKey<Block> tag : VersionUtil.getBlockTags(block)) {
 							//~ if 1.16.5 '.location' -> '.getPath'
-							canGen = !Client.EXCLUDED_BLOCKS.contains("#" + tag.location());
+							canGen = !CONFIG.getExcludedBlockSet().contains("#" + tag.location());
 							if (!canGen)
 								break;
 						}
@@ -309,6 +302,11 @@ public abstract class LivingEntityMixin extends Entity {
 		}
 		return canGen;
 	}
+
+	@Unique
+	private boolean fpp$isEnable(WorkMode workMode) {
+		//~ if 1.16.5 'this.isAlwaysTicking()' -> '(((LivingEntity) (Object) this) instanceof Player)'
+		return workMode == WorkMode.ALL || (workMode == WorkMode.PLAYER_ONLY && this.isAlwaysTicking());
+	}
 }
-//~ }
 //~ }

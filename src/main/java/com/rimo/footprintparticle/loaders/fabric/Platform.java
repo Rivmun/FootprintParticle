@@ -19,6 +19,7 @@ import net.minecraft.core.Registry;
 //? if > 1.19.2
 import net.minecraft.core.registries.BuiltInRegistries;
 
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -33,16 +34,18 @@ import java.util.List;
 public class Platform implements ClientModInitializer {
 	static {
 		PlatformUtil.PLATFORM = new PlatformUtil.IPlatform() {
-			@Override
 			public List<TextureAtlasSprite> getSprites(SpriteSet spriteSet) {
 				// Fabric-api 的 SpriteSet 实现同时是 FabricSpriteSet，直接强转拿全部 sprite。
 				//~ if < 26.1 'FabricSpriteSet' -> 'FabricSpriteProvider'
 				return ((FabricSpriteSet) spriteSet).getSprites();
 			}
 
-			@Override
 			public boolean isModLoaded(String id) {
 				return FabricLoader.getInstance().isModLoaded(id);
+			}
+
+			public Path getConfigFolder() {
+				return FabricLoader.getInstance().getConfigDir();
 			}
 		};
 	}

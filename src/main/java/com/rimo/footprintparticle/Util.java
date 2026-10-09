@@ -15,7 +15,7 @@ public class Util {
 	public static float getEntityScale(LivingEntity entity) {
 		float scale = 1f;
 
-		Float configured = Client.SIZE_PER_MOB.get(EntityType.getKey(entity.getType()).toString());
+		Float configured = Client.CONFIG.getSizePerMobMap().get(EntityType.getKey(entity.getType()).toString());
 		if (configured != null)
 			scale *= configured;
 
@@ -46,7 +46,7 @@ public class Util {
 	}
 
 	public static List<TextureAtlasSprite> getCustomSprites(LivingEntity entity, SpriteSet spriteProvider, String def) {
-		String[] spriteNames = Client.CUSTOM_PRINT.getOrDefault(
+		String[] spriteNames = Client.CONFIG.getCustomPrintMap().getOrDefault(
 				EntityType.getKey(entity.getType()).toString(), new String[]{def});
 		List<String> finalSpriteNames = Arrays.asList(spriteNames);
 		List<TextureAtlasSprite> sprites = PlatformUtil.PLATFORM.getSprites(spriteProvider);

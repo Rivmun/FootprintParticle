@@ -21,7 +21,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.levelgen.Heightmap;
 //? if > 1.19.2 {
 import org.joml.Quaternionf;

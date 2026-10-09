@@ -3,15 +3,13 @@
 
 import com.rimo.footprintparticle.Client;
 import com.rimo.footprintparticle.PlatformUtil;
-import com.rimo.footprintparticle.Util;
-import com.rimo.footprintparticle.config.Config;
+import com.rimo.footprintparticle.VersionUtil;
+import com.rimo.footprintparticle.config.ConfigScreen;
 import com.rimo.footprintparticle.mixin.ParticleSpriteSetAccessor;
 import com.rimo.footprintparticle.particle.FootprintParticle;
 import com.rimo.footprintparticle.particle.SnowDustParticle;
 import com.rimo.footprintparticle.particle.WaterSplashParticle;
 import com.rimo.footprintparticle.particle.WatermarkParticle;
-//~ if < 1.21.11 '.AutoConfigClient' -> '.AutoConfig'
-import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.registries.Registries;
@@ -21,10 +19,12 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
+import java.nio.file.Path;
 import java.util.List;
 
 // NeoForge 侧入口。 META-INF/neoforge.mods.toml 声明 modId，本类靠 @Mod 被 FML 实例化。
@@ -43,14 +43,16 @@ import java.util.List;
 public class Platform {
 	static {
 		PlatformUtil.PLATFORM = new PlatformUtil.IPlatform() {
-			@Override
 			public List<TextureAtlasSprite> getSprites(SpriteSet spriteSet) {
 				return ((ParticleSpriteSetAccessor) spriteSet).fpp$getSprites();
 			}
 
-			@Override
 			public boolean isModLoaded(String id) {
 				return ModList.get().isLoaded(id);
+			}
+
+			public Path getConfigFolder() {
+				return FMLPaths.CONFIGDIR.get();
 			}
 		};
 	}
@@ -66,10 +68,10 @@ public class Platform {
 		public static void onRegister(RegisterEvent event) {
 			// 粒子类型注册：仅客户端，服务端不需要 PARTICLE_TYPE registry 条目。
 			if (event.getRegistryKey().equals(Registries.PARTICLE_TYPE)) {
-				event.register(Registries.PARTICLE_TYPE, Util.getId("footprint"), () -> Client.FOOTPRINT);
-				event.register(Registries.PARTICLE_TYPE, Util.getId("watermark"), () -> Client.WATERMARK);
-				event.register(Registries.PARTICLE_TYPE, Util.getId("snowdust"), () -> Client.SNOWDUST);
-				event.register(Registries.PARTICLE_TYPE, Util.getId("watersplash"), () -> Client.WATERSPLASH);
+				event.register(Registries.PARTICLE_TYPE, VersionUtil.getId("footprint"), () -> Client.FOOTPRINT);
+				event.register(Registries.PARTICLE_TYPE, VersionUtil.getId("watermark"), () -> Client.WATERMARK);
+				event.register(Registries.PARTICLE_TYPE, VersionUtil.getId("snowdust"), () -> Client.SNOWDUST);
+				event.register(Registries.PARTICLE_TYPE, VersionUtil.getId("watersplash"), () -> Client.WATERSPLASH);
 			}
 		}
 
@@ -84,12 +86,11 @@ public class Platform {
 		@SubscribeEvent
 		public static void onClientSetup(FMLClientSetupEvent event) {
 			Client.init();
-			// 注册配置屏扩展点：NeoForge 内建模组列表只有在注册后才显示「Config」按钮，
-			// 相当于 Fabric 侧 ModMenuIntegration 的替代。AutoConfigClient 由 cloth-config-neoforge 提供。
-			ModList.get().getModContainerById(Client.MOD_ID).ifPresent(container ->
-					container.registerExtensionPoint(IConfigScreenFactory.class, (modContainer, parent) ->
-							//~ if < 1.21.11 'AutoConfigClient' -> 'AutoConfig'
-							AutoConfig.getConfigScreen(Config.class, parent).get()));
+			if (ModList.get().isLoaded("cloth_config")) {
+				ModList.get().getModContainerById(Client.MOD_ID).ifPresent(container ->
+						container.registerExtensionPoint(IConfigScreenFactory.class, (modContainer, parent) ->
+								new ConfigScreen().build(parent)));
+			}
 		}
 	}
 }

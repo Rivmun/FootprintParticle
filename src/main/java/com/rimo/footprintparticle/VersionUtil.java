@@ -12,8 +12,14 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.Collection;
+//? if 1.16.5 {
+/*import java.util.Collection;
 import java.util.Collections;
+*///? } else {
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.Block;
+import java.util.List;
+//? }
 
 /**
  * Full of Stonecutter language here as you like...
@@ -37,7 +43,7 @@ public final class VersionUtil {
 	//~ if < 1.21.1 '.withDefaultNamespace' -> '.tryParse'
 	//~ if < 1.19.3 'Registries.BLOCK' -> 'Registry.BLOCK_REGISTRY'
 	//? if > 1.18.2
-	private final ResourceKey<Block> fpp$AIR = ResourceKey.create(Registries.BLOCK, Identifier.withDefaultNamespace("air"));
+	private static final ResourceKey<Block> fpp$AIR = ResourceKey.create(Registries.BLOCK, Identifier.withDefaultNamespace("air"));
 
 	public static String getBlockName(BlockState block) {
 		//? if < 1.19.2 {

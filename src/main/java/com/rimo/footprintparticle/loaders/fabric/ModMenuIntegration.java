@@ -1,11 +1,9 @@
 //? if fabric {
 package com.rimo.footprintparticle.loaders.fabric;
 
-import com.rimo.footprintparticle.config.Config;
+import com.rimo.footprintparticle.config.ConfigScreen;
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
-//~ if < 1.21.11 '.AutoConfigClient' -> '.AutoConfig'
-import me.shedaniel.autoconfig.AutoConfigClient;
 
 /**
  * Fabric ModMenu 配置入口（{@code fabric.mod.json} 的 {@code modmenu} entrypoint）。
@@ -14,8 +12,7 @@ import me.shedaniel.autoconfig.AutoConfigClient;
 public class ModMenuIntegration implements ModMenuApi {
 	@Override
 	public ConfigScreenFactory<?> getModConfigScreenFactory() {
-		//~ if < 1.21.11 'AutoConfigClient' -> 'AutoConfig'
-		return parent -> AutoConfigClient.getConfigScreen(Config.class, parent).get();
+		return parent -> new ConfigScreen().build(parent);
 	}
 }
 //? }
