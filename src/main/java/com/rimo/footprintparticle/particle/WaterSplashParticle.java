@@ -11,8 +11,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 //? }
 import org.jspecify.annotations.NonNull;
-//? if < 1.21.1
-//import org.jspecify.annotations.Nullable;
 
 public class WaterSplashParticle extends WaterDropParticle {
 
@@ -37,7 +35,7 @@ public class WaterSplashParticle extends WaterDropParticle {
 
 		@Override
 		//? if < 1.21.11 {
-		/*public @Nullable Particle createParticle(@NonNull SimpleParticleType defaultParticleType, @NonNull ClientLevel clientWorld, double d, double e, double f, double g, double h, double i) {
+		/*public Particle createParticle(@NonNull SimpleParticleType defaultParticleType, @NonNull ClientLevel clientWorld, double d, double e, double f, double g, double h, double i) {
 			WaterSplashParticle waterSplashParticle = new WaterSplashParticle(clientWorld, d, e, f, g, h, i);
 			waterSplashParticle.pickSprite(this.spriteProvider);
 			return waterSplashParticle;

@@ -13,6 +13,8 @@ import com.rimo.footprintparticle.PlatformUtil;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -239,6 +241,7 @@ public class Config {
 				if (loaded != null) {
 					config = loaded;
 				}
+				config.fillDefaults();
 			} catch (IOException | JsonParseException e) {
 				Client.LOGGER.error("Failed to read config file: {}, using current/default config", CONFIG_PATH, e);
 			}
@@ -377,5 +380,25 @@ public class Config {
 			obj.add(k, arr);
 		}
 		root.add(key, obj);
+	}
+
+	/**
+	 * Gson 读到当前版本识别不了的值（旧版把枚举写成 ordinal 数字）或 {@code null} 时不会报错，
+	 * 而是静默地把引用字段置为 {@code null}；这里把 {@code null} 字段当作“该字段没读到”，
+	 * 从默认实例取回，保证 getter 永不返回 null——Cloth 的 EnumSelector 对 null 当前值零容忍。
+	 * 下次 {@link #save()} 会把修正后的值写回磁盘，完成平滑升级。
+	 *
+	 * <p>基本类型不用处理：磁盘上缺键或写成 {@code null} 时 Gson 会跳过赋值，字段初始值（当前版本默认）原样保留。</p>
+	 */
+	private void fillDefaults() {
+		Config defaults = new Config();
+		for (Field field : Config.class.getDeclaredFields()) {
+			if (Modifier.isStatic(field.getModifiers())) continue;
+			try {
+				if (field.get(this) == null) field.set(this, field.get(defaults));
+			} catch (ReflectiveOperationException e) {
+				Client.LOGGER.error("Failed to restore default for config field {}", field.getName(), e);
+			}
+		}
 	}
 }

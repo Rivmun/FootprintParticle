@@ -1,9 +1,9 @@
 package com.rimo.footprintparticle.config;
 
 public enum WorkMode {
-	DISABLED("text.footprintparticle.disabled"),
-	PLAYER_ONLY("text.footprintparticle.player_only"),
-	ALL("text.footprintparticle.all");
+	DISABLED("disabled"),
+	PLAYER_ONLY("player_only"),
+	ALL("all");
 
 	private final String key;
 

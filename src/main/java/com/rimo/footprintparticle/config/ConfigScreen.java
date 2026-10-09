@@ -55,7 +55,7 @@ public class ConfigScreen {
 					if (value == 0) {
 						return t("disabled");
 					} else {
-						return t("seconds", value);
+						return t("second", value);
 					}
 				})
 				.setTooltip(t("option.wetDuration.@Tooltip"))
@@ -72,7 +72,7 @@ public class ConfigScreen {
 					if (value == 0) {
 						return p("¿");
 					} else {
-						return t("seconds", value / 10);
+						return t("second", value / 10F);
 					}
 				})
 				.setSaveConsumer(CONFIG::setSecPerPrint)
@@ -129,7 +129,7 @@ public class ConfigScreen {
 						,-8
 						,8)
 				.setDefaultValue(Config.DEF_PRINT_HEIGHT)
-				.setTextGetter(value -> t("blocks", value * 0.0625f))
+				.setTextGetter(value -> t("block", value * 0.0625f))
 				.setTooltip(t("option.printHeight.@Tooltip"))
 				.setSaveConsumer(CONFIG::setPrintHeight)
 				.build()
@@ -233,7 +233,7 @@ public class ConfigScreen {
 
 	private void buildMiscCategory(ConfigCategory misc) {
 		misc.addEntry(entryBuilder
-				.startIntSlider(t("option.railSpark")
+				.startIntSlider(t("option.railFlameRange")
 						,(int) (CONFIG.getRailFlameRange() * 10)
 						,0
 						,10)
@@ -249,14 +249,14 @@ public class ConfigScreen {
 				.build()
 		);
 		misc.addEntry(entryBuilder
-				.startBooleanToggle(t("option.boatTrail")
+				.startBooleanToggle(t("option.enableBoatTrail")
 						, CONFIG.isEnableBoatTrail())
 				.setDefaultValue(Config.DEF_ENABLE_BOAT_TRAIL)
 				.setSaveConsumer(CONFIG::setEnableBoatTrail)
 				.build()
 		);
 		misc.addEntry(entryBuilder
-				.startEnumSelector(t("option.swimPop")
+				.startEnumSelector(t("option.swimPopLevel")
 						, WorkMode.class
 						, CONFIG.getSwimPopLevel())
 				.setDefaultValue(Config.DEF_SWIM_POP_LEVEL)
@@ -265,7 +265,7 @@ public class ConfigScreen {
 				.build()
 		);
 		misc.addEntry(entryBuilder
-				.startEnumSelector(t("option.snowDust")
+				.startEnumSelector(t("option.snowDustLevel")
 						, WorkMode.class
 						, CONFIG.getSnowDustLevel())
 				.setDefaultValue(Config.DEF_SNOW_DUST_LEVEL)
@@ -274,7 +274,7 @@ public class ConfigScreen {
 				.build()
 		);
 		misc.addEntry(entryBuilder
-				.startEnumSelector(t("option.waterSplash")
+				.startEnumSelector(t("option.waterSplashLevel")
 						, WorkMode.class
 						, CONFIG.getWaterSplashLevel())
 				.setDefaultValue(Config.DEF_WATER_SPLASH_LEVEL)
