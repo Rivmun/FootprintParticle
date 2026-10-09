@@ -64,15 +64,15 @@ public class ConfigScreen {
 		);
 		general.addEntry(entryBuilder
 				.startIntSlider(t("option.secPerPrint")
-						,(int) (CONFIG.getSecPerPrint())
+						,(int) (CONFIG.getSecPerPrint() * 10)
 						,0
-						,10)
+						,20)
 				.setDefaultValue(Config.DEF_SEC_PER_PRINT)
 				.setTextGetter(value -> {
 					if (value == 0) {
 						return p("¿");
 					} else {
-						return t("seconds", value);
+						return t("seconds", value / 10);
 					}
 				})
 				.setSaveConsumer(CONFIG::setSecPerPrint)
@@ -125,7 +125,7 @@ public class ConfigScreen {
 		);
 		general.addEntry(entryBuilder
 				.startIntSlider(t("option.printHeight")
-						,(int) (CONFIG.getPrintHeight() * 0.0625F)
+						,(int) (CONFIG.getPrintHeight() / 0.0625F)
 						,-8
 						,8)
 				.setDefaultValue(Config.DEF_PRINT_HEIGHT)
