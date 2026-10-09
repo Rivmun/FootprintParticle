@@ -24,6 +24,7 @@ tasks.named<ProcessResources>("processResources") {
         this["mod_icon"] =      prop("mod.icon")
 
         this["version_range"] = prop("version_range")
+        this["fabric_api_id"] = "fabric-api"
 
         // insert version-specific mixins
 

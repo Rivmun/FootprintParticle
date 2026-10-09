@@ -1,3 +1,6 @@
+# 0.6.1
+- Hotfix boot refusal on 1.16.5-fabric due to ModId of 'fabric-api' is 'fabric' in that version.
+
 # 0.6.0
 ### Breaking Update
 NOTICE: Although we have ensured compatibility, we **still recommend backing up your config file** before upgrading.

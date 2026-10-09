@@ -30,7 +30,7 @@
     "${mod_id}.mixins.json"
   ],
   "depends": {
-    "fabric-api": "*",
+    "${fabric_api_id}": "*",
     "minecraft": "${version_range}"
   },
   "suggests": {

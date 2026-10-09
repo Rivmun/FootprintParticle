@@ -28,6 +28,7 @@ tasks.named<ProcessResources>("processResources") {
         this["mod_icon"] =      prop("mod.icon")
 
         this["version_range"] = prop("version_range")
+        this["fabric_api_id"] = if (sc.current.parsed > "1.16.5") "fabric-api" else "fabric"
 
         // insert version-specific mixins
 
