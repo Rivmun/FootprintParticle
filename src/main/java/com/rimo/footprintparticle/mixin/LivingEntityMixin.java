@@ -164,14 +164,14 @@ public abstract class LivingEntityMixin extends Entity {
 		if (!feetShape.isEmpty()) {
 			// 脚格有碰撞箱：直接贴脚格顶面。
 			pos = feetPos;
-			py = feetY + feetShape.max(Direction.Axis.Y) + 0.01f + CONFIG.getPrintHeight();
+			py = feetY + feetShape.max(Direction.Axis.Y) + 0.01f;
 			canGen = fpp$isPrintCanGen(pos);
 		} else if (!feetState.isAir() && feetState.canOcclude()) {
 			// 脚格无碰撞箱但非空气、且脚踩在其顶面(feetFrac≥～0.05)＝实心却碰撞极薄的扁平方块(雪层等)：脚正压在它顶面。
 			// 以精确脚Y作面(=feetY+feetFrac，已含雪实际厚度，勿再叠加配置雪偏移否则双重抬高)，并把 pos 归到该方块，
 			// 使 isPrintCanGen / 高度修正 / 雪尘都按雪层而非下方泥土触发。feetFrac<0.05 不进来：草/花/树苗等贴地装饰脚 Y 为整数(踩在下方块顶)，落到 else 分支归属下方支撑方块。
 			pos = feetPos;
-			py = feetY + 0.01f + CONFIG.getPrintHeight();
+			py = feetY + 0.01f;
 			canGen = fpp$isPrintCanGen(pos);
 		} else {
 			// 脚格是空气，才用脚下一格作支撑：走路须贴地整数Y(feetFrac≈0，防止走到非完整方块边缘时脚悬空在旁边空气、误判到下方一格而隔空)，且须完整不透明方块；
@@ -181,7 +181,7 @@ public abstract class LivingEntityMixin extends Entity {
 			BlockState belowState = this.level().getBlockState(pos);
 			VoxelShape belowShape = belowState.getCollisionShape(this.level(), pos);
 			double feetFrac = py - feetY;   // 脚在其格内的离地高度：走路贴地时应≈0（Y 为整数），非零说明脚悬空在非完整方块的高度上。
-			py = feetY - 1 + (belowShape.isEmpty() ? 0.0 : belowShape.max(Direction.Axis.Y)) + 0.01f + CONFIG.getPrintHeight();
+			py = feetY - 1 + (belowShape.isEmpty() ? 0.0 : belowShape.max(Direction.Axis.Y)) + 0.01f;
 			canGen = !belowShape.isEmpty() && fpp$isPrintCanGen(pos)
 					&& (landedOrJump
 							? (belowShape.max(Direction.Axis.X) - belowShape.min(Direction.Axis.X) > 0.999

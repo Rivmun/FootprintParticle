@@ -43,6 +43,8 @@ public class FootprintParticle extends SingleQuadParticle {
 		//~ if < 1.21.11 'vz, spriteProvider.get(RandomSource.create())' -> 'vz'
 		super(clientWorld, x, y, z, vx, vy, vz, spriteProvider.get(RandomSource.create()));
 		pos = new BlockPos(Mth.floor(this.x), Mth.floor(this.y - 0.02f), Mth.floor(this.z));
+		this.y += Client.CONFIG.getPrintHeight();  // only apply to render.
+		this.yo = this.y;
 
 		this.xd = this.yd = this.zd = 0;
 		this.setAlpha(Client.CONFIG.getFootprintAlpha());
@@ -88,7 +90,7 @@ public class FootprintParticle extends SingleQuadParticle {
 		this.yo = this.y;
 
 		//~ if < 1.21.11 ', pos' -> ', pos.getX(), pos.getZ()'
-		if (this.level.isRaining() && this.level.getHeight(Heightmap.Types.MOTION_BLOCKING, pos) <= this.y)
+		if (this.level.isRaining() && this.level.getHeight(Heightmap.Types.MOTION_BLOCKING, pos) <= this.y - (double) Client.CONFIG.getPrintHeight())
 			if (this.age + Client.CONFIG.getLifeTimeAcc() < this.lifetime)
 				this.age += Client.CONFIG.getLifeTimeAcc();
 
