@@ -167,7 +167,8 @@ public abstract class LivingEntityMixin extends Entity {
 		if (!feetShape.isEmpty()) {
 			// 脚格有碰撞箱：直接贴脚格顶面。
 			pos = feetPos;
-			py = feetY + feetShape.max(Direction.Axis.Y) + 0.01f;
+			double tempY = feetY + feetShape.max(Direction.Axis.Y);
+			py = tempY > py ? py + 0.01F : tempY + 0.01F;  // never higher than feet.
 			canGen = fpp$isPrintCanGen(pos);
 		} else if (!feetState.isAir() && feetState.canOcclude()) {
 			// 脚格无碰撞箱但非空气、且脚踩在其顶面(feetFrac≥～0.05)＝实心却碰撞极薄的扁平方块(雪层等)：脚正压在它顶面。
