@@ -22,16 +22,28 @@ public abstract class AbstractMinecartEntityMixin extends Entity {
 
 	public AbstractMinecartEntityMixin(EntityType<?> type, Level world) {
 		super(type, world);
+		fpp$ox = this.getX();
+		fpp$oz = this.getZ();
 	}
 
 	@Unique
 	private int fpp$timer = 0;
+	@Unique	private double fpp$ox;
+	@Unique	private double fpp$oz;
 
 	//TODO: inject at TAIL will do nothing, why?
 	@Inject(method = "tick", at = @At("HEAD"))
 	public void fpp$tick(CallbackInfo ci) {
-		//~ if 1.16.5 'this.getDeltaMovement().horizontalDistance() != 0' -> '(this.getDeltaMovement().x != 0 || this.getDeltaMovement().z != 0)'
-		if (fpp$timer-- <= 0 && this.getDeltaMovement().horizontalDistance() != 0) {
+		// calc deltaMovement by ourselves because .getDeltaMovement() always 0 if entity ridden by remote player.
+		double x = this.getX();
+		double z = this.getZ();
+		double dx = x - fpp$ox;
+		double dz = z - fpp$oz;
+		double d = Math.sqrt(dx * dx + dz * dz);
+		fpp$ox = x;
+		fpp$oz = z;
+
+		if (fpp$timer-- <= 0 && d > 1.0E-4) {
 			if (this.level().getBlockState(this.blockPosition()).is(BlockTags.RAILS) && Math.random() <= Client.CONFIG.getRailFlameRange()) {
 				int i = Math.random() > 0.5f ? 1 : -1;
 				this.level().addParticle(
@@ -40,9 +52,9 @@ public abstract class AbstractMinecartEntityMixin extends Entity {
 						this.getX() + i * 0.4f * Mth.cos((float) Math.toRadians(this.getRotationVector().y + 90)),
 						this.getY() + 0.0625f,
 						this.getZ() + i * 0.4f * Mth.sin((float) Math.toRadians(this.getRotationVector().y + 90)),
-						this.getDeltaMovement().x() / 3f * Math.random(),
+						dx / 3f * Math.random(),
 						Math.random() / 3,
-						this.getDeltaMovement().z() / 3f * Math.random()
+						dz / 3f * Math.random()
 				);
 			}
 			fpp$timer = this.level().getBlockState(this.blockPosition()).is(Blocks.POWERED_RAIL)?

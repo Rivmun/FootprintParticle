@@ -10,6 +10,7 @@ import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -21,16 +22,28 @@ public abstract class AbstractBoatEntityMixin extends Entity {
 
 	public AbstractBoatEntityMixin(EntityType<?> type, Level world) {
 		super(type, world);
+		fpp$ox = this.getX();
+		fpp$oz = this.getZ();
 	}
 
 	@Shadow
 	protected abstract boolean checkInWater();
+	@Unique	private double fpp$ox;
+	@Unique	private double fpp$oz;
 
 	@Inject(method = "tick", at = @At("TAIL"))
 	public void fpp$tick(CallbackInfo ci) {
+		// calc deltaMovement by ourselves because .getDeltaMovement() always 0 if entity ridden by remote player.
+		double x = this.getX();
+		double z = this.getZ();
+		double dx = x - fpp$ox;
+		double dz = z - fpp$oz;
+		double d = Math.sqrt(dx * dx + dz * dz);
+		fpp$ox = x;
+		fpp$oz = z;
+
 		if (Client.CONFIG.isEnableBoatTrail()) {
-			//~ if 1.16.5 '.horizontalDistance' -> '.length'
-			int k = (int)(this.getDeltaMovement().horizontalDistance() * 10);
+			int k = (int)(d * 10);
 			while (Math.random() < k-- / 5f) {
 				int i = Math.random() > 0.5f ? 1 : -1;		//TODO: boat's yaw is 90 degrees more than other entity, strange.
 				if (this.checkInWater()) {
@@ -50,8 +63,7 @@ public abstract class AbstractBoatEntityMixin extends Entity {
 								(int) this.getY() + 1f,
 								this.getZ() + i * Mth.sin((float) Math.toRadians(this.getRotationVector().y - 10 + Math.random() * 20)),
 								(Math.random() - 0.5f) / 4f,
-								//~ if 1.16.5 '.horizontalDistance' -> '.length'
-								Math.random() * this.getDeltaMovement().horizontalDistance() / 2f,
+								Math.random() * d / 2f,
 								(Math.random() - 0.5f) / 4f
 						);
 					}
@@ -60,9 +72,9 @@ public abstract class AbstractBoatEntityMixin extends Entity {
 							this.getX() - 1.2f * Mth.cos((float) Math.toRadians(this.getRotationVector().y + 90 + Math.random() * 30 * i)),
 							(int) this.getY() + 0.5f + Math.random() / 2f,
 							this.getZ() - 1.2f * Mth.sin((float) Math.toRadians(this.getRotationVector().y + 90 + Math.random() * 30 * i)),
-							this.getDeltaMovement().x() / 5f,
+							dx / 5f,
 							Math.random() / 3f,
-							this.getDeltaMovement().z() / 5f
+							dz / 5f
 					);
 				} else {
 					if (Math.random() > 0.5f) {
@@ -81,9 +93,9 @@ public abstract class AbstractBoatEntityMixin extends Entity {
 								this.getX() - 1.2f * Mth.cos((float) Math.toRadians(this.getRotationVector().y + 90 + Math.random() * 30 * i)),
 								this.getY(),
 								this.getZ() - 1.2f * Mth.sin((float) Math.toRadians(this.getRotationVector().y + 90 + Math.random() * 30 * i)),
-								this.getDeltaMovement().x() / 5f,
+								dx / 5f,
 								Math.random() / 5f,
-								this.getDeltaMovement().z() / 5f
+								dz / 5f
 						);
 					}
 				}

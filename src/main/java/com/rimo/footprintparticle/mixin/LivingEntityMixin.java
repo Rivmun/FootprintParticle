@@ -38,6 +38,9 @@ import static com.rimo.footprintparticle.Client.CONFIG;
 public abstract class LivingEntityMixin extends Entity {
 	public LivingEntityMixin(EntityType<?> type, Level world) {
 		super(type, world);
+		fpp$lastX = this.getX();
+		fpp$lastY = this.getY();
+		fpp$lastZ = this.getZ();
 	}
 
 	@Unique private int fpp$timer = 0;
