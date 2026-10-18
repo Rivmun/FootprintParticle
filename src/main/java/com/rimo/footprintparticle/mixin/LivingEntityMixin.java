@@ -4,9 +4,6 @@ import com.rimo.footprintparticle.Client;
 import com.rimo.footprintparticle.Util;
 import com.rimo.footprintparticle.VersionUtil;
 import com.rimo.footprintparticle.config.WorkMode;
-import com.rimo.footprintparticle.particle.FootprintParticleType;
-import com.rimo.footprintparticle.particle.SnowDustParticleType;
-import com.rimo.footprintparticle.particle.WatermarkParticleType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -15,7 +12,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -27,9 +23,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //? if 1.16.5 {
 /*import net.minecraft.world.entity.player.Player;
 import net.minecraft.resources.ResourceLocation;
-*///? } else {
-import net.minecraft.tags.TagKey;
-//? }
+*///? }
+
+import java.util.Objects;
+import java.util.Set;
 
 import static com.rimo.footprintparticle.Client.CONFIG;
 
@@ -111,14 +108,14 @@ public abstract class LivingEntityMixin extends Entity {
 		if (interval != null)
 			fpp$timer *= interval;
 
-		// Fix pos...
+		// Fix pos. 2 steps:
 		double px = this.getX();
 		double py = this.getY();
 		double pz = this.getZ();
 		float scale = Util.getEntityScale((LivingEntity) (Object) this);
 
-		// Horizontal Offset
-		// Front and back
+		// 1.Horizontal Offset
+		// 1.1 Front and back
 		int side = Math.random() > 0.5f ? 1 : -1;
 		double hOffset = 0.0625f;  // default f/b offset for all entity to decrease repetition.
 		java.util.Map<String, Float> horseMap = CONFIG.getHorseLikeMobsMap();
@@ -130,15 +127,15 @@ public abstract class LivingEntityMixin extends Entity {
 					this.getControllingPassenger().isAlwaysTicking() ?
 							fpp$timer * 0.5f :
 							fpp$timer * 1.33f :
-						fpp$timer * 1.33f
+					fpp$timer * 1.33f
 			);
 		}
 		hOffset *= scale;
 		px -= hOffset * side * Mth.sin((float) Math.toRadians(this.getRotationVector().y));
 		pz += hOffset * side * Mth.cos((float) Math.toRadians(this.getRotationVector().y));
-		// Left and right
+		// 1.2 Left and right
 		side = Math.random() > 0.5f ? 1 : -1;
-		hOffset = 0.125f;  // default l/r offset for all entity to decrease repetition.
+		hOffset = 0.125f;  // default l/r offset for all entity to decrease repetition. (matching vanilla player)
 		java.util.Map<String, Float> spiderMap = CONFIG.getSpiderLikeMobsMap();
 		if (spiderMap.containsKey(id)) {
 			Float lateral = spiderMap.get(id);
@@ -148,70 +145,50 @@ public abstract class LivingEntityMixin extends Entity {
 		px -= hOffset * side * Mth.sin((float) Math.toRadians(this.getRotationVector().y + 90));
 		pz += hOffset * side * Mth.cos((float) Math.toRadians(this.getRotationVector().y + 90));
 
-		// Vertical Offset
+		// 2.Vertical Offset
 		int colX = Mth.floor(px), colZ = Mth.floor(pz), feetY = Mth.floor(py);
-		BlockPos pos;
-		boolean canGen;
-		BlockPos feetPos = new BlockPos(colX, feetY, colZ);
-		BlockState feetState = this.level().getBlockState(feetPos);
-		VoxelShape feetShape = feetState.getCollisionShape(this.level(), feetPos);
-		if (!feetShape.isEmpty()) {  // if feet block has collision shape...
-			pos = feetPos;
-			double tempY = feetY + feetShape.max(Direction.Axis.Y);
-			py = tempY > py ? py + 0.01F : tempY + 0.01F;  // never higher than feet.
-			canGen = fpp$isPrintCanGen(pos);
-		} else if (!feetState.isAir() && feetState.canOcclude()) {  // if no colShape, no air, but occlusion...(i mean, snowLayer)
-			pos = feetPos;
-			py = feetY + 0.01f;
-			canGen = fpp$isPrintCanGen(pos);
-		} else {  // no colShape, air or cant occlude... should be fragile, misc blocks...
-			pos = new BlockPos(colX, feetY - 1, colZ);  // move detector to below feet
-			BlockState belowState = this.level().getBlockState(pos);
-			VoxelShape belowShape = belowState.getCollisionShape(this.level(), pos);
-			canGen = !belowShape.isEmpty() && fpp$isPrintCanGen(pos);
-			if (canGen) {
-				if (landedOrJump) {
-					canGen = belowShape.max(Direction.Axis.X) - belowShape.min(Direction.Axis.X) > 0.999
-							&& belowShape.max(Direction.Axis.Z) - belowShape.min(Direction.Axis.Z) > 0.999
-							&& !(Block.isShapeFullBlock(belowShape) && !belowState.canOcclude());
-				} else {
-					canGen = py - feetY < 0.05 && belowState.canOcclude() && Block.isShapeFullBlock(belowShape);
-				}
-			}
-			py = feetY - 1 + (belowShape.isEmpty() ? 0.0 : belowShape.max(Direction.Axis.Y)) + 0.01f;
-		}
-
-		if (canGen) {
-			// Fix height by blocks if in...
-			BlockState block = this.level().getBlockState(pos);
-			String blockId = VersionUtil.getBlockName(block);
-			Float height = CONFIG.getBlockHeightMap().get(blockId);
-			if (height != null) {
-				py += height;
+		boolean canGen = false;
+		BlockState blockState = null;
+		for (int i = 0; i < 2; i++) {  // 2 loop, first is feetBlock, second is belowBlock.
+			BlockPos pos = new BlockPos(colX, feetY - i, colZ);
+			blockState = this.level().getBlockState(pos);
+			VoxelShape blockShape = blockState.getCollisionShape(this.level(), pos);
+			boolean isInBlackList = fpp$isInSet(blockState, CONFIG.getExcludedBlockSet());
+			double tempY = Double.NEGATIVE_INFINITY;
+			if (fpp$isInSet(blockState, CONFIG.getApplyBlockSet())) {  // Highest priority.
+				tempY = blockShape.isEmpty() ?
+						feetY - i :
+						Math.min(pos.getY() + blockShape.max(Direction.Axis.Y), py);  // strict print pos never higher than feet.
 			} else {
-				//~ if 1.16.5 'TagKey<Block>' -> 'ResourceLocation'
-				for (TagKey<Block> tag : VersionUtil.getBlockTags(block)) {
-					//~ if 1.16.5 '.location' -> '.getPath'
-					Float tagHeight = CONFIG.getBlockHeightMap().get("#" + tag.location());
-					if (tagHeight != null)
-						py += tagHeight;
-				}
+				boolean isFullInHorizontal = blockShape.max(Direction.Axis.X) - blockShape.min(Direction.Axis.X) > 0.999
+						&& blockShape.max(Direction.Axis.Z) - blockShape.min(Direction.Axis.Z) > 0.999;
+				if (fpp$isFragile(blockState) && ! isInBlackList) {  // no in whiteList but passed...
+					if (isFullInHorizontal   // if block's horizontal direction is full (considering has a shape)...
+							&& (i == 0 || blockState.canOcclude())) {  // belowBlock must occlude...
+						tempY = Math.min(pos.getY() + blockShape.max(Direction.Axis.Y), py);  // strict print pos never higher than feet.
+					} else if (! blockState.isAir() && blockState.canOcclude()) {  // if no shape (horizontal non-full), isn't air, but occlusion...(1 layer of snowLayer I mean.)
+						tempY = feetY - i;
+					}  // no shape, air or facilitate...
+				} else if (! isInBlackList && ! isFullInHorizontal && i == 0) {  // too hard but non-full...
+					continue;  // check its below...(allow to gen in same pos with horizontal non-full blocks, if its below is passed)
+				} else if (isInBlackList) {  // in blackList...
+					break;  // jump, only try to gen water print & splash.
+				}  // else continue;
 			}
-
-			// Snow Dust
-			if (block.is(Blocks.SNOW) && fpp$isEnable(CONFIG.getSnowDustLevel())) {
-				int i = this.isSprinting() ? 4 : 2;
-				int v = this.isSprinting() ? 3 : 10;
-				while (--i >= 0) {
-					SnowDustParticleType snowdust = Client.SNOWDUST;
-					this.level().addParticle(snowdust.setData(scale), px, py, pz,
-							(Math.random() - 0.5f) / v,
-							0,
-							(Math.random() - 0.5f) / v
-					);
+			if (tempY != Double.NEGATIVE_INFINITY) {
+				if (tempY <= py - (landedOrJump ? 0.25F : 0.125F)) {  // Limited dist from feet to print. walking must closer than jumping.
+					fpp$timer = 0;  // reset timer because nothing generated.
+					return false;  // reject if entity floating in air (at edge of block).
+				} else {
+					py = tempY;
+					canGen = true;
+					break;
 				}
 			}
 		}
+		if (! canGen)
+			py = feetY;  // provide current feet Y to waterPrint if footPrint cannot to gen.
+		py += 0.01F;  // prevent z-fight with terrain.
 
 		// Generate
 		double dx, dz;      // get facing
@@ -223,13 +200,36 @@ public abstract class LivingEntityMixin extends Entity {
 			dx = this.getDeltaMovement().x();
 			dz = this.getDeltaMovement().z();
 		}
-		if (canGen) {       // footprint
-			FootprintParticleType footprint = Client.FOOTPRINT;
-			this.level().addParticle(footprint.setData((LivingEntity) (Object) this), px, py, pz, dx, 0, dz);
-		} else if (fpp$wetTimer <= CONFIG.getWetDuration() * 20) {        // waterprint (gen when footprint not gen)
-			WatermarkParticleType watermark = Client.WATERMARK;
+		if (canGen) {
+			// Fix height by blocks if in...(extra vertical offset)
+			Float height = CONFIG.getBlockHeightMap().get(VersionUtil.getBlockName(blockState));
+			if (height != null) {
+				py += height;
+			} else {
+				py += VersionUtil.getBlockTags(blockState).stream().map(
+						//~ if 1.16.5 'tag.location().' -> 'tag.'
+						tag -> CONFIG.getBlockHeightMap().get("#" + tag.location().toString())
+				).filter(Objects::nonNull).findFirst().orElse(0f);
+			}
+
+			// footprint
+			this.level().addParticle(Client.FOOTPRINT.setData((LivingEntity) (Object) this), px, py, pz, dx, 0, dz);
+			// Snow Dust
+			if (blockState.is(Blocks.SNOW) && fpp$isEnable(CONFIG.getSnowDustLevel())) {
+				int i = this.isSprinting() ? 4 : 2;
+				int v = this.isSprinting() ? 3 : 10;
+				while (--i >= 0) {
+					this.level().addParticle(Client.SNOWDUST.setData(scale), px, py, pz,
+							(Math.random() - 0.5f) / v,
+							0,
+							(Math.random() - 0.5f) / v
+					);
+				}
+			}
+		} else if (fpp$wetTimer <= CONFIG.getWetDuration() * 20) {
+			// waterprint (gen when footprint not gen)
 			int i = Math.random() > 0.5f ? 1 : -1;
-			this.level().addParticle(watermark.setData((LivingEntity) (Object) this), px, py, pz, dx * i, fpp$wetTimer, dz * i);		// push timer to calc alpha
+			this.level().addParticle(Client.WATERMARK.setData((LivingEntity) (Object) this), px, py, pz, dx * i, fpp$wetTimer, dz * i);		// push timer to calc alpha
 		}
 		// water splash (gen whatever print gen)
 		if (fpp$wetTimer <= CONFIG.getWetDuration() * 20 && fpp$isEnable(CONFIG.getWaterSplashLevel())) {
@@ -238,7 +238,7 @@ public abstract class LivingEntityMixin extends Entity {
 			int v = this.isSprinting() ? 3 : 6;
 			while (--i > 0) {
 				this.level().addParticle(
-					Client.WATERSPLASH,
+						Client.WATERSPLASH,
 						px - 0.25f * range + Math.random() / 4,
 						py,
 						pz - 0.25f * range + Math.random() / 4,
@@ -253,42 +253,21 @@ public abstract class LivingEntityMixin extends Entity {
 		return canGen;
 	}
 
+	// Hardness Filter. See on https://minecraft.fandom.com/wiki/Breaking#Blocks_by_hardness
 	@Unique
-	private boolean fpp$isPrintCanGen(BlockPos pos) {
-		BlockState block = this.level().getBlockState(pos);
-		String blockId = VersionUtil.getBlockName(block);
-		// White Block List
-		boolean canGen = CONFIG.getApplyBlockSet().contains(blockId);
-		if (!canGen) {
-			//~ if 1.16.5 'TagKey<Block>' -> 'ResourceLocation'
-			for (TagKey<Block> tag : VersionUtil.getBlockTags(block)) {
-				//~ if 1.16.5 '.location' -> '.getPath'
-				canGen = CONFIG.getApplyBlockSet().contains("#" + tag.location());
-				if (canGen)
-					break;
-			}
-			if (!canGen) {
-				// Hardness Filter. See on https://minecraft.fandom.com/wiki/Breaking#Blocks_by_hardness
-				//~ if 1.16.5 '.defaultDestroyTime' -> '.getExplosionResistance'
-				float hardness = block.getBlock().defaultDestroyTime();
-				float hardnessGate = CONFIG.getHardnessGate();
-				canGen = hardnessGate > 0 && hardness >= 0 && Mth.abs(hardness) < hardnessGate;
-				if (canGen) {
-					// Black Block List
-					canGen = !CONFIG.getExcludedBlockSet().contains(blockId);
-					if (canGen) {
-						//~ if 1.16.5 'TagKey<Block>' -> 'ResourceLocation'
-						for (TagKey<Block> tag : VersionUtil.getBlockTags(block)) {
-							//~ if 1.16.5 '.location' -> '.getPath'
-							canGen = !CONFIG.getExcludedBlockSet().contains("#" + tag.location());
-							if (!canGen)
-								break;
-						}
-					}
-				}
-			}
-		}
-		return canGen;
+	private boolean fpp$isFragile(BlockState blockState) {
+		//~ if 1.16.5 '.defaultDestroyTime' -> '.getExplosionResistance'
+		float hardness = blockState.getBlock().defaultDestroyTime();
+		float hardnessGate = CONFIG.getHardnessGate();
+		return hardnessGate > 0 && hardness >= 0 && Mth.abs(hardness) < hardnessGate;
+	}
+
+	@Unique
+	private boolean fpp$isInSet(BlockState blockState, Set<String> set) {
+		return set.contains(VersionUtil.getBlockName(blockState)) ||
+		       VersionUtil.getBlockTags(blockState).stream().anyMatch(tag ->
+				       //~ if 1.16.5 '.location().toString()' -> '.toString()'
+				       set.contains("#" + tag.location().toString()));  // DO NOT remove .toString() you fool! IDE was a liar!
 	}
 
 	@Unique

@@ -137,20 +137,31 @@ public class Config {
 	static final WorkMode DEF_SNOW_DUST_LEVEL = WorkMode.ALL;
 	static final WorkMode DEF_WATER_SPLASH_LEVEL = WorkMode.PLAYER_ONLY;
 	static final List<String> DEF_APPLYBLOCKS = Arrays.asList(
-			"#minecraft:wool"
+			"#minecraft:wool",
+			"#minecraft:wool_slabs",
+			"#minecraft:wool_stairs"
 	);
 	static final List<String> DEF_BLOCKHEIGHT = Arrays.asList(
 			"minecraft:snow,0.125",
 			"minecraft:soul_sand,0.125",
-			"minecraft:mud,0.125"
+			"minecraft:mud,0.125",
+			"#minecraft:pressure_plates,0.0625"  // raise for water print, though it disabled in excludedList.
 	);
 	static final List<String> DEF_EXCLUDEDBLOCKS = Arrays.asList(
-			"minecraft:beehive",
-			"#minecraft:flower",
-			"#minecraft:crop",
-			"#minecraft:leaves",
-			"#minecraft:sapling",
-			"#minecraft:replaceable_plants"
+			"#minecraft:beehives",
+			"#minecraft:pressure_plates",
+			"#c:villager_job_sites",
+			"minecraft:tnt",
+			"minecraft:target",
+			"minecraft:daylight_detector",
+			"minecraft:repeater",
+			"minecraft:comparator",
+			"minecraft:redstone_lamp",
+			"minecraft:sea_lantern",
+			"minecraft:glowstone",
+			"minecraft:magma_block",
+			"#c:froglights",
+			"minecraft:big_dripleaf"
 	);
 	static final List<String> DEF_MODS = Arrays.asList(
 			"#aquatic",
