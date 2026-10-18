@@ -117,7 +117,7 @@ public abstract class LivingEntityMixin extends Entity {
 		// 1.Horizontal Offset
 		// 1.1 Front and back
 		int side = Math.random() > 0.5f ? 1 : -1;
-		double hOffset = 0.0625f;  // default f/b offset for all entity to decrease repetition.
+		double hOffset = 0.075f;  // default f/b offset for all entity to decrease repetition.
 		java.util.Map<String, Float> horseMap = CONFIG.getHorseLikeMobsMap();
 		if (horseMap.containsKey(id)) {
 			Float front = horseMap.get(id);
@@ -135,7 +135,7 @@ public abstract class LivingEntityMixin extends Entity {
 		pz += hOffset * side * Mth.cos((float) Math.toRadians(this.getRotationVector().y));
 		// 1.2 Left and right
 		side = Math.random() > 0.5f ? 1 : -1;
-		hOffset = 0.125f;  // default l/r offset for all entity to decrease repetition. (matching vanilla player)
+		hOffset = 0.15f;  // default l/r offset for all entity to decrease repetition. (matching vanilla player)
 		java.util.Map<String, Float> spiderMap = CONFIG.getSpiderLikeMobsMap();
 		if (spiderMap.containsKey(id)) {
 			Float lateral = spiderMap.get(id);

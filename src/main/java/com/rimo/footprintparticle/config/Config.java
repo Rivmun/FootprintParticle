@@ -189,7 +189,9 @@ public class Config {
 			"minecraft:creeper,0.8",
 			"minecraft:iron_golem,1.2",
 			"minecraft:ravager,2.0",
-			"minecraft:armadillo,0.7"
+			"minecraft:armadillo,0.7",
+			"minecraft:copper_golem,0.8",
+			"minecraft:sulfur_cube,2.0"
 	);
 	static final List<String> DEF_FOUR_LEGS = Arrays.asList(
 			"minecraft:horse",
@@ -200,7 +202,8 @@ public class Config {
 			"minecraft:camel",
 			"minecraft:sniffer,0.8",
 			"minecraft:ravager,0.5",
-			"minecraft:creeper,0.3"
+			"minecraft:creeper,0.3",
+			"minecraft:camel_husk"
 	);
 	static final List<String> DEF_EIGHT_LEGS = Arrays.asList(
 			"minecraft:spider",
@@ -208,7 +211,12 @@ public class Config {
 			"minecraft:camel,0.3",
 			"minecraft:sniffer,0.3",
 			"minecraft:iron_golem,0.3",
-			"minecraft:ravager,0.3"
+			"minecraft:ravager,0.3",
+			"minecraft:breeze,0.1",
+			"minecraft:camel_husk,0.3",
+			"minecraft:slime,0.3",
+			"minecraft:magma_cube,0.3",
+			"minecraft:sulfur_cube,0.3"
 	);
 	static final List<String> DEF_MOB_INTERVAL = Arrays.asList(
 			"minecraft:spider,0.5",
@@ -216,7 +224,10 @@ public class Config {
 			"minecraft:camel,2.0",
 			"minecraft:sniffer,3.0",
 			"minecraft:iron_golem,2.0",
-			"minecraft:creeper,0.8"
+			"minecraft:creeper,0.8",
+			"minecraft:creaking,1.6",
+			"minecraft:breeze,0.3",
+			"minecraft:camel_husk,2.0"
 	);
 	static final List<String> DEF_CUSTOM_PRINT = Arrays.asList(
 			"mod_id:mob_id,fileName_NoExtend"
