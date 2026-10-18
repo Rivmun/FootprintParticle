@@ -229,6 +229,17 @@ public class ConfigScreen {
 				.setSaveConsumer(CONFIG::setFootprintSize)
 				.build()
 		);
+		general.addEntry(entryBuilder
+				.startIntSlider(t("option.genHeightGap")
+						, (int) (CONFIG.getGenHeightGap() * 10)
+						,1
+						,10)
+				.setDefaultValue(Config.DEF_GEN_HEIGHT_GAP)
+				.setTextGetter(value -> t("block", value / 10F))
+				.setTooltip(t("option.genHeightGap.@Tooltip"))
+				.setSaveConsumer(CONFIG::setGenHeightGap)
+				.build()
+		);
 	}
 
 	private void buildMiscCategory(ConfigCategory misc) {

@@ -176,7 +176,7 @@ public abstract class LivingEntityMixin extends Entity {
 				}  // else continue;
 			}
 			if (tempY != Double.NEGATIVE_INFINITY) {
-				if (tempY <= py - (landedOrJump ? 0.25F : 0.125F)) {  // Limited dist from feet to print. walking must closer than jumping.
+				if (tempY <= py - CONFIG.getGenHeightGap() / (landedOrJump ? 1F : 4F)) {  // Limited dist from feet to print. walking must closer than jumping.
 					fpp$timer = 0;  // reset timer because nothing generated.
 					return false;  // reject if entity floating in air (at edge of block).
 				} else {

@@ -52,6 +52,7 @@ public class Config {
 	private WorkMode swimPopLevel = DEF_SWIM_POP_LEVEL;
 	private WorkMode snowDustLevel = DEF_SNOW_DUST_LEVEL;
 	private WorkMode waterSplashLevel = DEF_WATER_SPLASH_LEVEL;
+	private int genHeightGap = DEF_GEN_HEIGHT_GAP;
 
 	public WorkMode getEnableMod() {return enableMod;}
 	public float getSecPerPrint() {return secPerPrint / 10f;}
@@ -79,6 +80,7 @@ public class Config {
 	public WorkMode getSwimPopLevel() {return swimPopLevel;}
 	public WorkMode getSnowDustLevel() {return snowDustLevel;}
 	public WorkMode getWaterSplashLevel() {return waterSplashLevel;}
+	public float getGenHeightGap() {return genHeightGap / 10F;}
 
 	public void setEnableMod(WorkMode enableMod) {this.enableMod = enableMod;}
 	public void setWetDuration(int wetDuration) {this.wetDuration = wetDuration;}
@@ -106,6 +108,7 @@ public class Config {
 	public void setSwimPopLevel(WorkMode swimPopLevel) {this.swimPopLevel = swimPopLevel;}
 	public void setSnowDustLevel(WorkMode snowDustLevel) {this.snowDustLevel = snowDustLevel;}
 	public void setWaterSplashLevel(WorkMode waterSplashLevel) {this.waterSplashLevel = waterSplashLevel;}
+	public void setGenHeightGap(int genHeightGap) {this.genHeightGap = genHeightGap;}
 
 	/* - - - - - 内部集合裸视图（模组逻辑直接查表，避免拷贝 List） - - - - - */
 
@@ -136,6 +139,7 @@ public class Config {
 	static final WorkMode DEF_SWIM_POP_LEVEL = WorkMode.ALL;
 	static final WorkMode DEF_SNOW_DUST_LEVEL = WorkMode.ALL;
 	static final WorkMode DEF_WATER_SPLASH_LEVEL = WorkMode.PLAYER_ONLY;
+	static final int DEF_GEN_HEIGHT_GAP = 5;
 	static final List<String> DEF_APPLYBLOCKS = Arrays.asList(
 			"#minecraft:wool",
 			"#minecraft:wool_slabs",
