@@ -1,7 +1,7 @@
 //? if forge && <= 1.19.2 {
 /*package com.rimo.footprintparticle.loaders.forge;
 
-import com.rimo.footprintparticle.FppAtlas;
+import com.rimo.footprintparticle.particle.FppSpriteAtlas;
 import com.rimo.footprintparticle.particle.FppParticleRegistry;
 import com.rimo.footprintparticle.VersionUtil;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -14,14 +14,14 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 // 这里在 TextureStitchEvent.Pre 阶段读取（可能被资源包覆写的）particles/<id>.json 的贴图列表并 addSprite，
 // 把它们补进 particles 图集；运行期取回由共享 FppSpriteSet 的惰性 resolver 现向图集查询（无需在此回填，
 // 也无需再持有 MutableSpriteSet）。监听器由 Platform.ClientEvents 静态块注册到本 mod 的 MOD 事件总线。
-// （≥1.20.1 粒子图集是资源驱动的，原版会枚举所有 particles/*.json 缝合，故本类不参与。）
+// （≥1.20.1 粒子图集是资源驱动的，原版会枚举所有 particles/^.json 缝合，故本类不参与。）
 public class ForgeParticleStitcher {
 	//~ if 1.16.5 '.getAtlas()' -> '.getMap()' {
 	@SubscribeEvent
 	public static void onStitchPre(TextureStitchEvent.Pre event) {
 		if (!event.getAtlas().location().equals(VersionUtil.getId("minecraft", "textures/atlas/particles.png")))
 			return;
-		FppAtlas.forEachStitchTexture(FppParticleRegistry.particlePaths(),
+		FppSpriteAtlas.forEachStitchTexture(FppParticleRegistry.particlePaths(),
 				(namespace, path) -> event.addSprite(VersionUtil.getId(namespace, path)));
 	}
 	//~ }

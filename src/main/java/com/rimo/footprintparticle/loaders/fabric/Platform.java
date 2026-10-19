@@ -5,11 +5,13 @@ import com.rimo.footprintparticle.Client;
 import com.rimo.footprintparticle.particle.FppParticleRegistry;
 import com.rimo.footprintparticle.PlatformUtil;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 //? if <= 1.19.2 {
-/*import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback;
+/*import com.rimo.footprintparticle.VersionUtil;
+import com.rimo.footprintparticle.particle.FppSpriteAtlas;
+import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback;
 import net.minecraft.resources.ResourceLocation;
 *///? }
-import net.fabricmc.loader.api.FabricLoader;
 
 import java.nio.file.Path;
 
@@ -48,9 +50,9 @@ public class Platform implements ClientModInitializer {
 		//? if <= 1.19.2 {
 		/*// ≤1.19.2：把本模组自定义贴图手动缝进 particles 图集（≥1.20.1 资源驱动，无需此步）。
 		ClientSpriteRegistryCallback.event(VersionUtil.getId("minecraft", "textures/atlas/particles.png"))
-				.register((atlas, registry) -> FppAtlas.forEachStitchTexture(FppParticleRegistry.particlePaths(),
-						(namespace, path) -> registry.register(new ResourceLocation(namespace, path))));*/
-		//? }
+				.register((atlas, registry) -> FppSpriteAtlas.forEachStitchTexture(FppParticleRegistry.particlePaths(),
+						(namespace, path) -> registry.register(new ResourceLocation(namespace, path))));
+		*///? }
 	}
 }
 //? }

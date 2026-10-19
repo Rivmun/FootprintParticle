@@ -80,8 +80,8 @@ public final class FppSpriteAtlas {
 			//? if < 1.19.2 {
 			/*InputStream stream = Minecraft.getInstance().getResourceManager()
 					.getResource(VersionUtil.getId(Client.MOD_ID, "particles/" + particlePath + ".json"))
-					.getInputStream();*/
-			//? } else {
+					.getInputStream();
+			*///? } else {
 			java.util.Optional<Resource> optional = Minecraft.getInstance().getResourceManager()
 					.getResource(VersionUtil.getId(Client.MOD_ID, "particles/" + particlePath + ".json"));
 			InputStream stream = optional.isEmpty() ? null : optional.get().open();
@@ -115,8 +115,8 @@ public final class FppSpriteAtlas {
 		String path = colon < 0 ? texture : texture.substring(colon + 1);
 		if (!path.startsWith("particle/"))
 			path = "particle/" + path;
-		return namespace + ":" + path;*/
-		//? } else {
+		return namespace + ":" + path;
+		*///? } else {
 		return texture;
 		//? }
 	}

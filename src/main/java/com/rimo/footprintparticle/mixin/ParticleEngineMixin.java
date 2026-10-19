@@ -2,13 +2,6 @@ package com.rimo.footprintparticle.mixin;
 
 import com.rimo.footprintparticle.particle.FppParticleRegistry;
 import com.rimo.footprintparticle.particle.ParticleEngineAtlasAccess;
-//? if >= 1.21.11 {
-import com.rimo.footprintparticle.VersionUtil;
-import net.minecraft.client.Minecraft;
-import net.minecraft.resources.Identifier;
-//? } else {
-/*import net.minecraft.resources.ResourceLocation;*/
-//? }
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -16,14 +9,20 @@ import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.core.particles.ParticleOptions;
-//? if >= 1.21.11 {
-import net.minecraft.util.RandomSource;
-//? }
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+//? if >= 1.21.11 {
+import com.rimo.footprintparticle.VersionUtil;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.RandomSource;
+//? } else {
+/*import net.minecraft.resources.ResourceLocation;
+import org.spongepowered.asm.mixin.Final;
+*///? }
 
 /**
  * 跨加载器共享的粒子劫持（Fabric / Forge / NeoForge 三端统一）。
@@ -54,7 +53,7 @@ public class ParticleEngineMixin implements ParticleEngineAtlasAccess {
 
 	// 粒子图集（引擎自持）。≤1.21.1 各版本字段名/类型统一；≥1.21.11 无此字段，不 shadow。
 	//? if < 1.21.11
-	//@Shadow @Final private TextureAtlas textureAtlas;
+	//@Final @Shadow private TextureAtlas textureAtlas;
 
 	// handler 签名 = 目标方法形参逐个同类型 + CallbackInfoReturnable；泛型 T 取擦除后的 ParticleOptions 即可。
 	@SuppressWarnings("unchecked")
@@ -68,8 +67,8 @@ public class ParticleEngineMixin implements ParticleEngineAtlasAccess {
 		//? if >= 1.21.11 {
 		cir.setReturnValue(provider.createParticle(type, this.level, x, y, z, xSpeed, ySpeed, zSpeed, RandomSource.create()));
 		//? } else {
-		/*cir.setReturnValue(provider.createParticle(type, this.level, x, y, z, xSpeed, ySpeed, zSpeed));*/
-		//? }
+		/*cir.setReturnValue(provider.createParticle(type, this.level, x, y, z, xSpeed, ySpeed, zSpeed));
+		*///? }
 	}
 
 	// 从引擎自持的粒子图集现取 sprite。缺失时返回 missing-texture（不崩溃）。
@@ -88,6 +87,6 @@ public class ParticleEngineMixin implements ParticleEngineAtlasAccess {
 	/*@Override
 	public TextureAtlasSprite fpp$particleSprite(ResourceLocation id) {
 		return this.textureAtlas.getSprite(id);
-	}*/
-	//? }
+	}
+	*///? }
 }

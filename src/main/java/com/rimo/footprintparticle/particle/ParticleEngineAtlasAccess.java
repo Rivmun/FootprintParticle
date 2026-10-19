@@ -4,8 +4,8 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 //? if >= 1.21.11 {
 import net.minecraft.resources.Identifier;
 //? } else {
-/*import net.minecraft.resources.ResourceLocation;*/
-//? }
+/*import net.minecraft.resources.ResourceLocation;
+*///? }
 
 /**
  * 由共享 {@code ParticleEngineMixin} 实现：从 {@code ParticleEngine} 自己持有的粒子图集里取指定 sprite。
@@ -20,6 +20,6 @@ public interface ParticleEngineAtlasAccess {
 	//? if >= 1.21.11 {
 	TextureAtlasSprite fpp$particleSprite(Identifier id);
 	//? } else {
-	/*TextureAtlasSprite fpp$particleSprite(ResourceLocation id);*/
-	//? }
+	/*TextureAtlasSprite fpp$particleSprite(ResourceLocation id);
+	*///? }
 }
