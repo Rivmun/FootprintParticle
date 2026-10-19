@@ -27,6 +27,8 @@ public class ConfigScreen {
 		entryBuilder = builder.entryBuilder();
 
 		buildCategory(builder.getOrCreateCategory(t("category.default")));
+		buildFilterCategory(builder.getOrCreateCategory(t("category.filter")));
+		buildCustomCategory(builder.getOrCreateCategory(t("category.custom")));
 		buildMiscCategory(builder.getOrCreateCategory(t("category.misc")));
 
 		// Saving...
@@ -35,8 +37,8 @@ public class ConfigScreen {
 		return builder.build();
 	}
 
-	private void buildCategory(ConfigCategory general) {
-		general.addEntry(entryBuilder
+	private void buildCategory(ConfigCategory category) {
+		category.addEntry(entryBuilder
 				.startEnumSelector(t("option.enableMod")
 						, WorkMode.class
 						, CONFIG.getEnableMod())
@@ -45,7 +47,7 @@ public class ConfigScreen {
 				.setSaveConsumer(CONFIG::setEnableMod)
 				.build()
 		);
-		general.addEntry(entryBuilder
+		category.addEntry(entryBuilder
 				.startIntSlider(t("option.wetDuration")
 						, CONFIG.getWetDuration()
 						,0
@@ -62,7 +64,7 @@ public class ConfigScreen {
 				.setSaveConsumer(CONFIG::setWetDuration)
 				.build()
 		);
-		general.addEntry(entryBuilder
+		category.addEntry(entryBuilder
 				.startIntSlider(t("option.secPerPrint")
 						,(int) (CONFIG.getSecPerPrint() * 10)
 						,0
@@ -78,21 +80,21 @@ public class ConfigScreen {
 				.setSaveConsumer(CONFIG::setSecPerPrint)
 				.build()
 		);
-		general.addEntry(entryBuilder
+		category.addEntry(entryBuilder
 				.startFloatField(t("option.printLifetime")
 						, CONFIG.getPrintLifetime())
 				.setDefaultValue(Config.DEF_PRINT_LIFETIME)
 				.setSaveConsumer(CONFIG::setPrintLifetime)
 				.build()
 		);
-		general.addEntry(entryBuilder
+		category.addEntry(entryBuilder
 				.startFloatField(t("option.watermarkLifetime")
 						, CONFIG.getWatermarkLifetime())
 				.setDefaultValue(Config.DEF_WATERMARK_LIFETIME)
 				.setSaveConsumer(CONFIG::setWatermarkLifetime)
 				.build()
 		);
-		general.addEntry(entryBuilder
+		category.addEntry(entryBuilder
 				.startIntSlider(t("option.lifeTimeAcc")
 						, CONFIG.getLifeTimeAcc()
 						, 0
@@ -103,7 +105,7 @@ public class ConfigScreen {
 				.setSaveConsumer(CONFIG::setLifeTimeAcc)
 				.build()
 		);
-		general.addEntry(entryBuilder
+		category.addEntry(entryBuilder
 				.startIntSlider(t("option.footprintAlpha")
 						,(int) (CONFIG.getFootprintAlpha() * 10)
 						,1
@@ -113,7 +115,7 @@ public class ConfigScreen {
 				.setSaveConsumer(CONFIG::setFootprintAlpha)
 				.build()
 		);
-		general.addEntry(entryBuilder
+		category.addEntry(entryBuilder
 				.startIntSlider(t("option.watermarkAlpha")
 						,(int) (CONFIG.getWatermarkAlpha() * 10)
 						,1
@@ -123,7 +125,7 @@ public class ConfigScreen {
 				.setSaveConsumer(CONFIG::setWatermarkAlpha)
 				.build()
 		);
-		general.addEntry(entryBuilder
+		category.addEntry(entryBuilder
 				.startIntSlider(t("option.printHeight")
 						,(int) (CONFIG.getPrintHeight() / 0.0625F)
 						,-8
@@ -134,102 +136,7 @@ public class ConfigScreen {
 				.setSaveConsumer(CONFIG::setPrintHeight)
 				.build()
 		);
-		general.addEntry(entryBuilder
-				.startStrList(t("option.applyBlocks")
-						, CONFIG.getApplyBlocks())
-				.setDefaultValue(Config.DEF_APPLYBLOCKS)
-				.setTooltip(t("option.applyBlocks.@Tooltip"))
-				.setSaveConsumer(CONFIG::setApplyBlocks)
-				.build()
-		);
-		general.addEntry(entryBuilder
-				.startFloatField(t("option.hardnessGate")
-						, CONFIG.getHardnessGate())
-				.setDefaultValue(Config.DEF_HARDNESS_GATE)
-				.setTooltip(t("option.hardnessGate.@Tooltip"))
-				.setSaveConsumer(CONFIG::setHardnessGate)
-				.build()
-		);
-		general.addEntry(entryBuilder
-				.startStrList(t("option.excludedBlocks")
-						, CONFIG.getExcludedBlocks())
-				.setDefaultValue(Config.DEF_EXCLUDEDBLOCKS)
-				.setTooltip(t("option.excludedBlocks.@Tooltip"))
-				.setSaveConsumer(CONFIG::setExcludedBlocks)
-				.build()
-		);
-		general.addEntry(entryBuilder
-				.startStrList(t("option.blockHeight")
-						, CONFIG.getBlockHeight())
-				.setDefaultValue(Config.DEF_BLOCKHEIGHT)
-				.setTooltip(t("option.blockHeight.@Tooltip"))
-				.setSaveConsumer(CONFIG::setBlockHeight)
-				.build()
-		);
-		general.addEntry(entryBuilder
-				.startBooleanToggle(t("option.canGenWhenInvisible")
-						, CONFIG.getCanGenWhenInvisible())
-				.setDefaultValue(Config.DEF_CAN_GEN_WHEN_INVISIBLE)
-				.setSaveConsumer(CONFIG::setCanGenWhenInvisible)
-				.build()
-		);
-		general.addEntry(entryBuilder
-				.startStrList(t("option.excludedMobs")
-						, CONFIG.getExcludedMobs())
-				.setDefaultValue(Config.DEF_MODS)
-				.setTooltip(t("option.excludedMobs.@Tooltip"))
-				.setSaveConsumer(CONFIG::setExcludedMobs)
-				.build()
-		);
-		general.addEntry(entryBuilder
-				.startStrList(t("option.mobInterval")
-						, CONFIG.getMobInterval())
-				.setDefaultValue(Config.DEF_MOB_INTERVAL)
-				.setTooltip(t("option.mobInterval.@Tooltip"))
-				.setSaveConsumer(CONFIG::setMobInterval)
-				.build()
-		);
-		general.addEntry(entryBuilder
-				.startStrList(t("option.sizePerMob")
-						, CONFIG.getSizePerMob())
-				.setDefaultValue(Config.DEF_SIZE)
-				.setTooltip(t("option.sizePerMob.@Tooltip"))
-				.setSaveConsumer(CONFIG::setSizePerMob)
-				.build()
-		);
-		general.addEntry(entryBuilder
-				.startStrList(t("option.horseLikeMobs")
-						, CONFIG.getHorseLikeMobs())
-				.setDefaultValue(Config.DEF_FOUR_LEGS)
-				.setTooltip(t("option.horseLikeMobs.@Tooltip"))
-				.setSaveConsumer(CONFIG::setHorseLikeMobs)
-				.build()
-		);
-		general.addEntry(entryBuilder
-				.startStrList(t("option.spiderLikeMobs")
-						, CONFIG.getSpiderLikeMobs())
-				.setDefaultValue(Config.DEF_EIGHT_LEGS)
-				.setTooltip(t("option.spiderLikeMobs.@Tooltip"))
-				.setSaveConsumer(CONFIG::setSpiderLikeMobs)
-				.build()
-		);
-		general.addEntry(entryBuilder
-				.startStrList(t("option.customPrint")
-						, CONFIG.getCustomPrint())
-				.setDefaultValue(Config.DEF_CUSTOM_PRINT)
-				.setTooltip(t("option.customPrint.@Tooltip"))
-				.setSaveConsumer(CONFIG::setCustomPrint)
-				.build()
-		);
-		general.addEntry(entryBuilder
-				.startIntField(t("option.footprintSize")
-						, CONFIG.getFootprintSize())
-				.setDefaultValue(Config.DEF_FOOTPRINT_SIZE)
-				.setTooltip(t("option.footprintSize.@Tooltip"))
-				.setSaveConsumer(CONFIG::setFootprintSize)
-				.build()
-		);
-		general.addEntry(entryBuilder
+		category.addEntry(entryBuilder
 				.startIntSlider(t("option.genHeightGap")
 						, (int) (CONFIG.getGenHeightGap() * 10)
 						,1
@@ -242,8 +149,109 @@ public class ConfigScreen {
 		);
 	}
 
-	private void buildMiscCategory(ConfigCategory misc) {
-		misc.addEntry(entryBuilder
+	private void buildFilterCategory(ConfigCategory category) {
+		category.addEntry(entryBuilder
+				.startStrList(t("option.excludedMobs")
+						, CONFIG.getExcludedMobs())
+				.setDefaultValue(Config.DEF_MODS)
+				.setTooltip(t("option.excludedMobs.@Tooltip"))
+				.setSaveConsumer(CONFIG::setExcludedMobs)
+				.build()
+		);
+		category.addEntry(entryBuilder
+				.startBooleanToggle(t("option.canGenWhenInvisible")
+						, CONFIG.getCanGenWhenInvisible())
+				.setDefaultValue(Config.DEF_CAN_GEN_WHEN_INVISIBLE)
+				.setSaveConsumer(CONFIG::setCanGenWhenInvisible)
+				.build()
+		);
+		category.addEntry(entryBuilder
+				.startStrList(t("option.applyBlocks")
+						, CONFIG.getApplyBlocks())
+				.setDefaultValue(Config.DEF_APPLYBLOCKS)
+				.setTooltip(t("option.applyBlocks.@Tooltip"))
+				.setSaveConsumer(CONFIG::setApplyBlocks)
+				.build()
+		);
+		category.addEntry(entryBuilder
+				.startFloatField(t("option.hardnessGate")
+						, CONFIG.getHardnessGate())
+				.setDefaultValue(Config.DEF_HARDNESS_GATE)
+				.setTooltip(t("option.hardnessGate.@Tooltip"))
+				.setSaveConsumer(CONFIG::setHardnessGate)
+				.build()
+		);
+		category.addEntry(entryBuilder
+				.startStrList(t("option.excludedBlocks")
+						, CONFIG.getExcludedBlocks())
+				.setDefaultValue(Config.DEF_EXCLUDEDBLOCKS)
+				.setTooltip(t("option.excludedBlocks.@Tooltip"))
+				.setSaveConsumer(CONFIG::setExcludedBlocks)
+				.build()
+		);
+	}
+
+	private void buildCustomCategory(ConfigCategory category) {
+		category.addEntry(entryBuilder
+				.startStrList(t("option.blockHeight")
+						, CONFIG.getBlockHeight())
+				.setDefaultValue(Config.DEF_BLOCKHEIGHT)
+				.setTooltip(t("option.blockHeight.@Tooltip"))
+				.setSaveConsumer(CONFIG::setBlockHeight)
+				.build()
+		);
+		category.addEntry(entryBuilder
+				.startStrList(t("option.mobInterval")
+						, CONFIG.getMobInterval())
+				.setDefaultValue(Config.DEF_MOB_INTERVAL)
+				.setTooltip(t("option.mobInterval.@Tooltip"))
+				.setSaveConsumer(CONFIG::setMobInterval)
+				.build()
+		);
+		category.addEntry(entryBuilder
+				.startStrList(t("option.sizePerMob")
+						, CONFIG.getSizePerMob())
+				.setDefaultValue(Config.DEF_SIZE)
+				.setTooltip(t("option.sizePerMob.@Tooltip"))
+				.setSaveConsumer(CONFIG::setSizePerMob)
+				.build()
+		);
+		category.addEntry(entryBuilder
+				.startStrList(t("option.horseLikeMobs")
+						, CONFIG.getHorseLikeMobs())
+				.setDefaultValue(Config.DEF_FOUR_LEGS)
+				.setTooltip(t("option.horseLikeMobs.@Tooltip"))
+				.setSaveConsumer(CONFIG::setHorseLikeMobs)
+				.build()
+		);
+		category.addEntry(entryBuilder
+				.startStrList(t("option.spiderLikeMobs")
+						, CONFIG.getSpiderLikeMobs())
+				.setDefaultValue(Config.DEF_EIGHT_LEGS)
+				.setTooltip(t("option.spiderLikeMobs.@Tooltip"))
+				.setSaveConsumer(CONFIG::setSpiderLikeMobs)
+				.build()
+		);
+		category.addEntry(entryBuilder
+				.startStrList(t("option.customPrint")
+						, CONFIG.getCustomPrint())
+				.setDefaultValue(Config.DEF_CUSTOM_PRINT)
+				.setTooltip(t("option.customPrint.@Tooltip"))
+				.setSaveConsumer(CONFIG::setCustomPrint)
+				.build()
+		);
+		category.addEntry(entryBuilder
+				.startIntField(t("option.footprintSize")
+						, CONFIG.getFootprintSize())
+				.setDefaultValue(Config.DEF_FOOTPRINT_SIZE)
+				.setTooltip(t("option.footprintSize.@Tooltip"))
+				.setSaveConsumer(CONFIG::setFootprintSize)
+				.build()
+		);
+	}
+
+	private void buildMiscCategory(ConfigCategory category) {
+		category.addEntry(entryBuilder
 				.startIntSlider(t("option.railFlameRange")
 						,(int) (CONFIG.getRailFlameRange() * 10)
 						,0
@@ -259,14 +267,14 @@ public class ConfigScreen {
 				.setSaveConsumer(CONFIG::setRailFlameRange)
 				.build()
 		);
-		misc.addEntry(entryBuilder
+		category.addEntry(entryBuilder
 				.startBooleanToggle(t("option.enableBoatTrail")
 						, CONFIG.isEnableBoatTrail())
 				.setDefaultValue(Config.DEF_ENABLE_BOAT_TRAIL)
 				.setSaveConsumer(CONFIG::setEnableBoatTrail)
 				.build()
 		);
-		misc.addEntry(entryBuilder
+		category.addEntry(entryBuilder
 				.startEnumSelector(t("option.swimPopLevel")
 						, WorkMode.class
 						, CONFIG.getSwimPopLevel())
@@ -275,7 +283,7 @@ public class ConfigScreen {
 				.setSaveConsumer(CONFIG::setSwimPopLevel)
 				.build()
 		);
-		misc.addEntry(entryBuilder
+		category.addEntry(entryBuilder
 				.startEnumSelector(t("option.snowDustLevel")
 						, WorkMode.class
 						, CONFIG.getSnowDustLevel())
@@ -284,7 +292,7 @@ public class ConfigScreen {
 				.setSaveConsumer(CONFIG::setSnowDustLevel)
 				.build()
 		);
-		misc.addEntry(entryBuilder
+		category.addEntry(entryBuilder
 				.startEnumSelector(t("option.waterSplashLevel")
 						, WorkMode.class
 						, CONFIG.getWaterSplashLevel())

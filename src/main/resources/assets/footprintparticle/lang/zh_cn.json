@@ -52,6 +52,8 @@
 	"text.footprintparticle.option.swimPopLevel": "游泳时产生气泡",
 	"text.footprintparticle.option.snowDustLevel": "扬起雪花（当在雪中生成脚印时）",
 	"text.footprintparticle.option.waterSplashLevel": "溅起水花（当在雨中行走时）",
+	"text.footprintparticle.category.filter": "过滤",
+	"text.footprintparticle.category.custom": "自定义",
 
 	"modmenu.descriptionTranslation.footprintparticle": "一个简单地为生物和玩家添加脚印粒子的模组。"
 }

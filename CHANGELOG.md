@@ -1,18 +1,23 @@
-# 0.6.2
-Refactor footprint generator to fix some reference issue. (Thanks to @Redls07)
+# 0.7.0
+#### Refactor footprint generator to fix some reference issue. (Thanks to @Redls07)
 - Fix footprint generate on below block that player never touched.
-  - (Still have some small gap that was necessary to detect movement of remote player.)
+  - Still have some small gap that was necessary to detect movement for remote player.
+  - Add an option to config that gap (0.1-1.0 blocks).
 - Fix footprint generate above player foot position when walk in non-full block.
-- Fix footprint generate under pressure plate.
-- Fix footprint generate on some non-full block that shouldn't appear (i.e. candle).
+- Fix footprint generate under pressure plate (now it disabled to gen in default).
+- Fix footprint generate on some non-full block that shouldn't appear (i.e. candles).
 - Now footprint can generate besides some non-full block at correct position (i.e. fence gate).
-Other fixes and improvements since 0.6.0:
+#### Other fixes and improvements since 0.6.0:
+- Fix client without FPP cannot connect to LAN host with FPP on Fabric / Neoforge.
+  - Forge not be affected because it already self-hold particle since 0.6.0.
 - Fix tag item in configList cannot be hit and included / excluded.
 - Fix PrintHeightOffset incorrectly applied to logical, it must be visual only.
 - Fix boat & minecart misc function no functioning when their ridden by remote player.
 - Improve whileList / excludedList priority logically.
 - Add some default item to excludedList which blocks should be excluded.
 - Add default config for new mob up to 26.3.
+  - You must 'Reset' in configScreen to apply it, **remember backup your config**.
+- Add more category to configScreen.
 
 # 0.6.1
 - Hotfix boot refusal on 1.16.5-fabric due to ModId of 'fabric-api' is 'fabric' in that version.

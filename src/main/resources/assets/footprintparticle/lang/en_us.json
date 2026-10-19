@@ -50,5 +50,7 @@
 	"text.footprintparticle.option.enableBoatTrail": "Boattttrail",
 	"text.footprintparticle.option.swimPopLevel": "Pop up when swimming",
 	"text.footprintparticle.option.snowDustLevel": "Kick up snow (when print gen on it)",
-	"text.footprintparticle.option.waterSplashLevel": "Kick up splash (when walking on rain)"
+	"text.footprintparticle.option.waterSplashLevel": "Kick up splash (when walking on rain)",
+	"text.footprintparticle.category.filter": "Filter",
+	"text.footprintparticle.category.custom": "Custom"
 }
