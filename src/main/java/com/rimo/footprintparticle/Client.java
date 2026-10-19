@@ -1,10 +1,7 @@
 package com.rimo.footprintparticle;
 
 import com.rimo.footprintparticle.config.Config;
-import com.rimo.footprintparticle.particle.FootprintParticleType;
-import com.rimo.footprintparticle.particle.SnowDustParticleType;
-import com.rimo.footprintparticle.particle.WaterSplashParticleType;
-import com.rimo.footprintparticle.particle.WatermarkParticleType;
+import com.rimo.footprintparticle.particle.*;
 //? if = 1.16.5 {
 /*import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,10 +13,10 @@ import org.slf4j.LoggerFactory;
 /**
  * 仅客户端模组的共享入口：MOD_ID / 日志 / 配置单例 / 4 个粒子类型实例。
  *
- * <p>粒子类型对象在此仅 <em>构造</em>，真正的注册（写入 BuiltInRegistries.PARTICLE_TYPE）留给
- * {@code loaders.<平台>.Platform}——Fabric 用 {@code Registry.register}（走 {@code onInitializeClient}），
- * NeoForge 用 {@code RegisterEvent.register}（挂在 {@code @EventBusSubscriber(value = Dist.CLIENT)} 里）；
- * 两边再通过 lambda 引用同一批 {@code public static final} 实例。</p>
+ * <p>粒子类型对象在此 <em>构造</em> 为 public static final 单例（同时充当 ParticleOptions）。
+ * 它们 <b>不</b> 注册进原版 {@code particle_type} 同步表——那样会被 loader 同步给连接方、踢掉未装模组的客户端。
+ * 真正的"注册"由共享 {@link FppParticleRegistry} 私有持有 provider/SpriteSet，
+ * 运行期经共享 {@code ParticleEngineMixin} 在 {@code makeParticle} HEAD 拦截直接造粒子。</p>
  */
 public class Client {
 	public static final String MOD_ID = "footprintparticle";
@@ -34,6 +31,6 @@ public class Client {
 	public static final WaterSplashParticleType WATERSPLASH = new WaterSplashParticleType(true);
 
 	public static void init() {
-		// 平台差异化注册在 loaders.<平台>.Platform 里完成；此处留空作为共享初始化钩子。
+		// 粒子自托管由 FppParticleRegistry 静态初始化完成；此处保留为共享初始化钩子。
 	}
 }

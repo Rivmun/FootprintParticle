@@ -29,13 +29,21 @@ public final class VersionUtil {
 	public static Identifier getId(String path) {
 		return Identifier.fromNamespaceAndPath(Client.MOD_ID, path);
 	}
+
+	public static Identifier getId(String namespace, String path) {
+		return Identifier.fromNamespaceAndPath(namespace, path);
+	}
 	//? } else {
 	/*public static ResourceLocation getId(String path) {
+		return getId(Client.MOD_ID, path);
+	}
+
+	public static ResourceLocation getId(String namespace, String path) {
 		//? if <= 1.20.1 {
-		/^return new ResourceLocation(Client.MOD_ID, path);
+		/^return new ResourceLocation(namespace, path);
 		^///? } else {
-		return ResourceLocation.fromNamespaceAndPath(Client.MOD_ID, path);
-		 //? }
+		return ResourceLocation.fromNamespaceAndPath(namespace, path);
+		//? }
 	}
 	*///? }
 

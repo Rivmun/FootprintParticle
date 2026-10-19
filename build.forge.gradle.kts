@@ -23,8 +23,6 @@ loom {
         extraAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
 
         mixinConfig("${property("mod.id")}.mixins.json")
-        // forge 专用 mixin 配置：ParticleEngineMixin（本地粒子工厂劫持），仅此加载器需要。
-        mixinConfig("${property("mod.id")}-forge.mixins.json")
     }
 
     if (sc.current.parsed < "1.20") {
@@ -136,7 +134,7 @@ tasks {
     }
 
     jar {
-        manifest.attributes["MixinConfigs"] = "${project.property("mod.id")}.mixins.json,${project.property("mod.id")}-forge.mixins.json"
+        manifest.attributes["MixinConfigs"] = "${project.property("mod.id")}.mixins.json"
     }
 
     // resolve 1.16.5 mixinextras classDefNotFound / JIJ load failure issue, powered by https://www.doubao.com/

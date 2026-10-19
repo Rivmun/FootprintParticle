@@ -9,7 +9,7 @@
     "LivingEntityMixin",
     "AbstractBoatEntityMixin",
     "AbstractMinecartEntityMixin",
-    "ParticleSpriteSetAccessor"
+    "ParticleEngineMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -1,5 +1,6 @@
 package com.rimo.footprintparticle;
 
+import com.rimo.footprintparticle.particle.FppSpriteSet;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.entity.EntityType;
@@ -8,6 +9,7 @@ import net.minecraft.world.entity.LivingEntity;
 //import net.minecraft.world.entity.Mob;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,7 +51,10 @@ public class Util {
 		String[] spriteNames = Client.CONFIG.getCustomPrintMap().getOrDefault(
 				EntityType.getKey(entity.getType()).toString(), new String[]{def});
 		List<String> finalSpriteNames = Arrays.asList(spriteNames);
-		List<TextureAtlasSprite> sprites = PlatformUtil.PLATFORM.getSprites(spriteProvider);
+		// 粒子已自托管：spriteProvider 总是我们自己的 FppSpriteSet，直接取其实时 sprite 列表。
+		List<TextureAtlasSprite> sprites = spriteProvider instanceof FppSpriteSet
+				? ((FppSpriteSet) spriteProvider).sprites()
+				: Collections.emptyList();
 		List<TextureAtlasSprite> result = sprites.stream().filter(sprite ->
 				finalSpriteNames.stream().anyMatch(str ->
 						//? if <= 1.19.2 {
