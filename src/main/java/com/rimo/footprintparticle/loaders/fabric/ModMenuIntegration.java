@@ -5,10 +5,6 @@ import com.rimo.footprintparticle.config.ConfigScreen;
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 
-/**
- * Fabric ModMenu 配置入口（{@code fabric.mod.json} 的 {@code modmenu} entrypoint）。
- * NeoForge 侧的等价物在 {@code loaders.neoforge.Platform} 里通过 {@code IConfigScreenFactory} 扩展点注册。
- */
 public class ModMenuIntegration implements ModMenuApi {
 	@Override
 	public ConfigScreenFactory<?> getModConfigScreenFactory() {

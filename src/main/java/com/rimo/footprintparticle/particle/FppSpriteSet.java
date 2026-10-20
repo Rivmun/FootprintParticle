@@ -8,66 +8,71 @@ import net.minecraft.util.RandomSource;
 /*import java.util.Random;
 *///? }
 
+import java.util.Collections;
 import java.util.List;
-import java.util.function.Supplier;
 
 /**
- * 自托管粒子专用的 {@link SpriteSet} 实现。
+ * Sprite Set of a Self-hosted Particle<br>
+ * {@link FppSpriteAtlas} resolves the sprite list on reload and pushes it in via {@link #rebind(List)};
+ *  invalidation runs in batch from {@link FppParticleRegistry#reloadSpriteSets()}.<br>
+ * <br>
+ * There is no vanilla {@code MutableSpriteSet} to borrow, so sprite lookup and rebinding are implemented here.<br>
  *
- * <p>本项目不再把粒子类型注册进原版 {@code minecraft:particle_type}（那是被 loader 同步给连接方的同步表，
- * 会让未装模组的客户端连接时因“存在未注册的粒子类型”被踢线）。因此也不再依赖原版
- * {@code ParticleEngine$MutableSpriteSet} / {@code ParticleResources$MutableSpriteSet} 与 Fabric 的
- * {@code FabricSpriteProvider}。</p>
- *
- * <p>本类<b>不缓存</b> {@link TextureAtlasSprite}，而是持有一个 {@link Supplier}：每次取 sprite 时现向粒子图集
- * 查询（见 {@link FppSpriteAtlas}）。这样既不需要在图集缝合后手动回填，也能在 F3+T
- * 资源重载后自动拿到重新缝合的 sprite（旧 sprite 对象会失效），从根本上回避了填充时序与重载失效问题。</p>
- *
- * <p>各版本 {@code SpriteSet} 接口的抽象方法集不同：1.16.5 用 {@code java.util.Random}、
- * 1.18.2~1.21.1 用 {@code RandomSource}、1.21.11+ 额外多一个 {@code first()}；下面用 Stonecutter
- * 逐版本补齐，只实现当前版本接口真正要求的方法。</p>
+ * @see FppParticleRegistry
+ * @see FppSpriteAtlas
  */
 public class FppSpriteSet implements SpriteSet {
-	private final Supplier<List<TextureAtlasSprite>> resolver;
+	private final String particlePath;
+	/**
+	 * Only replaced as a whole by {@link #rebind(List)}; getters read it directly and never probe the atlas.
+	 */
+	private List<TextureAtlasSprite> sprites = Collections.emptyList();
 
-	public FppSpriteSet(Supplier<List<TextureAtlasSprite>> resolver) {
-		this.resolver = resolver;
+	public FppSpriteSet(String particlePath) {
+		this.particlePath = particlePath;
 	}
 
-	/** 供 {@link com.rimo.footprintparticle.Util#getCustomSprites} 按名字匹配自定义贴图。 */
+	String particlePath() {
+		return this.particlePath;
+	}
+
+	/**
+	 * Auto call {@link FppSpriteAtlas#reload(FppSpriteSet)} if sprites are empty.
+	 * @return all sprites of this particle.
+	 */
 	public List<TextureAtlasSprite> sprites() {
-		return this.resolver.get();
+		if (this.sprites.isEmpty())
+			FppSpriteAtlas.reload(this);
+		return this.sprites;
 	}
 
-	@Override
-	public TextureAtlasSprite get(int index, int total) {
-		List<TextureAtlasSprite> sprites = this.resolver.get();
-		if (sprites.isEmpty())
-			return null;
-		int size = sprites.size();
-		if (size == 1)
-			return sprites.get(0);
-		// 复刻原版 ParticleEngine$MutableSpriteSet.get(int,int)：index * (size-1) / total。
-		return sprites.get(Math.abs(index) * (size - 1) / (total <= 0 ? 1 : total));
+	public void rebind(List<TextureAtlasSprite> sprites) {
+		this.sprites = sprites;
 	}
 
-	@Override
-	//? if > 1.18.2 {
+	/*
+	 * Below are implementations of SpriteSet.
+	 * just copy from vanilla, see
+	 * in net.minecraft.client.particle.ParticleEngine$MutableSpriteSet.
+	 * or net.minecraft.client.particle.ParticleResources$MutableSpriteSet.
+	 *
+	 * Must use this.sprites() so the cache can lazily fill itself before the first reload callback.
+	 */
+
+	public TextureAtlasSprite get(int index, int max) {
+		List<TextureAtlasSprite> sprites = this.sprites();
+		return sprites.get(index * (sprites.size() - 1) / max);
+	}
+
+	//~ if > 1.18.2 'Random' -> 'RandomSource'
 	public TextureAtlasSprite get(RandomSource random) {
-	//? } else {
-	/*public TextureAtlasSprite get(Random random) {
-	*///? }
-		List<TextureAtlasSprite> sprites = this.resolver.get();
-		if (sprites.isEmpty())
-			return null;
+		List<TextureAtlasSprite> sprites = this.sprites();
 		return sprites.get(random.nextInt(sprites.size()));
 	}
 
 	//? if >= 1.21.11 {
-	@Override
 	public TextureAtlasSprite first() {
-		List<TextureAtlasSprite> sprites = this.resolver.get();
-		return sprites.isEmpty() ? null : sprites.get(0);
+		return this.sprites().getFirst();
 	}
 	//? }
 }

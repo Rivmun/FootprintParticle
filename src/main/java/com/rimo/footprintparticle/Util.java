@@ -48,10 +48,12 @@ public final class Util {
 	}
 
 	public static List<TextureAtlasSprite> getCustomSprites(LivingEntity entity, SpriteSet spriteProvider, String def) {
-		String[] spriteNames = Client.CONFIG.getCustomPrintMap().getOrDefault(
-				EntityType.getKey(entity.getType()).toString(), new String[]{def});
+		String[] spriteNames = Client.CONFIG.getCustomPrintMap().get(EntityType.getKey(entity.getType()).toString());
+		// A key mapped to null or an empty array must fall back to the default sprite.
+		if (spriteNames == null || spriteNames.length == 0)
+			spriteNames = new String[]{def};
 		List<String> finalSpriteNames = Arrays.asList(spriteNames);
-		// 粒子已自托管：spriteProvider 总是我们自己的 FppSpriteSet，直接取其实时 sprite 列表。
+		// Self-hosted particles: spriteProvider is always our FppSpriteSet, so read its live sprite list.
 		List<TextureAtlasSprite> sprites = spriteProvider instanceof FppSpriteSet
 				? ((FppSpriteSet) spriteProvider).sprites()
 				: Collections.emptyList();

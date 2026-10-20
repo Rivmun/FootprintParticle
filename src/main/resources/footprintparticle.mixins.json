@@ -9,7 +9,8 @@
     "LivingEntityMixin",
     "AbstractBoatEntityMixin",
     "AbstractMinecartEntityMixin",
-    "ParticleEngineMixin"
+    "ParticleEngineMixin",
+    "TextureAtlasMixin"
   ],
   "injectors": {
     "defaultRequire": 1

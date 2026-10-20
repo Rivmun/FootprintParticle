@@ -11,12 +11,11 @@ import org.slf4j.LoggerFactory;
 //? }
 
 /**
- * 仅客户端模组的共享入口：MOD_ID / 日志 / 配置单例 / 4 个粒子类型实例。
+ * Shared Entry Point of the Client-only Mod<br>
+ * Holds MOD_ID, the logger, the config singleton and the four particle type instances.<br>
  *
- * <p>粒子类型对象在此 <em>构造</em> 为 public static final 单例（同时充当 ParticleOptions）。
- * 它们 <b>不</b> 注册进原版 {@code particle_type} 同步表——那样会被 loader 同步给连接方、踢掉未装模组的客户端。
- * 真正的"注册"由共享 {@link FppParticleRegistry} 私有持有 provider/SpriteSet，
- * 运行期经共享 {@code ParticleEngineMixin} 在 {@code makeParticle} HEAD 拦截直接造粒子。</p>
+ * @see FppParticleRegistry
+ * @see com.rimo.footprintparticle.mixin.ParticleEngineMixin
  */
 public class Client {
 	public static final String MOD_ID = "footprintparticle";
@@ -31,11 +30,13 @@ public class Client {
 	public static final WaterSplashParticleType WATERSPLASH = new WaterSplashParticleType(true);
 
 	public static void init() {
-		// Use our own particle provider.
-		// Why? The official particle register of Fabric / Neoforge still use vanilla particleSheet.
-		// Though their register only run in client, but the client will be a server in LAN game.
-		// The particleSheet will sync to client which trying to connect the host, that's make a conflict and connect will be fail.
-		// Completely self-hold entire particle provider is the only way to fix it.
+		/*
+		 * Register to our own particle provider.
+		 * Why? The official particle register of Fabric / Neoforge still use vanilla particleSheet.
+		 * Though their register only run in client, but the client will be a server in LAN game.
+		 * The particleSheet will sync to client which trying to connect the host, that's make a conflict and connect will be fail.
+		 * Completely self-hold entire particle provider is the only way to fix it.
+		 */
 		FppParticleRegistry.register(Client.FOOTPRINT, "footprint", FootprintParticle.DefaultFactory::new);
 		FppParticleRegistry.register(Client.WATERMARK, "watermark", WatermarkParticle.DefaultFactory::new);
 		FppParticleRegistry.register(Client.SNOWDUST, "snowdust", SnowDustParticle.DefaultFactory::new);
