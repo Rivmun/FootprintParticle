@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Util {
+public final class Util {
 	public static float getEntityScale(LivingEntity entity) {
 		float scale = 1f;
 

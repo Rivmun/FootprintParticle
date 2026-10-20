@@ -43,8 +43,6 @@ public class Platform implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
-		// 触发共享登记表加载（构造 provider 与 SpriteSet）；粒子注册不再触碰原版同步表。
-		FppParticleRegistry.particlePaths();
 		Client.init();
 
 		//? if <= 1.19.2 {

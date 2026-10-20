@@ -48,28 +48,20 @@ public class FppSpriteSet implements SpriteSet {
 		if (size == 1)
 			return sprites.get(0);
 		// 复刻原版 ParticleEngine$MutableSpriteSet.get(int,int)：index * (size-1) / total。
-		// setSpriteFromAge 传 (age, lifetime)，于是贴图随生命进度在整个 lifetime 上均匀推进（按 life 阶段缓慢切换），
-		// 而非每 tick 变帧。旧实现 (x + y) % size 会因 age 每 tick+1 而快速循环。
 		return sprites.get(Math.abs(index) * (size - 1) / (total <= 0 ? 1 : total));
 	}
 
-	//? if > 1.18.2 {
 	@Override
+	//? if > 1.18.2 {
 	public TextureAtlasSprite get(RandomSource random) {
-		List<TextureAtlasSprite> sprites = this.resolver.get();
-		if (sprites.isEmpty())
-			return null;
-		return sprites.get(random.nextInt(sprites.size()));
-	}
 	//? } else {
-	/*@Override
-	public TextureAtlasSprite get(Random random) {
+	/*public TextureAtlasSprite get(Random random) {
+	*///? }
 		List<TextureAtlasSprite> sprites = this.resolver.get();
 		if (sprites.isEmpty())
 			return null;
 		return sprites.get(random.nextInt(sprites.size()));
 	}
-	*///? }
 
 	//? if >= 1.21.11 {
 	@Override

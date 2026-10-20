@@ -1,6 +1,5 @@
 package com.rimo.footprintparticle.particle;
 
-import com.rimo.footprintparticle.Client;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.core.particles.ParticleType;
@@ -33,17 +32,10 @@ public final class FppParticleRegistry {
 	// 本模组全部粒子 path（与 resources 里 assets/footprintparticle/particles/<path>.json 一一对应）。
 	private static final List<String> PATHS = new ArrayList<>();
 
-	static {
-		register(Client.FOOTPRINT, "footprint", FootprintParticle.DefaultFactory::new);
-		register(Client.WATERMARK, "watermark", WatermarkParticle.DefaultFactory::new);
-		register(Client.SNOWDUST, "snowdust", SnowDustParticle.DefaultFactory::new);
-		register(Client.WATERSPLASH, "watersplash", WaterSplashParticle.DefaultFactory::new);
-	}
-
 	private FppParticleRegistry() {
 	}
 
-	private static void register(ParticleType<?> type, String path, Function<SpriteSet, ? extends ParticleProvider<?>> factory) {
+	public static void register(ParticleType<?> type, String path, Function<SpriteSet, ? extends ParticleProvider<?>> factory) {
 		FppSpriteSet spriteSet = new FppSpriteSet(() -> FppSpriteAtlas.resolve(path));
 		PROVIDERS.put(type, factory.apply(spriteSet));
 		PATHS.add(path);

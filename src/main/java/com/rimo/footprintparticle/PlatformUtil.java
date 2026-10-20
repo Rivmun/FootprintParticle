@@ -13,9 +13,6 @@ public final class PlatformUtil {
 	/** 当前加载器的实现；由 loaders.&lt;平台&gt;.Platform 静态初始化块赋值。 */
 	public static IPlatform PLATFORM;
 
-	private PlatformUtil() {
-	}
-
 	public interface IPlatform {
 		boolean isModLoaded(String id);
 		Path getConfigFolder();

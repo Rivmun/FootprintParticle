@@ -51,6 +51,7 @@ public class Platform {
 					return FMLPaths.CONFIGDIR.get();
 				}
 			};
+
 			// ≤1.19.2-forge：TextureStitchEvent 属加载期事件，在 Forge 派发于 MOD 总线（挂 game 总线 /
 			// MinecraftForge.EVENT_BUS 与 bus=FORGE 实测都无回调）。故把缝合监听器注册到本 mod 的 MOD 总线；
 			// register(Class) 依方法上的 @SubscribeEvent 解析事件类型。
@@ -62,9 +63,8 @@ public class Platform {
 
 		@SubscribeEvent
 		public static void onClientSetup(FMLClientSetupEvent event) {
-			// 触发共享登记表加载（构造 provider 与 SpriteSet）。
-			FppParticleRegistry.particlePaths();
 			Client.init();
+
 			//~ if 1.16.5 'cloth_config' -> 'cloth-config'
 			if (ModList.get().isLoaded("cloth_config")) {
 				ModList.get().getModContainerById(Client.MOD_ID).ifPresent(container ->

@@ -31,6 +31,14 @@ public class Client {
 	public static final WaterSplashParticleType WATERSPLASH = new WaterSplashParticleType(true);
 
 	public static void init() {
-		// 粒子自托管由 FppParticleRegistry 静态初始化完成；此处保留为共享初始化钩子。
+		// Use our own particle provider.
+		// Why? The official particle register of Fabric / Neoforge still use vanilla particleSheet.
+		// Though their register only run in client, but the client will be a server in LAN game.
+		// The particleSheet will sync to client which trying to connect the host, that's make a conflict and connect will be fail.
+		// Completely self-hold entire particle provider is the only way to fix it.
+		FppParticleRegistry.register(Client.FOOTPRINT, "footprint", FootprintParticle.DefaultFactory::new);
+		FppParticleRegistry.register(Client.WATERMARK, "watermark", WatermarkParticle.DefaultFactory::new);
+		FppParticleRegistry.register(Client.SNOWDUST, "snowdust", SnowDustParticle.DefaultFactory::new);
+		FppParticleRegistry.register(Client.WATERSPLASH, "watersplash", WaterSplashParticle.DefaultFactory::new);
 	}
 }

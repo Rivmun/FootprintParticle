@@ -46,8 +46,6 @@ public class Platform {
 	public static class ClientEvents {
 		@SubscribeEvent
 		public static void onClientSetup(FMLClientSetupEvent event) {
-			// 触发共享登记表加载（构造 provider 与 SpriteSet）。
-			FppParticleRegistry.particlePaths();
 			Client.init();
 			if (ModList.get().isLoaded("cloth_config")) {
 				ModList.get().getModContainerById(Client.MOD_ID).ifPresent(container ->
