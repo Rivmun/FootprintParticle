@@ -13,9 +13,9 @@ import static com.rimo.footprintparticle.Client.CONFIG;
 
 public class WatermarkParticle extends FootprintParticle {
 
-	protected WatermarkParticle(ClientLevel clientWorld, double x, double y, double z, double vx, double vy, double vz, SpriteSet spriteProvider, FootprintParticleType parameters, String defName) {
-		super(clientWorld, x, y, z, vx, vy, vz, spriteProvider, parameters, defName);
-		this.setAlpha(CONFIG.getWatermarkAlpha() * (CONFIG.getWetDuration() * 20 - (float) vy) / CONFIG.getWetDuration() / 20);
+	protected WatermarkParticle(ClientLevel clientWorld, double x, double y, double z, double dx, double size, double dz, SpriteSet spriteProvider, WatermarkParticleType parameters, String defName) {
+		super(clientWorld, x, y, z, dx, size, dz, spriteProvider, parameters, defName);
+		this.setAlpha(CONFIG.getWatermarkAlpha() * (CONFIG.getWetDuration() * 20 - (float) parameters.startAlpha) / CONFIG.getWetDuration() / 20);
 		this.lifetime = (int) (CONFIG.getWatermarkLifetime() * 20);
 	}
 
@@ -27,9 +27,9 @@ public class WatermarkParticle extends FootprintParticle {
 		}
 
 		@Override
-		//~ if < 1.21.11 'velocityZ, @NonNull RandomSource random' -> 'velocityZ'
-		public Particle createParticle(@NonNull SimpleParticleType parameters, @NonNull ClientLevel world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, @NonNull RandomSource random) {
-			return new WatermarkParticle(world, x, y, z, velocityX, velocityY, velocityZ, this.spriteProvider, (WatermarkParticleType) parameters, "watermark");
+		//~ if < 1.21.11 'double dz, @NonNull RandomSource random) {' -> 'double dz) {'
+		public Particle createParticle(@NonNull SimpleParticleType parameters, @NonNull ClientLevel world, double x, double y, double z, double dx, double size, double dz, @NonNull RandomSource random) {
+			return new WatermarkParticle(world, x, y, z, dx, size, dz, this.spriteProvider, (WatermarkParticleType) parameters, "watermark");
 		}
 	}
 }

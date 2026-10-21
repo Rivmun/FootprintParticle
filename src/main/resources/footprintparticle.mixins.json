@@ -7,8 +7,8 @@
   ],
   "client": [
     "LivingEntityMixin",
-    "AbstractBoatEntityMixin",
-    "AbstractMinecartEntityMixin",
+    "AbstractBoatMixin",
+    "AbstractMinecartMixin",
     "ParticleEngineMixin",
     "TextureAtlasMixin"
   ],

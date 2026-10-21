@@ -12,7 +12,7 @@ public class FootprintParticleType extends SimpleParticleType {
 		super(alwaysShow);
 	}
 
-	public ParticleOptions setData(LivingEntity entity) {
+	public ParticleOptions setEntity(LivingEntity entity) {
 		this.entity = entity;
 		return this;
 	}

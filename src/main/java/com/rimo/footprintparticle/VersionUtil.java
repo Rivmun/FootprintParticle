@@ -18,8 +18,10 @@ import java.util.Collections;
 *///? } else {
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
-import java.util.List;
 //? }
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Full of Stonecutter language here as you like...
@@ -78,4 +80,11 @@ public final class VersionUtil {
 		return block.tags().toList();
 	}
 	//? }
+
+	public static List<String> getBlockTagNames(BlockState block) {
+		return getBlockTags(block).stream().map(tag ->
+				//~ if 1.16.5 '"#" + tag.location().toString()' -> '"#" + tag.toString()'
+				"#" + tag.location().toString()  // DO NOT remove '.toString()', IDE is a liar!
+		).collect(Collectors.toList());
+	}
 }

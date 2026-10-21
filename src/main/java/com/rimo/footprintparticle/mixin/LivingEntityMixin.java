@@ -1,7 +1,6 @@
 package com.rimo.footprintparticle.mixin;
 
 import com.rimo.footprintparticle.Client;
-import com.rimo.footprintparticle.Util;
 import com.rimo.footprintparticle.VersionUtil;
 import com.rimo.footprintparticle.config.WorkMode;
 import net.minecraft.core.BlockPos;
@@ -24,13 +23,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /*import net.minecraft.world.entity.player.Player;
 import net.minecraft.resources.ResourceLocation;
 *///? }
+//? if < 1.21.11
+//import com.rimo.footprintparticle.PlatformUtil;
+//? if < 1.21.1 && > 1.16.5
+//import net.minecraft.world.entity.Mob;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 import static com.rimo.footprintparticle.Client.CONFIG;
 
-//~ if < 1.20.1 'this.level()' -> 'this.level' {
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
 	public LivingEntityMixin(EntityType<?> type, Level world) {
@@ -44,6 +48,7 @@ public abstract class LivingEntityMixin extends Entity {
 	@Unique private boolean fpp$wasFalling;
 	@Unique private int fpp$wetTimer = CONFIG.getWetDuration() * 20;
 	@Unique private double fpp$lastX, fpp$lastZ, fpp$lastY;
+	@Unique private static boolean fpp$noPehkui, fpp$noRandomMobsizes;
 
 	@Inject(method = "tick", at = @At("TAIL"))
 	public void fpp$tick(CallbackInfo ci) {
@@ -79,12 +84,13 @@ public abstract class LivingEntityMixin extends Entity {
 
 		// Swim Pop
 		if (this.isSwimming() && fpp$isEnable(CONFIG.getSwimPopLevel())) {
-			float range = Util.getEntityScale((LivingEntity) (Object) this);
+			float range = fpp$getEntityScale((LivingEntity) (Object) this);
+			//~ if < 1.20.1 'this.level()' -> 'this.level'
 			this.level().addParticle(
 					ParticleTypes.BUBBLE,
-					this.getX() + Math.random() - 0.5f * range,
-					this.getY() + Math.random() - 0.5f * range,
-					this.getZ() + Math.random() - 0.5f * range,
+					this.getX() + (Math.random() - 0.5f) * range,
+					this.getY() + (Math.random() - 0.5f) * range,
+					this.getZ() + (Math.random() - 0.5f) * range,
 					0,
 					Math.random() / 10f,
 					0
@@ -101,61 +107,67 @@ public abstract class LivingEntityMixin extends Entity {
 			return false;
 		if (!CONFIG.getCanGenWhenInvisible() && this.isInvisible())
 			return false;
+		//~ if < 1.20.1 'this.level()' -> 'this.level'
+		Level level = this.level();
+		double px = this.getX();
+		double py = this.getY();
+		double pz = this.getZ();
+		float yawRad = (float) Math.toRadians(this.getRotationVector().y);
+		float dx = - Mth.sin(yawRad);  // horizontal facing vector.
+		float dz =   Mth.cos(yawRad);
+		LivingEntity entity = (LivingEntity) (Object) this;
+		float scale = fpp$getEntityScale(id, entity);
+		boolean isSprinting = this.isSprinting();
 
 		// Set Interval
-		fpp$timer = this.isSprinting() ? (int) (CONFIG.getSecPerPrint() * 13.33f) : (int) (CONFIG.getSecPerPrint() * 20);
+		fpp$timer = isSprinting ? (int) (CONFIG.getSecPerPrint() * 13.33f) : (int) (CONFIG.getSecPerPrint() * 20);
 		Float interval = CONFIG.getMobIntervalMap().get(id);
 		if (interval != null)
 			fpp$timer *= interval;
 
 		// Fix pos. 2 steps:
-		double px = this.getX();
-		double py = this.getY();
-		double pz = this.getZ();
-		float scale = Util.getEntityScale((LivingEntity) (Object) this);
-
 		// 1.Horizontal Offset
 		// 1.1 Front and back
-		int side = Math.random() > 0.5f ? 1 : -1;
-		double hOffset = 0.075f;  // default f/b offset for all entity to decrease repetition.
-		java.util.Map<String, Float> horseMap = CONFIG.getHorseLikeMobsMap();
+		double fbOffset = 0.075f;  // default f/b offset for all entity to decrease repetition.
+		Map<String, Float> horseMap = CONFIG.getHorseLikeMobsMap();
 		if (horseMap.containsKey(id)) {
 			Float front = horseMap.get(id);
-			hOffset = front != null ? front : 0.75f;  // 0.75F if value not found (matching the vanilla horse)
-			fpp$timer = (int) (this.getControllingPassenger() != null ?
-					//~ if 1.16.5 '.isAlwaysTicking()' -> ' instanceof Player'
-					this.getControllingPassenger().isAlwaysTicking() ?
-							fpp$timer * 0.5f :
-							fpp$timer * 1.33f :
-					fpp$timer * 1.33f
-			);
+			fbOffset = front != null ? front : 0.75f;  // 0.75F if value not found (matching the vanilla horse)
+			Entity passenger = this.getControllingPassenger();  // speed up the generation if ridden by player.
+			//~ if 1.16.5 'passenger != null && passenger.isAlwaysTicking()' -> 'passenger instanceof Player'
+			fpp$timer *= (passenger != null && passenger.isAlwaysTicking() ? 0.5f : 1.33f);
 		}
-		hOffset *= scale;
-		px -= hOffset * side * Mth.sin((float) Math.toRadians(this.getRotationVector().y));
-		pz += hOffset * side * Mth.cos((float) Math.toRadians(this.getRotationVector().y));
+		double fB = fbOffset * scale * (Math.random() > 0.5f ? 1 : -1);  // random a side.
 		// 1.2 Left and right
-		side = Math.random() > 0.5f ? 1 : -1;
-		hOffset = 0.15f;  // default l/r offset for all entity to decrease repetition. (matching vanilla player)
-		java.util.Map<String, Float> spiderMap = CONFIG.getSpiderLikeMobsMap();
+		double lrOffset = 0.15f;  // default l/r offset for all entity to decrease repetition. (matching vanilla player)
+		Map<String, Float> spiderMap = CONFIG.getSpiderLikeMobsMap();
 		if (spiderMap.containsKey(id)) {
 			Float lateral = spiderMap.get(id);
-			hOffset = lateral != null ? lateral : 0.9f;  // 0.9F if value not found (matching the vanilla spider)
+			lrOffset = lateral != null ? lateral : 0.9f;  // 0.9F if value not found (matching the vanilla spider)
 		}
-		hOffset *= scale;
-		px -= hOffset * side * Mth.sin((float) Math.toRadians(this.getRotationVector().y + 90));
-		pz += hOffset * side * Mth.cos((float) Math.toRadians(this.getRotationVector().y + 90));
+		double lR = lrOffset * scale * (Math.random() > 0.5f ? 1 : -1);
+		// 1.3 Apply: f/b follows the facing vector (sin, cos), l/r follows its right normal (-cos, sin).
+		px += fB * dx - lR * dz;
+		pz += fB * dz + lR * dx;
 
 		// 2.Vertical Offset
 		int colX = Mth.floor(px), colZ = Mth.floor(pz), feetY = Mth.floor(py);
 		boolean canGen = false;
 		BlockState blockState = null;
+		String blockName = null;
+		List<String> blockTagNames = null;
+
 		for (int i = 0; i < 2; i++) {  // 2 loop, first is feetBlock, second is belowBlock.
 			BlockPos pos = new BlockPos(colX, feetY - i, colZ);
-			blockState = this.level().getBlockState(pos);
-			VoxelShape blockShape = blockState.getCollisionShape(this.level(), pos);
-			boolean isInBlackList = fpp$isInSet(blockState, CONFIG.getExcludedBlockSet());
+			blockState = level.getBlockState(pos);
+			VoxelShape blockShape = blockState.getCollisionShape(level, pos);
+			blockName = VersionUtil.getBlockName(blockState);
+			blockTagNames = VersionUtil.getBlockTagNames(blockState);
+			boolean isInBlackList = fpp$isInSet(blockName, blockTagNames, CONFIG.getExcludedBlockSet());
 			double tempY = Double.NEGATIVE_INFINITY;
-			if (fpp$isInSet(blockState, CONFIG.getApplyBlockSet())) {  // Highest priority.
+
+			// Hope you can understand what you have written here in the future :P
+			if (fpp$isInSet(blockName, blockTagNames, CONFIG.getApplyBlockSet())) {  // Highest priority.
 				tempY = blockShape.isEmpty() ?
 						feetY - i :
 						Math.min(pos.getY() + blockShape.max(Direction.Axis.Y), py);  // strict print pos never higher than feet.
@@ -175,6 +187,7 @@ public abstract class LivingEntityMixin extends Entity {
 					break;  // jump, only try to gen water print & splash.
 				}  // else continue;
 			}
+
 			if (tempY != Double.NEGATIVE_INFINITY) {
 				if (tempY <= py - CONFIG.getGenHeightGap() / (landedOrJump ? 1F : 4F)) {  // Limited dist from feet to print. walking must closer than jumping.
 					fpp$timer = 0;  // reset timer because nothing generated.
@@ -191,60 +204,51 @@ public abstract class LivingEntityMixin extends Entity {
 		py += 0.01F;  // prevent z-fight with terrain.
 
 		// Generate
-		double dx, dz;      // get facing
-		//~ if 1.16.5 'this.getDeltaMovement().horizontalDistance() == 0' -> 'this.getDeltaMovement().x == 0 && this.getDeltaMovement().z == 0'
-		if (this.getDeltaMovement().horizontalDistance() == 0) {
-			dx = -Mth.sin((float) Math.toRadians(this.getRotationVector().y));
-			dz =  Mth.cos((float) Math.toRadians(this.getRotationVector().y));
-		} else {
-			dx = this.getDeltaMovement().x();
-			dz = this.getDeltaMovement().z();
-		}
+		int wetLimit = CONFIG.getWetDuration() * 20;
 		if (canGen) {
 			// Fix height by blocks if in...(extra vertical offset)
-			Float height = CONFIG.getBlockHeightMap().get(VersionUtil.getBlockName(blockState));
+			Map<String, Float> heightMap = CONFIG.getBlockHeightMap();
+			Float height = heightMap.get(blockName);
 			if (height != null) {
 				py += height;
 			} else {
-				py += VersionUtil.getBlockTags(blockState).stream().map(
-						//~ if 1.16.5 'tag.location().' -> 'tag.'
-						tag -> CONFIG.getBlockHeightMap().get("#" + tag.location().toString())
-				).filter(Objects::nonNull).findFirst().orElse(0f);
+				py += blockTagNames.stream().map(heightMap::get).filter(Objects::nonNull).findFirst().orElse(0f);
 			}
 
 			// footprint
-			this.level().addParticle(Client.FOOTPRINT.setData((LivingEntity) (Object) this), px, py, pz, dx, 0, dz);
+			level.addParticle(Client.FOOTPRINT.setEntity(entity), px, py, pz, dx, scale, dz);
 			// Snow Dust
 			if (blockState.is(Blocks.SNOW) && fpp$isEnable(CONFIG.getSnowDustLevel())) {
-				int i = this.isSprinting() ? 4 : 2;
-				int v = this.isSprinting() ? 3 : 10;
-				while (--i >= 0) {
-					this.level().addParticle(Client.SNOWDUST.setData(scale), px, py, pz,
-							(Math.random() - 0.5f) / v,
+				int count = isSprinting ? 4 : 2;
+				int range = isSprinting ? 3 : 10;
+				while (--count >= 0) {
+					level.addParticle(Client.SNOWDUST.setSize(scale), px, py, pz,
+							(Math.random() - 0.5f) / range,
 							0,
-							(Math.random() - 0.5f) / v
+							(Math.random() - 0.5f) / range
 					);
 				}
 			}
-		} else if (fpp$wetTimer <= CONFIG.getWetDuration() * 20) {
+		} else if (fpp$wetTimer <= wetLimit) {
 			// waterprint (gen when footprint not gen)
-			this.level().addParticle(Client.WATERMARK.setData((LivingEntity) (Object) this), px, py, pz, dx, fpp$wetTimer, dz);		// push timer to calc alpha
+			level.addParticle(Client.WATERMARK.setStartAlpha(fpp$wetTimer).setEntity(entity),   // push timer to calc alpha
+					px, py, pz, dx, scale, dz);
 		}
 		// water splash (gen whatever print gen)
-		if (fpp$wetTimer <= CONFIG.getWetDuration() * 20 && fpp$isEnable(CONFIG.getWaterSplashLevel())) {
-			float range = Util.getEntityScale((LivingEntity) (Object) this);
-			int i = (int)((this.isSprinting() ? 18 : 10) * Math.max((0.7f - (float) fpp$wetTimer / (CONFIG.getWetDuration() * 20)), 0));
-			int v = this.isSprinting() ? 3 : 6;
-			while (--i > 0) {
-				this.level().addParticle(
+		if (fpp$wetTimer <= wetLimit && fpp$isEnable(CONFIG.getWaterSplashLevel())) {
+			int count = (int)((isSprinting ? 18 : 10) * Math.max((0.7f - (float) fpp$wetTimer / (wetLimit)), 0));
+			int range = isSprinting ? 3 : 6;
+			//~ if 1.16.5 '.horizontalDistance' -> '.length'
+			double velocity = this.getDeltaMovement().horizontalDistance();
+			while (--count > 0) {
+				level.addParticle(
 						Client.WATERSPLASH,
-						px - 0.25f * range + Math.random() / 4,
+						px - 0.25f * scale + Math.random() / 4,
 						py,
-						pz - 0.25f * range + Math.random() / 4,
-						(Math.random() - 0.5f) / v,
-						//~ if 1.16.5 '.horizontalDistance' -> '.length'
-						0.02f + Math.random() * this.getDeltaMovement().horizontalDistance(),
-						(Math.random() - 0.5f) / v
+						pz - 0.25f * scale + Math.random() / 4,
+						(Math.random() - 0.5f) / range,
+						0.02f + Math.random() * velocity,
+						(Math.random() - 0.5f) / range
 				);
 			}
 		}
@@ -258,15 +262,14 @@ public abstract class LivingEntityMixin extends Entity {
 		//~ if 1.16.5 '.defaultDestroyTime' -> '.getExplosionResistance'
 		float hardness = blockState.getBlock().defaultDestroyTime();
 		float hardnessGate = CONFIG.getHardnessGate();
-		return hardnessGate > 0 && hardness >= 0 && Mth.abs(hardness) < hardnessGate;
+		return hardnessGate > 0 && hardness >= 0 && hardness < hardnessGate;
 	}
 
 	@Unique
-	private boolean fpp$isInSet(BlockState blockState, Set<String> set) {
-		return set.contains(VersionUtil.getBlockName(blockState)) ||
-		       VersionUtil.getBlockTags(blockState).stream().anyMatch(tag ->
-				       //~ if 1.16.5 '.location().toString()' -> '.toString()'
-				       set.contains("#" + tag.location().toString()));  // DO NOT remove .toString() you fool! IDE was a liar!
+	private boolean fpp$isInSet(String blockName, List<String> blockTagNames, Set<String> set) {
+		if (set.isEmpty())
+			return false;
+		return set.contains(blockName) || blockTagNames.stream().anyMatch(set::contains);
 	}
 
 	@Unique
@@ -274,5 +277,47 @@ public abstract class LivingEntityMixin extends Entity {
 		//~ if 1.16.5 'this.isAlwaysTicking()' -> '(((LivingEntity) (Object) this) instanceof Player)'
 		return workMode == WorkMode.ALL || (workMode == WorkMode.PLAYER_ONLY && this.isAlwaysTicking());
 	}
+
+	@Unique
+	private static float fpp$getEntityScale(LivingEntity entity) {
+		return fpp$getEntityScale(EntityType.getKey(entity.getType()).toString(), entity);
+	}
+
+	@Unique
+	private static float fpp$getEntityScale(String Id, LivingEntity entity) {
+		float scale = 1f;
+
+		Float configured = CONFIG.getSizePerMobMap().get(Id);
+		if (configured != null)
+			scale *= configured;
+
+		//? if < 1.21.11 {
+		/*if (! fpp$noPehkui && PlatformUtil.PLATFORM.isModLoaded("pehkui")) {
+			try {
+				scale *= virtuoel.pehkui.api.ScaleTypes.BASE.getScaleData(entity).getScale();
+			} catch (Exception | LinkageError e) {
+				fpp$noPehkui = true;
+			}
+		}
+		*///? }
+		// seems randommobsizes do not have its own scaling since vanilla makes one on 1.21+
+		//? if < 1.21.1 && > 1.16.5 {
+		/*if (! fpp$noRandomMobsizes && PlatformUtil.PLATFORM.isModLoaded("random_mob_sizes") && entity instanceof Mob) {
+			try {
+				//? if ! 1.19.2 {
+				scale *= ((com.tristankechlo.random_mob_sizes.mixin_helper.MobMixinAddon) entity).getMobScaling$RandomMobSizes();
+				//? } else {
+				/^scale *= ((com.tristankechlo.random_mob_sizes.mixin_access.MobMixinAddon) entity).getMobScaling();  // randommobsizes version < 2.0
+				^///? }
+			} catch (Exception | LinkageError e) {
+				fpp$noRandomMobsizes = true;
+			}
+		}
+		*///? }
+
+		if (entity.isBaby())
+			scale *= 0.66f;
+		scale *= entity.getScale();
+		return scale;
+	}
 }
-//~ }

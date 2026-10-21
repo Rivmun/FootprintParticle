@@ -10,7 +10,7 @@ public class SnowDustParticleType extends SimpleParticleType {
         super(alwaysShow);
     }
 
-    public ParticleOptions setData(float size) {
+    public ParticleOptions setSize(float size) {
         this.size = size;
         return this;
     }
