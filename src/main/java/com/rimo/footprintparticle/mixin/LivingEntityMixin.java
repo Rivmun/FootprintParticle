@@ -228,8 +228,7 @@ public abstract class LivingEntityMixin extends Entity {
 			}
 		} else if (fpp$wetTimer <= CONFIG.getWetDuration() * 20) {
 			// waterprint (gen when footprint not gen)
-			int i = Math.random() > 0.5f ? 1 : -1;
-			this.level().addParticle(Client.WATERMARK.setData((LivingEntity) (Object) this), px, py, pz, dx * i, fpp$wetTimer, dz * i);		// push timer to calc alpha
+			this.level().addParticle(Client.WATERMARK.setData((LivingEntity) (Object) this), px, py, pz, dx, fpp$wetTimer, dz);		// push timer to calc alpha
 		}
 		// water splash (gen whatever print gen)
 		if (fpp$wetTimer <= CONFIG.getWetDuration() * 20 && fpp$isEnable(CONFIG.getWaterSplashLevel())) {
