@@ -45,16 +45,30 @@ public class Platform {
 				}
 			};
 
-			// 1.19.2 and older: TextureStitchEvent is fired on the MOD bus, not the game bus;
-			// register the stitcher here so its @SubscribeEvent methods are picked up.
+			/*
+			 * 1.19.2 and older: TextureStitchEvent is fired on the MOD bus, not the game bus;
+			 * register the stitcher here so its @SubscribeEvent methods are picked up.
+			 *
+			 * The stitcher adds the texture ids returned by FppParticleRegistry.particlePaths(), so the
+			 * particles must already be registered before the stitch runs. But the FMLClientSetupEvent
+			 * (via onClientSetup) fires too late on these versions. When the stitcher invoked by event,
+			 * the registry would still be empty and nothing will be stitched. That causes our particle
+			 * cannot load texture but only black-purple tile.
+			 * We must put our particle register besides stitcher register, to ensure that particle was
+			 * registered before stitching.
+			 ^/
 			//? if forge && <= 1.19.2 {
-			/^net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus()
+			/^Client.init();
+			net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus()
 					.register(ForgeParticleStitcher.class);
 			^///? }
 		}
 
 		@SubscribeEvent
 		public static void onClientSetup(FMLClientSetupEvent event) {
+			// 1.20.1 and later: texture stitch is data-driven by vanilla itself that particle JSON will be automatic loaded.
+			// We can safely register our particle at anytime before particle has been created.
+			//? if > 1.19.2
 			Client.init();
 
 			//~ if 1.16.5 'cloth_config' -> 'cloth-config'
