@@ -24,10 +24,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /*import net.minecraft.world.entity.player.Player;
 import net.minecraft.resources.ResourceLocation;
 *///? }
-//? if < 1.21.11
-//import com.rimo.footprintparticle.PlatformUtil;
-//? if < 1.21.1 && > 1.16.5
-//import net.minecraft.world.entity.Mob;
 
 import java.util.List;
 import java.util.Map;
@@ -47,7 +43,6 @@ public abstract class LivingEntityMixin extends Entity {
 	@Unique private boolean fpp$hasLastPos;
 	@Unique private int fpp$wetTimer = CONFIG.getWetDuration() * 20;
 	@Unique private double fpp$lastX, fpp$lastZ, fpp$lastY;
-	@Unique private static boolean fpp$noPehkui, fpp$noRandomMobsizes;
 
 	@Inject(method = "tick", at = @At("TAIL"))
 	public void fpp$tick(CallbackInfo ci) {
@@ -90,7 +85,7 @@ public abstract class LivingEntityMixin extends Entity {
 
 		// Swim Pop
 		if (near && this.isSwimming() && fpp$isEnable(CONFIG.getSwimPopLevel())) {
-			float range = fpp$getEntityScale((LivingEntity) (Object) this);
+			float range = VersionUtil.getEntityScale((LivingEntity) (Object) this);
 			//~ if < 1.20.1 'this.level()' -> 'this.level'
 			this.level().addParticle(
 					ParticleTypes.BUBBLE,
@@ -123,7 +118,7 @@ public abstract class LivingEntityMixin extends Entity {
 		float dx = - Mth.sin(yawRad);  // horizontal facing vector.
 		float dz =   Mth.cos(yawRad);
 		LivingEntity entity = (LivingEntity) (Object) this;
-		float scale = fpp$getEntityScale(id, entity);
+		float scale = VersionUtil.getEntityScale(id, entity);
 		boolean isSprinting = this.isSprinting();
 
 		// Set Interval
@@ -283,48 +278,5 @@ public abstract class LivingEntityMixin extends Entity {
 	private boolean fpp$isEnable(WorkMode workMode) {
 		//~ if 1.16.5 'this.isAlwaysTicking()' -> '(((LivingEntity) (Object) this) instanceof Player)'
 		return workMode == WorkMode.ALL || (workMode == WorkMode.PLAYER_ONLY && this.isAlwaysTicking());
-	}
-
-	@Unique
-	private static float fpp$getEntityScale(LivingEntity entity) {
-		return fpp$getEntityScale(EntityType.getKey(entity.getType()).toString(), entity);
-	}
-
-	@Unique
-	private static float fpp$getEntityScale(String Id, LivingEntity entity) {
-		float scale = 1f;
-
-		Float configured = CONFIG.getSizePerMobMap().get(Id);
-		if (configured != null)
-			scale *= configured;
-
-		//? if < 1.21.11 {
-		/*if (! fpp$noPehkui && PlatformUtil.PLATFORM.isModLoaded("pehkui")) {
-			try {
-				scale *= virtuoel.pehkui.api.ScaleTypes.BASE.getScaleData(entity).getScale();
-			} catch (Exception | LinkageError e) {
-				fpp$noPehkui = true;
-			}
-		}
-		*///? }
-		// seems randommobsizes do not have its own scaling since vanilla makes one on 1.21+
-		//? if < 1.21.1 && > 1.16.5 {
-		/*if (! fpp$noRandomMobsizes && PlatformUtil.PLATFORM.isModLoaded("random_mob_sizes") && entity instanceof Mob) {
-			try {
-				//? if ! 1.19.2 {
-				scale *= ((com.tristankechlo.random_mob_sizes.mixin_helper.MobMixinAddon) entity).getMobScaling$RandomMobSizes();
-				//? } else {
-				/^scale *= ((com.tristankechlo.random_mob_sizes.mixin_access.MobMixinAddon) entity).getMobScaling();  // randommobsizes version < 2.0
-				^///? }
-			} catch (Exception | LinkageError e) {
-				fpp$noRandomMobsizes = true;
-			}
-		}
-		*///? }
-
-		if (entity.isBaby())
-			scale *= 0.66f;
-		scale *= entity.getScale();
-		return scale;
 	}
 }
