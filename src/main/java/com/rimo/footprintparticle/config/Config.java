@@ -154,7 +154,8 @@ public class Config {
 	static final List<String> DEF_EXCLUDEDBLOCKS = Arrays.asList(
 			"#minecraft:beehives",
 			"#minecraft:pressure_plates",
-			"#c:villager_job_sites",
+			"minecraft:brewing_stand",
+			"minecraft:composter",
 			"minecraft:tnt",
 			"minecraft:target",
 			"minecraft:daylight_detector",
@@ -164,8 +165,10 @@ public class Config {
 			"minecraft:sea_lantern",
 			"minecraft:glowstone",
 			"minecraft:magma_block",
-			"#c:froglights",
-			"minecraft:big_dripleaf"
+			"minecraft:big_dripleaf",
+			"minecraft:ochre_froglight",
+			"minecraft:verdant_froglight",
+			"minecraft:pearlescent_froglight"
 	);
 	static final List<String> DEF_MODS = Arrays.asList(
 			"#aquatic",
