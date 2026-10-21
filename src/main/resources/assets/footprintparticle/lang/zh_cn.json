@@ -50,7 +50,6 @@
 	"text.footprintparticle.option.hardnessGate.@Tooltip": "硬度小于该值的方块将生成脚印。\n你可以将该值设为0来禁用所有方块，或者设为999来启用所有方块\n默认值为0.7",
 	"text.footprintparticle.option.genHeightGap": "生成高度间隔",
 	"text.footprintparticle.option.genHeightGap.@Tooltip": "控制脚印会在离生物脚部多远的地面上生成。默认值为 0.5\n如果其他玩家在连续跳跃时无法生成脚印，请适当提高该参数；\n如果你在落地时脚印会生成在离脚部很远的其他方块上，请适当降低该参数。",
-
 	"text.footprintparticle.category.misc": "额外功能",
 	"text.footprintparticle.option.railFlameRange": "矿车行驶时产生火花",
 	"text.footprintparticle.option.enableBoatTrail": "船只行驶时产生水花",
@@ -59,6 +58,8 @@
 	"text.footprintparticle.option.waterSplashLevel": "溅起水花（当在雨中行走时）",
 	"text.footprintparticle.category.filter": "过滤",
 	"text.footprintparticle.category.custom": "自定义",
+	"text.footprintparticle.option.genDistChunk": "生成距离",
+	"text.footprintparticle.option.genDistChunk.@Tooltip": "与你的距离大于此数值的生物不会生成任何本模组的粒子。\n单位为区块（每个区块 16 个方块）。",
 
 	"modmenu.descriptionTranslation.footprintparticle": "一个简单地为生物和玩家添加脚印粒子的模组。"
 }

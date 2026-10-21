@@ -53,6 +53,7 @@ public class Config {
 	private WorkMode snowDustLevel = DEF_SNOW_DUST_LEVEL;
 	private WorkMode waterSplashLevel = DEF_WATER_SPLASH_LEVEL;
 	private int genHeightGap = DEF_GEN_HEIGHT_GAP;
+	private int genDistChunk = DEF_GEN_DIST_CHUNK;
 
 	public WorkMode getEnableMod() {return enableMod;}
 	public float getSecPerPrint() {return secPerPrint / 10f;}
@@ -81,6 +82,7 @@ public class Config {
 	public WorkMode getSnowDustLevel() {return snowDustLevel;}
 	public WorkMode getWaterSplashLevel() {return waterSplashLevel;}
 	public float getGenHeightGap() {return genHeightGap / 10F;}
+	public int getGenDistSqr() {return genDistChunk * genDistChunk * 256;}
 
 	public void setEnableMod(WorkMode enableMod) {this.enableMod = enableMod;}
 	public void setWetDuration(int wetDuration) {this.wetDuration = wetDuration;}
@@ -109,6 +111,7 @@ public class Config {
 	public void setSnowDustLevel(WorkMode snowDustLevel) {this.snowDustLevel = snowDustLevel;}
 	public void setWaterSplashLevel(WorkMode waterSplashLevel) {this.waterSplashLevel = waterSplashLevel;}
 	public void setGenHeightGap(int genHeightGap) {this.genHeightGap = genHeightGap;}
+	public void setGenDistChunk(int genDistChunk) {this.genDistChunk = genDistChunk;}
 
 	/* - - - - - Raw collection views (avoid copying to List) - - - - - */
 
@@ -140,6 +143,7 @@ public class Config {
 	static final WorkMode DEF_SNOW_DUST_LEVEL = WorkMode.ALL;
 	static final WorkMode DEF_WATER_SPLASH_LEVEL = WorkMode.PLAYER_ONLY;
 	static final int DEF_GEN_HEIGHT_GAP = 5;
+	static final int DEF_GEN_DIST_CHUNK = 4;
 	static final List<String> DEF_APPLYBLOCKS = Arrays.asList(
 			"#minecraft:wool",
 			"#minecraft:wool_slabs",

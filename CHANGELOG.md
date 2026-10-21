@@ -5,7 +5,7 @@
 - Refactor boat & minecart mixin.
   - Fix they'll spit out a lot of particle when placed.
   - Improved generator performance.
-- Limited max generate distance of our particles. Before it bases on simulate distance.
+- Add an option to limited max generate distance of our particles. Default is 64 blocks.
 - Fix '#c' tag in default list cannot be matched on Forge by replace them to specific block name. (i.e. composter, froglight)
 - Remove accesswidener file that no longer in use from Forge build.
 - Improved performance of self-hosted particle system.

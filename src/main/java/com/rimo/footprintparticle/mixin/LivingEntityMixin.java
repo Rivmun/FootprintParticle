@@ -65,7 +65,7 @@ public abstract class LivingEntityMixin extends Entity {
 
 		// Vanilla only sends world particles to players within 32 blocks; ours are client-side, so cap them at 64 blocks.
 		Minecraft minecraft = Minecraft.getInstance();
-		boolean near = minecraft.player == null || this.distanceToSqr(minecraft.player) <= 64.0 * 64.0;
+		boolean near = minecraft.player == null || this.distanceToSqr(minecraft.player) <= CONFIG.getGenDistSqr();
 
 		boolean generated = false;
 		if (near && !this.isShiftKeyDown() && !this.isUnderWater()) {

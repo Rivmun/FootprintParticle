@@ -59,7 +59,7 @@ public abstract class AbstractMinecartMixin extends Entity {
 			return;
 
 		Minecraft minecraft = Minecraft.getInstance();
-		if (minecraft.player != null && this.distanceToSqr(minecraft.player) > 64.0 * 64.0)
+		if (minecraft.player != null && this.distanceToSqr(minecraft.player) > Client.CONFIG.getGenDistSqr())
 			return;
 
 		int side = Math.random() > 0.5f ? 1 : -1;

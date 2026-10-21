@@ -57,5 +57,7 @@
 	"text.footprintparticle.option.snowDustLevel": "Kick up snow (when print gen on it)",
 	"text.footprintparticle.option.waterSplashLevel": "Kick up splash (when walking on rain)",
 	"text.footprintparticle.category.filter": "Filter",
-	"text.footprintparticle.category.custom": "Custom"
+	"text.footprintparticle.category.custom": "Custom",
+	"text.footprintparticle.option.genDistChunk": "Generate Distance",
+	"text.footprintparticle.option.genDistChunk.@Tooltip": "Entity further than this value will be generate nothing.\nMeasure in chunk (16 blocks per chunk)."
 }

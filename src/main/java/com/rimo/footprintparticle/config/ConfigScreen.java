@@ -69,6 +69,16 @@ public class ConfigScreen {
 				.build()
 		);
 		category.addEntry(entryBuilder
+				.startIntSlider(t("option.genDistChunk")
+						, (int) Math.sqrt(CONFIG.getGenDistSqr() / 256F)
+						,1
+						,16)
+				.setDefaultValue(Config.DEF_GEN_DIST_CHUNK)
+				.setTooltip(t("option.genDistChunk.@Tooltip"))
+				.setSaveConsumer(CONFIG::setGenDistChunk)
+				.build()
+		);
+		category.addEntry(entryBuilder
 				.startIntSlider(t("option.secPerPrint")
 						,(int) (CONFIG.getSecPerPrint() * 10)
 						,0
