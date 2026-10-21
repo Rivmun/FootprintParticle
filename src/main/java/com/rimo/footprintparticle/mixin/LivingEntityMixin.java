@@ -3,6 +3,7 @@ package com.rimo.footprintparticle.mixin;
 import com.rimo.footprintparticle.Client;
 import com.rimo.footprintparticle.VersionUtil;
 import com.rimo.footprintparticle.config.WorkMode;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -66,8 +67,12 @@ public abstract class LivingEntityMixin extends Entity {
 		this.fpp$lastZ = z;
 		fpp$wasFalling = falling;
 
+		// Vanilla only sends world particles to players within 32 blocks; ours are client-side, so cap them at 64 blocks.
+		Minecraft minecraft = Minecraft.getInstance();
+		boolean near = minecraft.player == null || this.distanceToSqr(minecraft.player) <= 64.0 * 64.0;
+
 		boolean generated = false;
-		if (!this.isShiftKeyDown() && !this.isUnderWater()) {
+		if (near && !this.isShiftKeyDown() && !this.isUnderWater()) {
 			//~ if < 1.20.1 'this.onGround()' -> 'this.onGround'
 			if (landed || (fpp$timer <= 0 && moved && this.onGround()))
 				generated = this.fpp$footprintGenerator(landed);
@@ -83,7 +88,7 @@ public abstract class LivingEntityMixin extends Entity {
 		}
 
 		// Swim Pop
-		if (this.isSwimming() && fpp$isEnable(CONFIG.getSwimPopLevel())) {
+		if (near && this.isSwimming() && fpp$isEnable(CONFIG.getSwimPopLevel())) {
 			float range = fpp$getEntityScale((LivingEntity) (Object) this);
 			//~ if < 1.20.1 'this.level()' -> 'this.level'
 			this.level().addParticle(
