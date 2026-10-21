@@ -110,7 +110,7 @@ public class Config {
 	public void setWaterSplashLevel(WorkMode waterSplashLevel) {this.waterSplashLevel = waterSplashLevel;}
 	public void setGenHeightGap(int genHeightGap) {this.genHeightGap = genHeightGap;}
 
-	/* - - - - - 内部集合裸视图（模组逻辑直接查表，避免拷贝 List） - - - - - */
+	/* - - - - - Raw collection views (avoid copying to List) - - - - - */
 
 	public Set<String> getApplyBlockSet() {return applyBlocks;}
 	public Set<String> getExcludedBlockSet() {return excludedBlocks;}
@@ -239,8 +239,11 @@ public class Config {
 
 	/* - - - - - IO - - - - - */
 
-	// serializeNulls 保证 Map<String,Float> 里“有 key 无 value”（如 horseLikeMobs 中的 “minecraft:horse”）能落盘与回读。
-	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+	private static final Gson GSON = new GsonBuilder()
+			.setPrettyPrinting()  // make file readable.
+			.serializeNulls()  // make null field can be written/loaded.
+			.create();
+	// Default config path. May '.minecraft/config/footprintparticle.json'.
 	private static final Path CONFIG_PATH = PlatformUtil.PLATFORM.getConfigFolder().resolve(Client.MOD_ID + ".json");
 
 	private Config() {}
@@ -253,7 +256,7 @@ public class Config {
 				Config loaded = null;
 				if (rootEl != null && rootEl.isJsonObject()) {
 					JsonObject root = rootEl.getAsJsonObject();
-					// 旧版本 List<String> 格式兼容：字段在磁盘上仍是数组时，按行而解析入对象。
+					// Transform old List<String> to Map for compatibility across version.
 					migrateLegacyFloatMap(root, "blockHeight");
 					migrateLegacyFloatMap(root, "mobInterval");
 					migrateLegacyFloatMap(root, "sizePerMob");
@@ -268,6 +271,7 @@ public class Config {
 					config = loaded;
 				}
 				config.fillDefaults();
+				config.sanitize();
 			} catch (IOException | JsonParseException e) {
 				Client.LOGGER.error("Failed to read config file: {}, using current/default config", CONFIG_PATH, e);
 			}
@@ -279,44 +283,43 @@ public class Config {
 
 	public void save() {
 		try {
+			// Serialize before opening the file, so a failure cannot truncate the previous config.
+			String json = GSON.toJson(this);
 			Files.createDirectories(CONFIG_PATH.getParent());
 			try (BufferedWriter writer = Files.newBufferedWriter(CONFIG_PATH)) {
-				GSON.toJson(this, writer);
+				writer.write(json);
 			}
-		} catch (IOException e) {
+		} catch (IOException | JsonParseException | IllegalArgumentException e) {
 			Client.LOGGER.error("Failed to write config file: {}", CONFIG_PATH, e);
 		}
 	}
 
+	// Codes below are vibe coding by CoderCN...
 	/* - - - - - List <-> Set/Map - - - - - */
 
+	/** The editor rejects blank lines, so the list can be copied as-is. */
 	private static Set<String> toSet(List<String> list) {
-		Set<String> set = new LinkedHashSet<>();
-		if (list != null) {
-			for (String s : list) {
-				if (s != null && !s.isEmpty()) set.add(s);
-			}
-		}
-		return set;
+		return list == null ? new LinkedHashSet<>() : new LinkedHashSet<>(list);
 	}
 
 	private static List<String> fromSet(Set<String> set) {
 		return new ArrayList<>(set);
 	}
 
-	/** 解析 "key,value" 行；无逗号或 value 非法 → 存入 null（保留 key，由消费方处理默认）。 */
+	/**
+	 * Parse "key,value" lines into a map. A bare "key" keeps the key with a null value (consumer default), and an
+	 *  unparsable value is stored as null. The editor rejects blank lines before saving.
+	 */
 	private static Map<String, Float> toFloatMap(List<String> list) {
 		Map<String, Float> map = new LinkedHashMap<>();
 		if (list == null) return map;
-		for (String s : list) {
-			if (s == null || s.isEmpty()) continue;
-			int idx = s.indexOf(',');
+		for (String line : list) {
+			if (line == null) continue;
+			int idx = line.indexOf(',');
 			if (idx < 0) {
-				map.put(s, null);
+				map.put(line, null);
 			} else {
-				String key = s.substring(0, idx);
-				Float value = parseFloat(s.substring(idx + 1).trim());
-				map.put(key, value);
+				map.put(line.substring(0, idx), parseFloat(line.substring(idx + 1).trim()));
 			}
 		}
 		return map;
@@ -325,21 +328,25 @@ public class Config {
 	private static List<String> fromFloatMap(Map<String, Float> map) {
 		List<String> list = new ArrayList<>(map.size());
 		for (Map.Entry<String, Float> e : map.entrySet()) {
-			if (e.getValue() == null) list.add(e.getKey());
-			else list.add(e.getKey() + "," + e.getValue());
+			Float value = e.getValue();
+			if (value == null || !Float.isFinite(value)) list.add(e.getKey());
+			else list.add(e.getKey() + "," + value);
 		}
 		return list;
 	}
 
-	/** 解析 "key,v1,v2,..." 行；无逗号的行直接丢弃（customPrint 至少要有 1 个 value）。 */
+	/**
+	 * Parse "key,v1,v2,..." lines into a map. A line without a comma is discarded and a repeated key keeps its
+	 *  first line; the editor rejects both cases before saving.
+	 */
 	private static Map<String, String[]> toStringArrayMap(List<String> list) {
 		Map<String, String[]> map = new LinkedHashMap<>();
 		if (list == null) return map;
-		for (String s : list) {
-			if (s == null || s.isEmpty()) continue;
-			int idx = s.indexOf(',');
+		for (String line : list) {
+			if (line == null) continue;
+			int idx = line.indexOf(',');
 			if (idx < 0) continue;
-			map.putIfAbsent(s.substring(0, idx), s.substring(idx + 1).split(",", -1));
+			map.putIfAbsent(line.substring(0, idx), line.substring(idx + 1).split(",", -1));
 		}
 		return map;
 	}
@@ -347,22 +354,28 @@ public class Config {
 	private static List<String> fromStringArrayMap(Map<String, String[]> map) {
 		List<String> list = new ArrayList<>(map.size());
 		for (Map.Entry<String, String[]> e : map.entrySet()) {
-			list.add(e.getKey() + "," + String.join(",", e.getValue()));
+			String[] values = e.getValue();
+			if (values == null) continue;
+			list.add(e.getKey() + "," + String.join(",", values));
 		}
 		return list;
 	}
 
 	private static Float parseFloat(String raw) {
-		try { return Float.parseFloat(raw); }
-		catch (NumberFormatException e) { return null; }
+		try {
+			float value = Float.parseFloat(raw);
+			return Float.isFinite(value) ? value : null;
+		} catch (NumberFormatException e) {
+			return null;
+		}
 	}
 
-	/* - - - - - 旧版 List<String> 磁盘格式→ Map 对象兼容 - - - - - */
+	/* - - - - - Legacy List<String> -> Map migration - - - - - */
 
 	/**
-	 * 旧版中 {@code blockHeight / mobInterval / sizePerMob / horseLikeMobs / spiderLikeMobs}
-	 * 在磁盘上写为 {@code ["key,value", ...]}，需转为 Gson 可直接反序列化的
-	 * {@code {"key": value}} 对象；无逗号或 value 非法时写入 JsonNull，与 {@link #toFloatMap(List)} 行为一致。
+	 * Migrate legacy {@code blockHeight / mobInterval / sizePerMob / horseLikeMobs / spiderLikeMobs} values from
+	 *  {@code ["key,value", ...]} to a Gson-deserializable {@code {"key": value}} object. A missing comma or an
+	 *  invalid value becomes {@link JsonNull}, matching the leniency of {@link #toFloatMap(List)}.
 	 */
 	private static void migrateLegacyFloatMap(JsonObject root, String key) {
 		JsonElement el = root.get(key);
@@ -386,8 +399,8 @@ public class Config {
 	}
 
 	/**
-	 * 旧版 {@code customPrint} 写为 {@code ["key,v1,v2,...", ...]}，转为 {@code {"key": ["v1","v2",...]}}；
-	 * 无逗号的行直接丢弃，与 {@link #toStringArrayMap(List)} 行为一致。
+	 * Old {@code customPrint} written as {@code ["key,v1,v2,...", ...]} needs to be transformed to {@code {"key": ["v1","v2",...]}};
+	 * lines without a comma are discarded, matching {@link #toStringArrayMap(List)}.
 	 */
 	private static void migrateLegacyStringArrayMap(JsonObject root, String key) {
 		JsonElement el = root.get(key);
@@ -409,12 +422,11 @@ public class Config {
 	}
 
 	/**
-	 * Gson 读到当前版本识别不了的值（旧版把枚举写成 ordinal 数字）或 {@code null} 时不会报错，
-	 * 而是静默地把引用字段置为 {@code null}；这里把 {@code null} 字段当作“该字段没读到”，
-	 * 从默认实例取回，保证 getter 永不返回 null——Cloth 的 EnumSelector 对 null 当前值零容忍。
-	 * 下次 {@link #save()} 会把修正后的值写回磁盘，完成平滑升级。
-	 *
-	 * <p>基本类型不用处理：磁盘上缺键或写成 {@code null} 时 Gson 会跳过赋值，字段初始值（当前版本默认）原样保留。</p>
+	 * Restore reference fields that Gson left {@code null} (unreadable old enum values, explicit nulls or missing
+	 *  keys) from a fresh default instance, so getters never return null; Cloth's EnumSelector cannot handle a null
+	 *  current value. The next {@link #save()} persists the repaired values.<br>
+	 * <br>
+	 * Primitives are skipped by Gson on missing/null keys, so their initializers already keep the current defaults.<br>
 	 */
 	private void fillDefaults() {
 		Config defaults = new Config();
@@ -426,5 +438,26 @@ public class Config {
 				Client.LOGGER.error("Failed to restore default for config field {}", field.getName(), e);
 			}
 		}
+	}
+
+	/**
+	 * Drop values that cannot be represented in JSON or used by consumers: empty keys, non-finite floats, empty
+	 *  customPrint entries, and null/empty set entries. Otherwise an entry the editor flags (e.g. a blank sprite
+	 *  name loaded from JSON) would keep the save button disabled until the user removed it manually.
+	 */
+	private void sanitize() {
+		for (Map<String, Float> map : Arrays.asList(blockHeight, mobInterval, sizePerMob, horseLikeMobs, spiderLikeMobs)) {
+			map.keySet().removeIf(String::isEmpty);
+			map.replaceAll((key, value) -> value == null || Float.isFinite(value) ? value : null);
+		}
+
+		customPrint.keySet().removeIf(String::isEmpty);
+		customPrint.replaceAll((key, values) -> values == null
+				? null
+				: Arrays.stream(values).filter(value -> value != null && !value.isEmpty()).toArray(String[]::new));
+		customPrint.entrySet().removeIf(entry -> entry.getValue() == null || entry.getValue().length == 0);
+		applyBlocks.removeIf(value -> value == null || value.isEmpty());
+		excludedBlocks.removeIf(value -> value == null || value.isEmpty());
+		excludedMobs.removeIf(value -> value == null || value.isEmpty());
 	}
 }

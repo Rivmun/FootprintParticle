@@ -5,6 +5,11 @@
 	"text.footprintparticle.second": "%s sec",
 	"text.footprintparticle.block": "%s block(s)",
 
+	"text.footprintparticle.error.float": "Invalid line. Use \"modid:id\" or \"modid:id,number\".",
+	"text.footprintparticle.error.customPrint": "Invalid line. Use \"modid:id,fileName\" or \"modid:id,fileName1,fileName2,...\".",
+	"text.footprintparticle.error.duplicate": "Duplicate key: %s",
+	"text.footprintparticle.error.empty": "Empty line is not allowed.",
+
 	"text.footprintparticle.title": "Footprint Particle",
 
 	"text.footprintparticle.category.default": "General",

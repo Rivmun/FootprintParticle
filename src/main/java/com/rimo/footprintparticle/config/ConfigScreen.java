@@ -4,17 +4,21 @@ import com.rimo.footprintparticle.Client;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
+import me.shedaniel.clothconfig2.gui.entries.StringListListEntry;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 //? if < 1.19.2
 //import net.minecraft.network.chat.TranslatableComponent;
 
+import java.util.List;
+import java.util.Optional;
+
 import static com.rimo.footprintparticle.Client.CONFIG;
 
 /**
- * 唯一配置屏幕。
- * 原生屏幕的跨版本构造会破坏模组构建产物的多版本兼容，故此项目不引入无 Cloth 提示屏。
- * （特指 26.1 构建对于 26.1-26.3 的全版本兼容）
+ * Manually construct vanilla screen across multiple version will break the compatibility for multi-version.
+ *  Especially 26.1 subproject for 26.x.<br>
+ * So we no longer provide a MissingClothScreen.
  */
 public class ConfigScreen {
 	ConfigBuilder builder;
@@ -155,6 +159,7 @@ public class ConfigScreen {
 						, CONFIG.getExcludedMobs())
 				.setDefaultValue(Config.DEF_MODS)
 				.setTooltip(t("option.excludedMobs.@Tooltip"))
+				.setCellErrorSupplier(this::setLineError)
 				.setSaveConsumer(CONFIG::setExcludedMobs)
 				.build()
 		);
@@ -170,6 +175,7 @@ public class ConfigScreen {
 						, CONFIG.getApplyBlocks())
 				.setDefaultValue(Config.DEF_APPLYBLOCKS)
 				.setTooltip(t("option.applyBlocks.@Tooltip"))
+				.setCellErrorSupplier(this::setLineError)
 				.setSaveConsumer(CONFIG::setApplyBlocks)
 				.build()
 		);
@@ -186,60 +192,67 @@ public class ConfigScreen {
 						, CONFIG.getExcludedBlocks())
 				.setDefaultValue(Config.DEF_EXCLUDEDBLOCKS)
 				.setTooltip(t("option.excludedBlocks.@Tooltip"))
+				.setCellErrorSupplier(this::setLineError)
 				.setSaveConsumer(CONFIG::setExcludedBlocks)
 				.build()
 		);
 	}
 
 	private void buildCustomCategory(ConfigCategory category) {
-		category.addEntry(entryBuilder
+		StringListListEntry blockHeight = entryBuilder
 				.startStrList(t("option.blockHeight")
 						, CONFIG.getBlockHeight())
 				.setDefaultValue(Config.DEF_BLOCKHEIGHT)
 				.setTooltip(t("option.blockHeight.@Tooltip"))
 				.setSaveConsumer(CONFIG::setBlockHeight)
-				.build()
-		);
-		category.addEntry(entryBuilder
+				.build();
+		blockHeight.setCellErrorSupplier(line -> floatLineError(line, blockHeight.getValue()));
+		category.addEntry(blockHeight);
+		StringListListEntry mobInterval = entryBuilder
 				.startStrList(t("option.mobInterval")
 						, CONFIG.getMobInterval())
 				.setDefaultValue(Config.DEF_MOB_INTERVAL)
 				.setTooltip(t("option.mobInterval.@Tooltip"))
 				.setSaveConsumer(CONFIG::setMobInterval)
-				.build()
-		);
-		category.addEntry(entryBuilder
+				.build();
+		mobInterval.setCellErrorSupplier(line -> floatLineError(line, mobInterval.getValue()));
+		category.addEntry(mobInterval);
+		StringListListEntry sizePerMob = entryBuilder
 				.startStrList(t("option.sizePerMob")
 						, CONFIG.getSizePerMob())
 				.setDefaultValue(Config.DEF_SIZE)
 				.setTooltip(t("option.sizePerMob.@Tooltip"))
 				.setSaveConsumer(CONFIG::setSizePerMob)
-				.build()
-		);
-		category.addEntry(entryBuilder
+				.build();
+		sizePerMob.setCellErrorSupplier(line -> floatLineError(line, sizePerMob.getValue()));
+		category.addEntry(sizePerMob);
+		StringListListEntry horseLikeMobs = entryBuilder
 				.startStrList(t("option.horseLikeMobs")
 						, CONFIG.getHorseLikeMobs())
 				.setDefaultValue(Config.DEF_FOUR_LEGS)
 				.setTooltip(t("option.horseLikeMobs.@Tooltip"))
 				.setSaveConsumer(CONFIG::setHorseLikeMobs)
-				.build()
-		);
-		category.addEntry(entryBuilder
+				.build();
+		horseLikeMobs.setCellErrorSupplier(line -> floatLineError(line, horseLikeMobs.getValue()));
+		category.addEntry(horseLikeMobs);
+		StringListListEntry spiderLikeMobs = entryBuilder
 				.startStrList(t("option.spiderLikeMobs")
 						, CONFIG.getSpiderLikeMobs())
 				.setDefaultValue(Config.DEF_EIGHT_LEGS)
 				.setTooltip(t("option.spiderLikeMobs.@Tooltip"))
 				.setSaveConsumer(CONFIG::setSpiderLikeMobs)
-				.build()
-		);
-		category.addEntry(entryBuilder
+				.build();
+		spiderLikeMobs.setCellErrorSupplier(line -> floatLineError(line, spiderLikeMobs.getValue()));
+		category.addEntry(spiderLikeMobs);
+		StringListListEntry customPrint = entryBuilder
 				.startStrList(t("option.customPrint")
 						, CONFIG.getCustomPrint())
 				.setDefaultValue(Config.DEF_CUSTOM_PRINT)
 				.setTooltip(t("option.customPrint.@Tooltip"))
 				.setSaveConsumer(CONFIG::setCustomPrint)
-				.build()
-		);
+				.build();
+		customPrint.setCellErrorSupplier(line -> customPrintLineError(line, customPrint.getValue()));
+		category.addEntry(customPrint);
 		category.addEntry(entryBuilder
 				.startIntField(t("option.footprintSize")
 						, CONFIG.getFootprintSize())
@@ -301,6 +314,67 @@ public class ConfigScreen {
 				.setSaveConsumer(CONFIG::setWaterSplashLevel)
 				.build()
 		);
+	}
+
+	/** Shown on a float-list cell while its line is blank, malformed or repeats a key used by another line. */
+	private Optional<Component> floatLineError(String line, List<String> lines) {
+		if (line.trim().isEmpty()) return Optional.of(t("error.empty"));
+		String key = floatKey(line);
+		if (key == null) return Optional.of(t("error.float"));
+		int count = 0;
+		for (String other : lines) {
+			if (key.equals(floatKey(other))) count++;
+		}
+		return count > 1 ? Optional.of(t("error.duplicate", key)) : Optional.empty();
+	}
+
+	/** @return the key of a well-formed float line, or null if the line is blank or malformed. */
+	private static String floatKey(String line) {
+		if (line == null || line.trim().isEmpty()) return null;
+		int idx = line.indexOf(',');
+		String key = idx < 0 ? line : line.substring(0, idx);
+		if (key.isEmpty()) return null;
+		if (idx >= 0) {
+			String raw = line.substring(idx + 1).trim();
+			if (!raw.isEmpty() && !isFiniteFloat(raw)) return null;
+		}
+		return key;
+	}
+
+	private static boolean isFiniteFloat(String raw) {
+		try {
+			return Float.isFinite(Float.parseFloat(raw));
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
+
+	/** Shown on a customPrint cell while its line is blank, malformed or repeats a key used by another line. */
+	private Optional<Component> customPrintLineError(String line, List<String> lines) {
+		if (line.trim().isEmpty()) return Optional.of(t("error.empty"));
+		String key = customPrintKey(line);
+		if (key == null) return Optional.of(t("error.customPrint"));
+		int count = 0;
+		for (String other : lines) {
+			if (key.equals(customPrintKey(other))) count++;
+		}
+		return count > 1 ? Optional.of(t("error.duplicate", key)) : Optional.empty();
+	}
+
+	/** @return the key of a well-formed customPrint line, or null if the line is blank or malformed. */
+	private static String customPrintKey(String line) {
+		if (line == null || line.trim().isEmpty()) return null;
+		int idx = line.indexOf(',');
+		if (idx <= 0) return null;
+		for (String name : line.substring(idx + 1).split(",", -1)) {
+			if (name.isEmpty()) return null;
+		}
+		return line.substring(0, idx);
+	}
+
+	/** Shown on a set-list cell while its line is blank. */
+	private Optional<Component> setLineError(String line) {
+		return line.trim().isEmpty() ? Optional.of(t("error.empty")) : Optional.empty();
 	}
 
 	//? if > 1.18.2 {
