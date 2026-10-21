@@ -232,11 +232,14 @@ public abstract class LivingEntityMixin extends Entity {
 				}
 			}
 		} else if (fpp$wetTimer <= wetLimit) {
+			BlockPos pos = new BlockPos(colX, Mth.floor(py - 0.02F), colZ);
+			if (level.getBlockState(pos).getCollisionShape(level, pos).isEmpty())
+				return false;  // supported block must have shape. if not, jump the water splash.
 			// waterprint (gen when footprint not gen)
 			level.addParticle(Client.WATERMARK.setStartAlpha(fpp$wetTimer).setEntity(entity),   // push timer to calc alpha
 					px, py, pz, dx, scale, dz);
 		}
-		// water splash (gen whatever print gen)
+		// water splash (gen any print was generated with wet)
 		if (fpp$wetTimer <= wetLimit && fpp$isEnable(CONFIG.getWaterSplashLevel())) {
 			int count = (int)((isSprinting ? 18 : 10) * Math.max((0.7f - (float) fpp$wetTimer / (wetLimit)), 0));
 			int range = isSprinting ? 3 : 6;
@@ -254,7 +257,6 @@ public abstract class LivingEntityMixin extends Entity {
 				);
 			}
 		}
-
 		return canGen;
 	}
 
@@ -264,7 +266,7 @@ public abstract class LivingEntityMixin extends Entity {
 		//~ if 1.16.5 '.defaultDestroyTime' -> '.getExplosionResistance'
 		float hardness = blockState.getBlock().defaultDestroyTime();
 		float hardnessGate = CONFIG.getHardnessGate();
-		return hardnessGate > 0 && hardness >= 0 && hardness < hardnessGate;
+		return hardness >= 0 && hardness < hardnessGate;
 	}
 
 	@Unique
