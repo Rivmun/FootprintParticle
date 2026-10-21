@@ -40,13 +40,11 @@ import static com.rimo.footprintparticle.Client.CONFIG;
 public abstract class LivingEntityMixin extends Entity {
 	public LivingEntityMixin(EntityType<?> type, Level world) {
 		super(type, world);
-		fpp$lastX = this.getX();
-		fpp$lastY = this.getY();
-		fpp$lastZ = this.getZ();
 	}
 
 	@Unique private int fpp$timer = 0;
 	@Unique private boolean fpp$wasFalling;
+	@Unique private boolean fpp$hasLastPos;
 	@Unique private int fpp$wetTimer = CONFIG.getWetDuration() * 20;
 	@Unique private double fpp$lastX, fpp$lastZ, fpp$lastY;
 	@Unique private static boolean fpp$noPehkui, fpp$noRandomMobsizes;
@@ -56,15 +54,18 @@ public abstract class LivingEntityMixin extends Entity {
 		double x = this.getX();
 		double y = this.getY();
 		double z = this.getZ();
-		boolean moved = Math.abs(x - this.fpp$lastX) + Math.abs(z - this.fpp$lastZ) > 1.0E-4;
+		// Entities read from disk get their position after construction, so the first tick only samples the position.
+		boolean moved = fpp$hasLastPos
+				&& Math.abs(x - this.fpp$lastX) + Math.abs(z - this.fpp$lastZ) > 1.0E-4;
 		// Remote player using lerp to calc its pos that cannot get onGround() in accuracy, so we detect whether the dy is flipped.
-		double dy = y - this.fpp$lastY;
+		double dy = fpp$hasLastPos ? y - this.fpp$lastY : 0;
 		// -0.25 is the velocity Y after player freefall around 0.5 blocks. Equivalent to we've filtered out the falling distance lower than the 0.5 blocks.
 		boolean falling = dy < -0.25;
 		boolean landed = fpp$wasFalling && !falling;
 		this.fpp$lastX = x;
 		this.fpp$lastY = y;
 		this.fpp$lastZ = z;
+		fpp$hasLastPos = true;
 		fpp$wasFalling = falling;
 
 		// Vanilla only sends world particles to players within 32 blocks; ours are client-side, so cap them at 64 blocks.
@@ -117,7 +118,8 @@ public abstract class LivingEntityMixin extends Entity {
 		double px = this.getX();
 		double py = this.getY();
 		double pz = this.getZ();
-		float yawRad = (float) Math.toRadians(this.getRotationVector().y);
+		//~ if 1.16.5 'this.getYRot()' -> 'this.yRot'
+		float yawRad = (float) Math.toRadians(this.getYRot());
 		float dx = - Mth.sin(yawRad);  // horizontal facing vector.
 		float dz =   Mth.cos(yawRad);
 		LivingEntity entity = (LivingEntity) (Object) this;
