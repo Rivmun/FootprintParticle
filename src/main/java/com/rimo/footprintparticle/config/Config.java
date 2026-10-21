@@ -193,6 +193,7 @@ public class Config {
 			"minecraft:cat,0.5",
 			"minecraft:ocelot,0.5",
 			"minecraft:wolf,0.6",
+			"minecraft:rabbit,0.7",
 			"minecraft:sniffer,1.6",
 			"minecraft:enderman,0.6",
 			"minecraft:slime,2.0",
@@ -219,6 +220,7 @@ public class Config {
 	static final List<String> DEF_EIGHT_LEGS = Arrays.asList(
 			"minecraft:spider",
 			"minecraft:cave_spider",
+			"minecraft:rabbit,0.3",
 			"minecraft:camel,0.3",
 			"minecraft:sniffer,0.3",
 			"minecraft:iron_golem,0.3",
