@@ -2,10 +2,15 @@
 - Fix particle texture will be missing until game restart, when change custom footprint particle resourcepack and reload in game.
 - Fix saving config will crash the game that causing by configScreen push invalid value to IO system.
   - Add some validator to configScreen. Now 'Save & Quit' button will be disabled if there is invalid value until you correct it.
+- Refactor boat & minecart mixin.
+  - Fix they'll spit out a lot of particle when placed.
+  - Improved generator performance.
+- Limited max generate distance of our particles. Before it bases on simulate distance.
 - Fix '#c' tag in default list cannot be matched on Forge by replace them to specific block name. (i.e. composter, froglight)
 - Remove accesswidener file that no longer in use from Forge build.
 - Improved performance of self-hosted particle system.
-- Other internal improvements.
+- Large internal improvements assistant by AI that clean up a lot of dumb code I wrote before...
+  - Fix water print will randomize its direction. (Why did I write this random()? Sorry I delayed for a whole year...)
 
 # 0.7.0
 #### Refactor footprint generator to fix some reference issue. (Thanks to @Redls07)
