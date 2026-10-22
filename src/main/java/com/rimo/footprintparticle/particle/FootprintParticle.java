@@ -1,6 +1,7 @@
 package com.rimo.footprintparticle.particle;
 
 import com.rimo.footprintparticle.Client;
+import com.rimo.footprintparticle.VersionUtil;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
@@ -167,7 +168,8 @@ public class FootprintParticle extends SingleQuadParticle {
 	*///? }
 
 	private static List<TextureAtlasSprite> getCustomSprites(LivingEntity entity, SpriteSet spriteProvider, String def) {
-		String[] spriteNames = Client.CONFIG.getCustomPrintMap().get(EntityType.getKey(entity.getType()).toString());
+		String entityId = EntityType.getKey(entity.getType()).toString();
+		String[] spriteNames = Client.CONFIG.getCustomTextureNames(entityId, VersionUtil.getEntityTagNames(entity.getType()));
 		// A key mapped to null or an empty array must fall back to the default sprite.
 		if (spriteNames == null || spriteNames.length == 0)
 			spriteNames = new String[]{def};
@@ -189,7 +191,7 @@ public class FootprintParticle extends SingleQuadParticle {
 				)
 		).collect(Collectors.toList());
 		if (result.isEmpty()) {
-			Client.LOGGER.error("Wrong custom texture for {}, please check.", EntityType.getKey(entity.getType()));
+			Client.LOGGER.error("Wrong custom texture for {}, please check.", entityId);
 			return sprites;
 		}
 		return result;

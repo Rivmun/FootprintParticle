@@ -79,14 +79,14 @@ public final class VersionUtil {
 	}
 
 	//? if 1.16.5 {
-	/*public static Collection<ResourceLocation> getBlockTags(BlockState block) {
+	/*private static Collection<ResourceLocation> getBlockTags(BlockState block) {
 		ClientPacketListener connection = Minecraft.getInstance().getConnection();
 		if (connection == null)
 			return Collections.emptyList();
 		return connection.getTags().getBlocks().getMatchingTags(block.getBlock());
 	}
 	*///? } else {
-	public static List<TagKey<Block>> getBlockTags(BlockState block) {
+	private static List<TagKey<Block>> getBlockTags(BlockState block) {
 		//~ if < 26.1 '.tags()' -> '.getTags()'
 		return block.tags().toList();
 	}
@@ -99,15 +99,31 @@ public final class VersionUtil {
 		).collect(Collectors.toList());
 	}
 
+	//? if 1.16.5 {
+	/*private static Collection<ResourceLocation> getEntityTags(EntityType<?> type) {
+		ClientPacketListener connection = Minecraft.getInstance().getConnection();
+		if (connection == null)
+			return Collections.emptyList();
+		return connection.getTags().getEntityTypes().getMatchingTags(type);
+	}
+	*///? } else {
+	private static List<TagKey<EntityType<?>>> getEntityTags(EntityType<?> type) {
+		return type.builtInRegistryHolder().tags().collect(Collectors.toList());
+	}
+	//? }
+
+	public static List<String> getEntityTagNames(EntityType<?> type) {
+		return getEntityTags(type).stream().map(tag ->
+				//~ if 1.16.5 '"#" + tag.location().toString()' -> '"#" + tag.toString()'
+				"#" + tag.location().toString()
+		).collect(Collectors.toList());
+	}
+
 	// Don't inline this function into mixin class that mixin descriptor will resolve every reference
 	// even target class not be import just a full name invoke.
 	// It will crash the game on boot.
-	public static float getEntityScale(String Id, LivingEntity entity) {
-		float scale = 1f;
-
-		Float configured = CONFIG.getSizePerMobMap().get(Id);
-		if (configured != null)
-			scale *= configured;
+	public static float getEntityScale(String id, LivingEntity entity) {
+		float scale = Client.CONFIG.getMobSize(id, getEntityTagNames(entity.getType()));
 
 		//? if < 1.21.11 {
 		/*if (! isNoPehkui && PlatformUtil.PLATFORM.isModLoaded("pehkui")) {

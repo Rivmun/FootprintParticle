@@ -104,7 +104,8 @@ public abstract class LivingEntityMixin extends Entity {
 		if (!fpp$isEnable(CONFIG.getEnableMod()))
 			return false;
 		String id = EntityType.getKey(this.getType()).toString();
-		if (CONFIG.getExcludedMobSet().contains(id))
+		List<String> tags = VersionUtil.getEntityTagNames(this.getType());
+		if (CONFIG.isBlackListMob(id, tags))
 			return false;
 		if (!CONFIG.getCanGenWhenInvisible() && this.isInvisible())
 			return false;
@@ -122,32 +123,24 @@ public abstract class LivingEntityMixin extends Entity {
 		boolean isSprinting = this.isSprinting();
 
 		// Set Interval
-		fpp$timer = isSprinting ? (int) (CONFIG.getSecPerPrint() * 13.33f) : (int) (CONFIG.getSecPerPrint() * 20);
-		Float interval = CONFIG.getMobIntervalMap().get(id);
-		if (interval != null)
-			fpp$timer *= interval;
+		fpp$timer = (int) (CONFIG.getSecPerPrint() * (isSprinting ? 13.33F : 20F));
+		fpp$timer *= CONFIG.getMobInterval(id, tags);
 
 		// Fix pos. 2 steps:
 		// 1.Horizontal Offset
 		// 1.1 Front and back
-		double fbOffset = 0.075f;  // default f/b offset for all entity to decrease repetition.
-		Map<String, Float> horseMap = CONFIG.getHorseLikeMobsMap();
-		if (horseMap.containsKey(id)) {
-			Float front = horseMap.get(id);
-			fbOffset = front != null ? front : 0.75f;  // 0.75F if value not found (matching the vanilla horse)
+		float front = CONFIG.getMobFront(id, tags);
+		if (! Float.isNaN(front)) {
 			Entity passenger = this.getControllingPassenger();  // speed up the generation if ridden by player.
 			//~ if 1.16.5 'passenger != null && passenger.isAlwaysTicking()' -> 'passenger instanceof Player'
 			fpp$timer *= (passenger != null && passenger.isAlwaysTicking() ? 0.5f : 1.33f);
 		}
-		double fB = fbOffset * scale * (Math.random() > 0.5f ? 1 : -1);  // random a side.
+		else front = 0.075f;  // default f/b offset to decrease repetition.
+		double fB = front * scale * (Math.random() > 0.5f ? 1 : -1);  // random a side.
 		// 1.2 Left and right
-		double lrOffset = 0.15f;  // default l/r offset for all entity to decrease repetition. (matching vanilla player)
-		Map<String, Float> spiderMap = CONFIG.getSpiderLikeMobsMap();
-		if (spiderMap.containsKey(id)) {
-			Float lateral = spiderMap.get(id);
-			lrOffset = lateral != null ? lateral : 0.9f;  // 0.9F if value not found (matching the vanilla spider)
-		}
-		double lR = lrOffset * scale * (Math.random() > 0.5f ? 1 : -1);
+		float lateral = CONFIG.getMobLateral(id, tags);
+		if (Float.isNaN(lateral)) lateral = 0.15f;  // default l/r offset (for player).
+		double lR = lateral * scale * (Math.random() > 0.5f ? 1 : -1);
 		// 1.3 Apply: f/b follows the facing vector (sin, cos), l/r follows its right normal (-cos, sin).
 		px += fB * dx - lR * dz;
 		pz += fB * dz + lR * dx;
@@ -165,11 +158,11 @@ public abstract class LivingEntityMixin extends Entity {
 			VoxelShape blockShape = blockState.getCollisionShape(level, pos);
 			blockName = VersionUtil.getBlockName(blockState);
 			blockTagNames = VersionUtil.getBlockTagNames(blockState);
-			boolean isInBlackList = fpp$isInSet(blockName, blockTagNames, CONFIG.getExcludedBlockSet());
+			boolean isInBlackList = CONFIG.isBlackListBlock(blockName, blockTagNames);
 			double tempY = Double.NEGATIVE_INFINITY;
 
 			// Hope you can understand what you have written here in the future :P
-			if (fpp$isInSet(blockName, blockTagNames, CONFIG.getApplyBlockSet())) {  // Highest priority.
+			if (CONFIG.isWhiteListBlock(blockName, blockTagNames)) {  // Highest priority.
 				tempY = blockShape.isEmpty() ?
 						feetY - i :
 						Math.min(pos.getY() + blockShape.max(Direction.Axis.Y), py);  // strict print pos never higher than feet.
@@ -208,15 +201,7 @@ public abstract class LivingEntityMixin extends Entity {
 		// Generate
 		int wetLimit = CONFIG.getWetDuration() * 20;
 		if (canGen) {
-			// Fix height by blocks if in...(extra vertical offset)
-			Map<String, Float> heightMap = CONFIG.getBlockHeightMap();
-			Float height = heightMap.get(blockName);
-			if (height != null) {
-				py += height;
-			} else {
-				py += blockTagNames.stream().map(heightMap::get).filter(Objects::nonNull).findFirst().orElse(0f);
-			}
-
+			py += CONFIG.getBlockHeight(blockName, blockTagNames);  // Fix height by blocks if in...(extra vertical offset)
 			// footprint
 			level.addParticle(Client.FOOTPRINT.setEntity(entity), px, py, pz, dx, scale, dz);
 			// Snow Dust
@@ -266,14 +251,7 @@ public abstract class LivingEntityMixin extends Entity {
 		//~ if 1.16.5 '.defaultDestroyTime' -> '.getExplosionResistance'
 		float hardness = blockState.getBlock().defaultDestroyTime();
 		float hardnessGate = CONFIG.getHardnessGate();
-		return hardness >= 0 && hardness < hardnessGate;
-	}
-
-	@Unique
-	private boolean fpp$isInSet(String blockName, List<String> blockTagNames, Set<String> set) {
-		if (set.isEmpty())
-			return false;
-		return set.contains(blockName) || blockTagNames.stream().anyMatch(set::contains);
+		return hardness >= 0 && hardness < hardnessGate;  // implicitly included 'hardnessGate > 0'.
 	}
 
 	@Unique

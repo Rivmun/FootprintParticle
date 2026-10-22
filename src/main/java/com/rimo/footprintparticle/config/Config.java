@@ -17,13 +17,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Config {
 	private WorkMode enableMod = DEF_ENABLE_MOD;
@@ -113,18 +107,72 @@ public class Config {
 	public void setGenHeightGap(int genHeightGap) {this.genHeightGap = genHeightGap;}
 	public void setGenDistChunk(int genDistChunk) {this.genDistChunk = genDistChunk;}
 
-	/* - - - - - Raw collection views (avoid copying to List) - - - - - */
+	/* - - - Set/Map lookup - - - */
+	public boolean isWhiteListBlock(String id, List<String> tags) {return isInSet(id, tags, applyBlocks);}
+	public boolean isBlackListBlock(String id, List<String> tags) {return isInSet(id, tags, excludedBlocks);}
+	public boolean isBlackListMob(String id, List<String> tags) {return isInSet(id, tags, excludedMobs);}
+	/**
+	 * @return 0F if no match found.
+	 */
+	public float getBlockHeight(String id, List<String> tags) {return getFloatNoNaN(id, tags, blockHeight, 0F);}
+	/**
+	 * @return 1F if no match found.
+	 */
+	public float getMobInterval(String id, List<String> tags) {return getFloatNoNaN(id, tags, mobInterval, 1F);}
+	/**
+	 * @return 1F if no match found.
+	 */
+	public float getMobSize(String id, List<String> tags) {return getFloatNoNaN(id, tags, sizePerMob, 1F);}
+	/**
+	 * @return {@code value} if specific id or tags matched,<br>
+	 *         {@code 0.75F} if matched but no value (horse default),<br>
+	 *         {@link Float#NaN} if no match found.
+	 */
+	public float getMobFront(String id, List<String> tags) {return getFloatOrDefault(id, tags, horseLikeMobs, 0.75F);}
+	/**
+	 * @return {@code value} if specific id or tags matched,<br>
+	 *         {@code 0.9F} if matched but no value (spider default),<br>
+	 *         {@link Float#NaN} if no match found.
+	 */
+	public float getMobLateral(String id, List<String> tags) {return getFloatOrDefault(id, tags, spiderLikeMobs, 0.9F);}
+	public String[] getCustomTextureNames(String id, List<String> tags) {
+		if (customPrint.isEmpty()) return null;
+		if (customPrint.containsKey(id)) return customPrint.get(id).clone();
+		for (Map.Entry<String, String[]> entry : customPrint.entrySet())
+			if (tags.contains(entry.getKey())) return entry.getValue().clone();
+		return null;
+	}
 
-	public Set<String> getApplyBlockSet() {return applyBlocks;}
-	public Set<String> getExcludedBlockSet() {return excludedBlocks;}
-	public Set<String> getExcludedMobSet() {return excludedMobs;}
-	public Map<String, Float> getBlockHeightMap() {return blockHeight;}
-	public Map<String, Float> getMobIntervalMap() {return mobInterval;}
-	public Map<String, Float> getSizePerMobMap() {return sizePerMob;}
-	public Map<String, Float> getHorseLikeMobsMap() {return horseLikeMobs;}
-	public Map<String, Float> getSpiderLikeMobsMap() {return spiderLikeMobs;}
-	public Map<String, String[]> getCustomPrintMap() {return customPrint;}
+	private static boolean isInSet(String id, List<String> ids, Set<String> set) {
+		if (set.isEmpty()) return false;
+		if (set.contains(id)) return true;
+		for (String tag : ids)
+			if (set.contains(tag)) return true;
+		return false;
+	}
+	/**
+	 * house/spider map has 'null' value that indicate default, we must resolve it.<br>
+	 * To indicate 'no match found', we use {@link Float#NaN} as return.
+	 */
+	private static float getFloatOrDefault(String id, List<String> ids, Map<String, Float> map, float defVal) {
+		if (map.isEmpty()) return Float.NaN;
+		Float value = map.containsKey(id) ? map.get(id) : Float.valueOf(Float.NaN);
+		if (value == null) return defVal;
+		if (! Float.isNaN(value) || ids.isEmpty()) return value;
+		for (Map.Entry<String, Float> entry : map.entrySet()) {
+			if (ids.contains(entry.getKey())) {
+				value = entry.getValue();
+				return value == null ? defVal : value;
+			}
+		}
+		return Float.NaN;
+	}
+	private static float getFloatNoNaN(String id, List<String> ids, Map<String, Float> map, float defVal) {
+		float value = getFloatOrDefault(id, ids, map, defVal);
+		return Float.isNaN(value) ? defVal : value;
+	}
 
+	/* - - - Default value - - - */
 	static final WorkMode DEF_ENABLE_MOD = WorkMode.ALL;
 	static final int DEF_WET_DURATION = 10;
 	static final int DEF_SEC_PER_PRINT = 5;
@@ -265,7 +313,7 @@ public class Config {
 				Config loaded = null;
 				if (rootEl != null && rootEl.isJsonObject()) {
 					JsonObject root = rootEl.getAsJsonObject();
-					// Transform old List<String> to Map for compatibility across version.
+					// Transform old List<String> to Map for compat.
 					migrateLegacyFloatMap(root, "blockHeight");
 					migrateLegacyFloatMap(root, "mobInterval");
 					migrateLegacyFloatMap(root, "sizePerMob");
