@@ -302,10 +302,15 @@ public class Config {
 			.create();
 	// Default config path. May '.minecraft/config/footprintparticle.json'.
 	private static final Path CONFIG_PATH = PlatformUtil.PLATFORM.getConfigFolder().resolve(Client.MOD_ID + ".json");
+	private static final Config INSTANCE = Config.load();
 
 	private Config() {}
 
-	public static Config load() {
+	public static Config getInstance() {
+		return INSTANCE;
+	}
+
+	private static Config load() {
 		Config config = new Config();
 		if (Files.exists(CONFIG_PATH)) {
 			try (BufferedReader reader = Files.newBufferedReader(CONFIG_PATH)) {

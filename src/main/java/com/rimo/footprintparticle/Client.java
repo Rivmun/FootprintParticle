@@ -21,7 +21,7 @@ public class Client {
 	public static final String MOD_ID = "footprintparticle";
 	//~if = 1.16.5 'LoggerFactory.' -> 'LogManager.'
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-	public static final Config CONFIG = Config.load();
+	public static final Config CONFIG = Config.getInstance();
 
 	// Our Particles...
 	public static final FootprintParticleType FOOTPRINT = new FootprintParticleType(true);
