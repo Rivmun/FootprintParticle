@@ -205,7 +205,7 @@ public class FootprintParticle extends SingleQuadParticle {
 		}
 
 		@Override
-		//~ if < 1.21.11 'double dz, @NonNull RandomSource random) {' -> 'double dz) {'
+		//~ if < 1.21.11 'double dz, @NonNull RandomSource random' -> 'double dz'
 		public Particle createParticle(@NonNull SimpleParticleType parameters, @NonNull ClientLevel world, double x, double y, double z, double dx, double size, double dz, @NonNull RandomSource random) {
 			return new FootprintParticle(world, x, y, z, dx, size, dz, this.spriteProvider, (FootprintParticleType) parameters, "footprint");
 		}

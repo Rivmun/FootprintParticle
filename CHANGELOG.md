@@ -1,17 +1,20 @@
 # 0.7.1
+### Fixes & Improvements
 - Fix particle texture will be missing until game restart, when change custom footprint particle resourcepack and reload in game.
 - Fix saving config will crash the game that causing by configScreen push invalid value to IO system.
   - Add some validator to configScreen. Now 'Save & Quit' button will be disabled if there is invalid value until you correct it.
-- Refactor boat & minecart mixin.
-  - Fix they'll spit out a lot of particle when placed.
-  - Improved generator performance.
-- Fix watermark will generate in air. 
+- Fix boat will spit out a lot of particle when placed.
+- Refactor list lookup method for better performance, readability and others.
+  - Now mob list can input tags starts with '#' symbol.
 - Add an option to limited max generate distance of our particles. Default is 64 blocks.
 - Fix '#c' tag in default list cannot be matched on Forge by replace them to specific block name. (i.e. composter, froglight)
 - Remove accesswidener file that no longer in use from Forge build.
 - Improved performance of self-hosted particle system.
-- Large internal improvements assistant by AI that clean up a lot of dumb code I wrote before...
-  - Fix water print will randomize its direction. (Why did I write this random()? Sorry I delayed for a whole year...)
+#### Large internal improvements that clean up a lot of dumb code I wrote before 0.6.0...
+- Refactor boat & minecart mixin, improved their performance.
+- Improved footprint generator readability and performance. 
+- Fix watermark will generate in air.
+- Fix watermark will randomize its direction.
 
 # 0.7.0
 #### Refactor footprint generator to fix some reference issue. (Thanks to @Redls07)

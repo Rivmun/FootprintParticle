@@ -22,13 +22,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //? if 1.16.5 {
 /*import net.minecraft.world.entity.player.Player;
-import net.minecraft.resources.ResourceLocation;
 *///? }
 
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 
 import static com.rimo.footprintparticle.Client.CONFIG;
 
@@ -161,7 +157,7 @@ public abstract class LivingEntityMixin extends Entity {
 			boolean isInBlackList = CONFIG.isBlackListBlock(blockName, blockTagNames);
 			double tempY = Double.NEGATIVE_INFINITY;
 
-			// Hope you can understand what you have written here in the future :P
+			// Wish you can understand what you have written here in the future :P
 			if (CONFIG.isWhiteListBlock(blockName, blockTagNames)) {  // Highest priority.
 				tempY = blockShape.isEmpty() ?
 						feetY - i :

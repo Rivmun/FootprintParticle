@@ -26,19 +26,15 @@ import net.minecraft.world.level.block.Block;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.rimo.footprintparticle.Client.CONFIG;
-
 /**
  * Full of Stonecutter language here as you like...
  */
 public final class VersionUtil {
-
 	//~ if < 1.21.11 'Identifier' -> 'ResourceLocation'
 	//~ if < 1.21.1 '.withDefaultNamespace' -> '.tryParse'
 	//~ if < 1.19.3 'Registries.BLOCK' -> 'Registry.BLOCK_REGISTRY'
 	//? if > 1.18.2
 	private static final ResourceKey<Block> fpp$AIR = ResourceKey.create(Registries.BLOCK, Identifier.withDefaultNamespace("air"));
-
 	//? if < 1.21.11
 	//private static boolean isNoPehkui;
 	//? if < 1.21.1 && > 1.16.5
@@ -94,7 +90,7 @@ public final class VersionUtil {
 
 	public static List<String> getBlockTagNames(BlockState block) {
 		return getBlockTags(block).stream().map(tag ->
-				//~ if 1.16.5 '"#" + tag.location().toString()' -> '"#" + tag.toString()'
+				//~ if 1.16.5 '.location().toString()' -> '.toString()'
 				"#" + tag.location().toString()  // DO NOT remove '.toString()', IDE is a liar!
 		).collect(Collectors.toList());
 	}
@@ -114,7 +110,7 @@ public final class VersionUtil {
 
 	public static List<String> getEntityTagNames(EntityType<?> type) {
 		return getEntityTags(type).stream().map(tag ->
-				//~ if 1.16.5 '"#" + tag.location().toString()' -> '"#" + tag.toString()'
+				//~ if 1.16.5 '.location().toString()' -> '.toString()'
 				"#" + tag.location().toString()
 		).collect(Collectors.toList());
 	}

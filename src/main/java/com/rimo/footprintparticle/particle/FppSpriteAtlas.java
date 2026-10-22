@@ -19,9 +19,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-//? if <= 1.19.2 {
-/*import java.util.function.BiConsumer;
-*///? }
+//? if <= 1.19.2
+//import java.util.function.BiConsumer;
 
 /**
  * Particle Atlas Access for Self-hosted Particles<br>

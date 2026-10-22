@@ -18,7 +18,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-//~ if < 1.20.1 'this.level()' -> 'this.level' {
 @Mixin(AbstractMinecart.class)
 public abstract class AbstractMinecartMixin extends Entity {
 	public AbstractMinecartMixin(EntityType<?> type, Level world) {
@@ -48,6 +47,7 @@ public abstract class AbstractMinecartMixin extends Entity {
 		if (dx * dx + dz * dz <= 1.0E-8)  // d <= 1.0E-4
 			return;
 
+		//~ if < 1.20.1 'this.level()' -> 'this.level'
 		Level level = this.level();
 		BlockState state = level.getBlockState(this.blockPosition());
 		float secPerPrint = Client.CONFIG.getSecPerPrint();
@@ -79,4 +79,3 @@ public abstract class AbstractMinecartMixin extends Entity {
 		);
 	}
 }
-//~ }

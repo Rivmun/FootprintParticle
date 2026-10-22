@@ -5,9 +5,7 @@ import java.nio.file.Path;
 /**
  * Cross-loader capability abstraction.<br>
  * Each {@code loaders.<platform>.Platform} assigns its implementation to {@link #PLATFORM} in a static
- *  initializer; common code only touches loader differences through this interface.<br>
- *
- * @see com.rimo.footprintparticle.particle.FppSpriteSet#sprites()
+ *  initializer; common code only touches loader differences through this interface.
  */
 public final class PlatformUtil {
 	/** The current loader implementation, assigned by {@code loaders.<platform>.Platform}. */

@@ -27,7 +27,7 @@ public class WatermarkParticle extends FootprintParticle {
 		}
 
 		@Override
-		//~ if < 1.21.11 'double dz, @NonNull RandomSource random) {' -> 'double dz) {'
+		//~ if < 1.21.11 'double dz, @NonNull RandomSource random' -> 'double dz'
 		public Particle createParticle(@NonNull SimpleParticleType parameters, @NonNull ClientLevel world, double x, double y, double z, double dx, double size, double dz, @NonNull RandomSource random) {
 			return new WatermarkParticle(world, x, y, z, dx, size, dz, this.spriteProvider, (WatermarkParticleType) parameters, "watermark");
 		}

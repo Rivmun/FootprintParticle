@@ -16,7 +16,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-//~ if < 1.20.1 'this.level()' -> 'this.level' {
 //~ if < 1.21.11 'AbstractBoat.class' -> 'Boat.class'
 @Mixin(AbstractBoat.class)
 public abstract class AbstractBoatMixin extends Entity {
@@ -50,6 +49,7 @@ public abstract class AbstractBoatMixin extends Entity {
 		if (minecraft.player != null && this.distanceToSqr(minecraft.player) > Client.CONFIG.getGenDistSqr())
 			return;
 
+		//~ if < 1.20.1 'this.level()' -> 'this.level'
 		Level level = this.level();
 		boolean inWater = this.checkInWater();	// hoisted: the boat does not move while this burst spawns.
 		//~ if 1.16.5 'this.getYRot()' -> 'this.yRot'
@@ -117,4 +117,3 @@ public abstract class AbstractBoatMixin extends Entity {
 		}
 	}
 }
-//~ }
