@@ -8,8 +8,11 @@ import net.minecraft.util.RandomSource;
 /*import java.util.Random;
 *///? }
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Sprite Set of a Self-hosted Particle<br>
@@ -22,11 +25,17 @@ import java.util.List;
  * @see FppSpriteAtlas
  */
 public class FppSpriteSet implements SpriteSet {
+	//? if <= 1.19.2
+	//private static final String prefix = "particle/";
 	private final String particlePath;
 	/**
-	 * Only replaced as a whole by {@link #rebind(List)}; getters read it directly and never probe the atlas.
+	 * Replaced as a whole by {@link #rebind(List)}; preserves atlas order for random/index lookups.
 	 */
 	private List<TextureAtlasSprite> sprites = Collections.emptyList();
+	/**
+	 * Name -> sprite lookup; custom texture names are file paths, so a name maps to one sprite.
+	 */
+	private final Map<String, TextureAtlasSprite> nameSpriteMap = new HashMap<>();
 
 	public FppSpriteSet(String particlePath) {
 		this.particlePath = particlePath;
@@ -38,16 +47,47 @@ public class FppSpriteSet implements SpriteSet {
 
 	/**
 	 * Auto call {@link FppSpriteAtlas#reload(FppSpriteSet)} if sprites are empty.
-	 * @return all sprites of this particle.
+	 * @return all sprites of this particle, in atlas order.
 	 */
 	public List<TextureAtlasSprite> sprites() {
+		this.ensureLoaded();
+		return this.sprites;
+	}
+
+	/**
+	 * Look up custom sprites by their file names (no extension). Unknown names are skipped;
+	 *  the result preserves the order of {@code names}.
+	 */
+	public List<TextureAtlasSprite> getSprites(String[] names) {
+		this.ensureLoaded();
+		if (names == null || names.length == 0)
+			return Collections.emptyList();
+		List<TextureAtlasSprite> result = new ArrayList<>(names.length);
+		for (String name : names) {
+			TextureAtlasSprite sprite = this.nameSpriteMap.get(name);
+			if (sprite != null && ! result.contains(sprite))
+				result.add(sprite);
+		}
+		return result;
+	}
+
+	private void ensureLoaded() {
 		if (this.sprites.isEmpty())
 			FppSpriteAtlas.reload(this);
-		return this.sprites;
 	}
 
 	public void rebind(List<TextureAtlasSprite> sprites) {
 		this.sprites = sprites;
+		this.nameSpriteMap.clear();
+		for (TextureAtlasSprite sprite : sprites) {
+			//? if <= 1.19.2 {
+			/*String path = sprite.getName().getPath();
+			String name = path.startsWith(prefix) ? path.substring(prefix.length()) : path;
+			*///? } else {
+			String name = sprite.contents().name().getPath();
+			//? }
+			this.nameSpriteMap.put(name, sprite);
+		}
 	}
 
 	/*

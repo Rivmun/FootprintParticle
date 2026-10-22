@@ -3,7 +3,6 @@ package com.rimo.footprintparticle.particle;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.WaterDropParticle;
 import net.minecraft.core.particles.SimpleParticleType;
 //? if > 1.21.1 {
@@ -27,9 +26,9 @@ public class WaterSplashParticle extends WaterDropParticle {
 	}
 
 	public static class DefaultFactory implements ParticleProvider<@NonNull SimpleParticleType> {
-		private final SpriteSet spriteProvider;
+		private final FppSpriteSet spriteProvider;
 
-		public DefaultFactory(SpriteSet spriteProvider) {
+		public DefaultFactory(FppSpriteSet spriteProvider) {
 			this.spriteProvider = spriteProvider;
 		}
 

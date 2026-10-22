@@ -24,6 +24,10 @@ public class Client {
 	public static final Config CONFIG = Config.getInstance();
 
 	// Our Particles...
+	public static final String FOOTPRINT_PATH = "footprint";
+	public static final String WATERMARK_PATH = "watermark";
+	public static final String SNOWDUST_PATH = "snowdust";
+	public static final String WATERSPLASH_PATH = "watersplash";
 	public static final FootprintParticleType FOOTPRINT = new FootprintParticleType(true);
 	public static final WatermarkParticleType WATERMARK = new WatermarkParticleType(true);
 	public static final SnowDustParticleType SNOWDUST = new SnowDustParticleType(true);

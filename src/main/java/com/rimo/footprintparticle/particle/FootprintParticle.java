@@ -29,22 +29,18 @@ import org.joml.Quaternionf;
 import com.mojang.math.Vector3f;
 *///? }
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 //~ if < 1.21.11 'SingleQuadParticle' -> 'TextureSheetParticle'
 public class FootprintParticle extends SingleQuadParticle {
-	//? if <= 1.19.2
-	//private static final String prefix = "particle/";
+	private static final String[] defTexture = new String[]{Client.FOOTPRINT_PATH};
 
 	protected float startAlpha;
 	//~ if < 1.20.1 'Quaternionf' -> 'Quaternion'
 	private final Quaternionf q;
 	private final BlockPos pos;
 
-	protected FootprintParticle(ClientLevel clientWorld, double x, double y, double z, double dx, double size, double dz, SpriteSet spriteProvider, FootprintParticleType parameters, String defName) {
+	protected FootprintParticle(ClientLevel clientWorld, double x, double y, double z, double dx, double size, double dz, FppSpriteSet spriteProvider, FootprintParticleType parameters) {
 		//~ if < 1.21.11 ', spriteProvider.get(RandomSource.create()))' -> ')'
 		super(clientWorld, x, y, z, 0, 0, 0, spriteProvider.get(RandomSource.create()));
 		pos = new BlockPos(Mth.floor(this.x), Mth.floor(this.y - 0.02f), Mth.floor(this.z));
@@ -76,7 +72,7 @@ public class FootprintParticle extends SingleQuadParticle {
 		/*this.q = new Quaternion((float) -cf, (float) -sf, (float) sf, (float) -cf);
 		*///? }
 
-		List<TextureAtlasSprite> spriteList = getCustomSprites(parameters.entityId, parameters.tags, spriteProvider, defName);
+		List<TextureAtlasSprite> spriteList = getCustomSprites(parameters.entityId, parameters.tags, spriteProvider);
 		this.setSprite(spriteList.get((int) (Math.random() * spriteList.size())));
 	}
 
@@ -164,44 +160,33 @@ public class FootprintParticle extends SingleQuadParticle {
 	}
 	*///? }
 
-	private static List<TextureAtlasSprite> getCustomSprites(String entityId, List<String> tags, SpriteSet spriteProvider, String def) {
+	private List<TextureAtlasSprite> getCustomSprites(String entityId, List<String> tags, FppSpriteSet spriteProvider) {
 		String[] spriteNames = Client.CONFIG.getCustomTextureNames(entityId, tags);
 		if (spriteNames == null || spriteNames.length == 0)
-			spriteNames = new String[]{def};  // A key mapped to null or an empty array must fall back to the default sprite.
-		List<String> finalSpriteNames = Arrays.asList(spriteNames);
-		List<TextureAtlasSprite> sprites = spriteProvider instanceof FppSpriteSet
-				? ((FppSpriteSet) spriteProvider).sprites()
-				: Collections.emptyList();
-		List<TextureAtlasSprite> result = sprites.stream().filter(sprite ->
-				finalSpriteNames.stream().anyMatch(str ->
-						//? if <= 1.19.2 {
-						/*{
-							String path = sprite.getName().getPath();
-							return (path.startsWith(prefix) ? path.substring(prefix.length()) : path).contentEquals(str);
-						}
-						*///? } else {
-						sprite.contents().name().getPath().contentEquals(str)
-						//? }
-				)
-		).collect(Collectors.toList());
+			spriteNames = this.getDefTexture();  // A key mapped to null or an empty array must fall back to the default sprite.
+		List<TextureAtlasSprite> result = spriteProvider.getSprites(spriteNames);
 		if (result.isEmpty()) {
 			Client.LOGGER.error("Wrong custom texture for {}, please check.", entityId);
-			return sprites;
+			return spriteProvider.sprites();
 		}
 		return result;
 	}
 
-	public static class DefaultFactory implements ParticleProvider<SimpleParticleType> {
-		private final SpriteSet spriteProvider;
+	protected String[] getDefTexture() {
+		return defTexture;
+	}
 
-		public DefaultFactory(SpriteSet spriteProvider) {
+	public static class DefaultFactory implements ParticleProvider<SimpleParticleType> {
+		private final FppSpriteSet spriteProvider;
+
+		public DefaultFactory(FppSpriteSet spriteProvider) {
 			this.spriteProvider = spriteProvider;
 		}
 
 		@Override
 		//~ if < 1.21.11 'double dz, @NonNull RandomSource random' -> 'double dz'
 		public Particle createParticle(@NonNull SimpleParticleType parameters, @NonNull ClientLevel world, double x, double y, double z, double dx, double size, double dz, @NonNull RandomSource random) {
-			return new FootprintParticle(world, x, y, z, dx, size, dz, this.spriteProvider, (FootprintParticleType) parameters, "footprint");
+			return new FootprintParticle(world, x, y, z, dx, size, dz, this.spriteProvider, (FootprintParticleType) parameters);
 		}
 	}
 

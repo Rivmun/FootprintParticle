@@ -2,7 +2,6 @@ package com.rimo.footprintparticle.particle;
 
 import com.rimo.footprintparticle.Client;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.core.particles.ParticleType;
 
 import java.util.ArrayList;
@@ -29,16 +28,16 @@ public final class FppParticleRegistry {
 	private static final List<FppSpriteSet> SPRITE_SETS = new ArrayList<>();
 
 	static {
-		register(Client.FOOTPRINT, "footprint", FootprintParticle.DefaultFactory::new);
-		register(Client.WATERMARK, "watermark", WatermarkParticle.DefaultFactory::new);
-		register(Client.SNOWDUST, "snowdust", SnowDustParticle.DefaultFactory::new);
-		register(Client.WATERSPLASH, "watersplash", WaterSplashParticle.DefaultFactory::new);
+		register(Client.FOOTPRINT, Client.FOOTPRINT_PATH, FootprintParticle.DefaultFactory::new);
+		register(Client.WATERMARK, Client.WATERMARK_PATH, WatermarkParticle.DefaultFactory::new);
+		register(Client.SNOWDUST, Client.SNOWDUST_PATH, SnowDustParticle.DefaultFactory::new);
+		register(Client.WATERSPLASH, Client.WATERSPLASH_PATH, WaterSplashParticle.DefaultFactory::new);
 	}
 
 	private FppParticleRegistry() {
 	}
 
-	public static void register(ParticleType<?> type, String path, Function<SpriteSet, ? extends ParticleProvider<?>> factory) {
+	public static void register(ParticleType<?> type, String path, Function<FppSpriteSet, ? extends ParticleProvider<?>> factory) {
 		FppSpriteSet spriteSet = new FppSpriteSet(path);
 		SPRITE_SETS.add(spriteSet);
 		PROVIDERS.put(type, factory.apply(spriteSet));

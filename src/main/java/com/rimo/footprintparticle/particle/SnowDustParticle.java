@@ -2,7 +2,6 @@ package com.rimo.footprintparticle.particle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
-import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.core.particles.SimpleParticleType;
 //? if > 1.21.1
 import net.minecraft.util.RandomSource;
@@ -11,9 +10,9 @@ import org.jspecify.annotations.NonNull;
 // Copy from net.minecraft.client.particle.PlayerCloudParticle
 //~ if < 1.21.11 'SingleQuadParticle' -> 'TextureSheetParticle'
 public class SnowDustParticle extends SingleQuadParticle {
-    private final SpriteSet sprites;
+    private final FppSpriteSet sprites;
 
-    SnowDustParticle(ClientLevel clientLevel, double d, double e, double f, double g, double h, double i, SpriteSet spriteSet) {
+    SnowDustParticle(ClientLevel clientLevel, double d, double e, double f, double g, double h, double i, FppSpriteSet spriteSet) {
         //~ if < 1.21.11 ', spriteSet.first());' -> ');'
         super(clientLevel, d, e, f, (double) 0.0F, (double) 0.0F, (double) 0.0F, spriteSet.first());
         //? if ! 1.16.5
@@ -56,9 +55,9 @@ public class SnowDustParticle extends SingleQuadParticle {
     *///? }
 
     public static class DefaultFactory implements ParticleProvider<@NonNull SimpleParticleType> {
-        private final SpriteSet spriteProvider;
+        private final FppSpriteSet spriteProvider;
 
-        public DefaultFactory(SpriteSet spriteProvider) {
+        public DefaultFactory(FppSpriteSet spriteProvider) {
             this.spriteProvider = spriteProvider;
         }
 
