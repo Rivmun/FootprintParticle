@@ -2,6 +2,7 @@ package com.rimo.footprintparticle.mixin;
 
 import com.rimo.footprintparticle.Client;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
@@ -31,14 +32,17 @@ public abstract class AbstractMinecartMixin extends Entity {
 
 	@Inject(method = "tick", at = @At("RETURN"))
 	public void fpp$tick(CallbackInfo ci) {
-		// calc deltaMovement by ourselves because .getDeltaMovement() always 0 if entity ridden by remote player.
+		//~ if < 1.20.1 'this.level()' -> 'this.level'
+		Level level = this.level();
+		if (!(level instanceof ClientLevel))
+			return;
 		double x = this.getX();
 		double z = this.getZ();
 		double dx = fpp$hasLastPos ? x - fpp$ox : 0;
 		double dz = fpp$hasLastPos ? z - fpp$oz : 0;
 		fpp$ox = x;
 		fpp$oz = z;
-		fpp$hasLastPos = true;	// entities read from disk get their position after construction, so ignore the first delta.
+		fpp$hasLastPos = true;
 
 		if (fpp$timer > 0) {
 			fpp$timer--;
@@ -47,8 +51,6 @@ public abstract class AbstractMinecartMixin extends Entity {
 		if (dx * dx + dz * dz <= 1.0E-8)  // d <= 1.0E-4
 			return;
 
-		//~ if < 1.20.1 'this.level()' -> 'this.level'
-		Level level = this.level();
 		BlockState state = level.getBlockState(this.blockPosition());
 		float secPerPrint = Client.CONFIG.getSecPerPrint();
 		fpp$timer = state.is(Blocks.POWERED_RAIL)?

@@ -118,8 +118,8 @@ public final class VersionUtil {
 	// Don't inline this function into mixin class that mixin descriptor will resolve every reference
 	// even target class not be import just a full name invoke.
 	// It will crash the game on boot.
-	public static float getEntityScale(String id, LivingEntity entity) {
-		float scale = Client.CONFIG.getMobSize(id, getEntityTagNames(entity.getType()));
+	public static float getEntityScale(String id, List<String> tags, LivingEntity entity) {
+		float scale = Client.CONFIG.getMobSize(id, tags);
 
 		//? if < 1.21.11 {
 		/*if (! isNoPehkui && PlatformUtil.PLATFORM.isModLoaded("pehkui")) {
@@ -149,9 +149,5 @@ public final class VersionUtil {
 			scale *= 0.66f;
 		scale *= entity.getScale();
 		return scale;
-	}
-
-	public static float getEntityScale(LivingEntity entity) {
-		return getEntityScale(EntityType.getKey(entity.getType()).toString(), entity);
 	}
 }

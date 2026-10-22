@@ -4,6 +4,7 @@ import com.rimo.footprintparticle.Client;
 import com.rimo.footprintparticle.VersionUtil;
 import com.rimo.footprintparticle.config.WorkMode;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -34,6 +35,9 @@ public abstract class LivingEntityMixin extends Entity {
 		super(type, world);
 	}
 
+	// Entity id is fixed. Tags are loaded on the first near tick and refreshed every 200 ticks, staggered by entity id.
+	@Unique private final String fpp$idCache = EntityType.getKey(this.getType()).toString();
+	@Unique private List<String> fpp$tagsCache;
 	@Unique private int fpp$timer = 0;
 	@Unique private boolean fpp$wasFalling;
 	@Unique private boolean fpp$hasLastPos;
@@ -42,6 +46,10 @@ public abstract class LivingEntityMixin extends Entity {
 
 	@Inject(method = "tick", at = @At("TAIL"))
 	public void fpp$tick(CallbackInfo ci) {
+		//~ if < 1.20.1 'this.level()' -> 'this.level'
+		Level level = this.level();
+		if (!(level instanceof ClientLevel))
+			return;  // Integrated-server entities share this class in singleplayer; particles are client-only.
 		double x = this.getX();
 		double y = this.getY();
 		double z = this.getZ();
@@ -59,12 +67,20 @@ public abstract class LivingEntityMixin extends Entity {
 		fpp$hasLastPos = true;
 		fpp$wasFalling = falling;
 
-		// Vanilla only sends world particles to players within 32 blocks; ours are client-side, so cap them at 64 blocks.
+		if (this.isInWaterOrRain()) {
+			fpp$wetTimer = 0;
+		} else if (fpp$wetTimer <= CONFIG.getWetDuration() * 20) {
+			fpp$wetTimer++;
+		}
+
 		Minecraft minecraft = Minecraft.getInstance();
-		boolean near = minecraft.player == null || this.distanceToSqr(minecraft.player) <= CONFIG.getGenDistSqr();
+		if (minecraft.player != null && this.distanceToSqr(minecraft.player) > CONFIG.getGenDistSqr())
+			return;
+		if (fpp$tagsCache == null || (level.getGameTime() + this.getId()) % 200 == 0)
+			fpp$tagsCache = VersionUtil.getEntityTagNames(this.getType());
 
 		boolean generated = false;
-		if (near && !this.isShiftKeyDown() && !this.isUnderWater()) {
+		if (!this.isShiftKeyDown() && !this.isUnderWater()) {
 			//~ if < 1.20.1 'this.onGround()' -> 'this.onGround'
 			if (landed || (fpp$timer <= 0 && moved && this.onGround()))
 				generated = this.fpp$footprintGenerator(landed);
@@ -73,17 +89,10 @@ public abstract class LivingEntityMixin extends Entity {
 			fpp$timer--;
 		}
 
-		if (this.isInWaterOrRain()) {
-			fpp$wetTimer = 0;
-		} else if (fpp$wetTimer <= CONFIG.getWetDuration() * 20) {
-			fpp$wetTimer++;
-		}
-
 		// Swim Pop
-		if (near && this.isSwimming() && fpp$isEnable(CONFIG.getSwimPopLevel())) {
-			float range = VersionUtil.getEntityScale((LivingEntity) (Object) this);
-			//~ if < 1.20.1 'this.level()' -> 'this.level'
-			this.level().addParticle(
+		if (this.isSwimming() && fpp$isEnable(CONFIG.getSwimPopLevel())) {
+			float range = VersionUtil.getEntityScale(fpp$idCache, fpp$tagsCache, (LivingEntity) (Object) this);
+			level.addParticle(
 					ParticleTypes.BUBBLE,
 					this.getX() + (Math.random() - 0.5f) * range,
 					this.getY() + (Math.random() - 0.5f) * range,
@@ -99,8 +108,8 @@ public abstract class LivingEntityMixin extends Entity {
 	public boolean fpp$footprintGenerator(boolean landedOrJump) {
 		if (!fpp$isEnable(CONFIG.getEnableMod()))
 			return false;
-		String id = EntityType.getKey(this.getType()).toString();
-		List<String> tags = VersionUtil.getEntityTagNames(this.getType());
+		String id = fpp$idCache;
+		List<String> tags = fpp$tagsCache;
 		if (CONFIG.isBlackListMob(id, tags))
 			return false;
 		if (!CONFIG.getCanGenWhenInvisible() && this.isInvisible())
@@ -115,7 +124,7 @@ public abstract class LivingEntityMixin extends Entity {
 		float dx = - Mth.sin(yawRad);  // horizontal facing vector.
 		float dz =   Mth.cos(yawRad);
 		LivingEntity entity = (LivingEntity) (Object) this;
-		float scale = VersionUtil.getEntityScale(id, entity);
+		float scale = VersionUtil.getEntityScale(id, tags, entity);
 		boolean isSprinting = this.isSprinting();
 
 		// Set Interval
@@ -199,7 +208,7 @@ public abstract class LivingEntityMixin extends Entity {
 		if (canGen) {
 			py += CONFIG.getBlockHeight(blockName, blockTagNames);  // Fix height by blocks if in...(extra vertical offset)
 			// footprint
-			level.addParticle(Client.FOOTPRINT.setEntity(entity), px, py, pz, dx, scale, dz);
+			level.addParticle(Client.FOOTPRINT.setEntityInfo(id, tags), px, py, pz, dx, scale, dz);
 			// Snow Dust
 			if (blockState.is(Blocks.SNOW) && fpp$isEnable(CONFIG.getSnowDustLevel())) {
 				int count = isSprinting ? 4 : 2;
@@ -217,7 +226,7 @@ public abstract class LivingEntityMixin extends Entity {
 			if (level.getBlockState(pos).getCollisionShape(level, pos).isEmpty())
 				return false;  // supported block must have shape. if not, jump the water splash.
 			// waterprint (gen when footprint not gen)
-			level.addParticle(Client.WATERMARK.setStartAlpha(fpp$wetTimer).setEntity(entity),   // push timer to calc alpha
+			level.addParticle(Client.WATERMARK.setStartAlpha(fpp$wetTimer).setEntityInfo(id, tags),   // push timer to calc alpha
 					px, py, pz, dx, scale, dz);
 		}
 		// water splash (gen any print was generated with wet)

@@ -1,7 +1,6 @@
 package com.rimo.footprintparticle.particle;
 
 import com.rimo.footprintparticle.Client;
-import com.rimo.footprintparticle.VersionUtil;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
@@ -9,8 +8,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.levelgen.Heightmap;
 import org.jspecify.annotations.NonNull;
 //? if > 1.21.1 {
@@ -79,7 +76,7 @@ public class FootprintParticle extends SingleQuadParticle {
 		/*this.q = new Quaternion((float) -cf, (float) -sf, (float) sf, (float) -cf);
 		*///? }
 
-		List<TextureAtlasSprite> spriteList = getCustomSprites(parameters.entity, spriteProvider, defName);
+		List<TextureAtlasSprite> spriteList = getCustomSprites(parameters.entityId, parameters.tags, spriteProvider, defName);
 		this.setSprite(spriteList.get((int) (Math.random() * spriteList.size())));
 	}
 
@@ -167,14 +164,11 @@ public class FootprintParticle extends SingleQuadParticle {
 	}
 	*///? }
 
-	private static List<TextureAtlasSprite> getCustomSprites(LivingEntity entity, SpriteSet spriteProvider, String def) {
-		String entityId = EntityType.getKey(entity.getType()).toString();
-		String[] spriteNames = Client.CONFIG.getCustomTextureNames(entityId, VersionUtil.getEntityTagNames(entity.getType()));
-		// A key mapped to null or an empty array must fall back to the default sprite.
+	private static List<TextureAtlasSprite> getCustomSprites(String entityId, List<String> tags, SpriteSet spriteProvider, String def) {
+		String[] spriteNames = Client.CONFIG.getCustomTextureNames(entityId, tags);
 		if (spriteNames == null || spriteNames.length == 0)
-			spriteNames = new String[]{def};
+			spriteNames = new String[]{def};  // A key mapped to null or an empty array must fall back to the default sprite.
 		List<String> finalSpriteNames = Arrays.asList(spriteNames);
-		// Self-hosted particles: spriteProvider is always our FppSpriteSet, so read its live sprite list.
 		List<TextureAtlasSprite> sprites = spriteProvider instanceof FppSpriteSet
 				? ((FppSpriteSet) spriteProvider).sprites()
 				: Collections.emptyList();

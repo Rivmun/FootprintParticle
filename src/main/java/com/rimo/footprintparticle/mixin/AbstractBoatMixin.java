@@ -2,6 +2,7 @@ package com.rimo.footprintparticle.mixin;
 
 import com.rimo.footprintparticle.Client;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -30,7 +31,10 @@ public abstract class AbstractBoatMixin extends Entity {
 
 	@Inject(method = "tick", at = @At("RETURN"))
 	public void fpp$tick(CallbackInfo ci) {
-		// calc deltaMovement by ourselves because .getDeltaMovement() always 0 if entity ridden by remote player.
+		//~ if < 1.20.1 'this.level()' -> 'this.level'
+		Level level = this.level();
+		if (!(level instanceof ClientLevel))
+			return;
 		double x = this.getX();
 		double y = this.getY();
 		double z = this.getZ();
@@ -38,7 +42,7 @@ public abstract class AbstractBoatMixin extends Entity {
 		double dz = fpp$hasLastPos ? z - fpp$oz : 0;
 		fpp$ox = x;
 		fpp$oz = z;
-		fpp$hasLastPos = true;	// entities read from disk get their position after construction, so ignore the first delta.
+		fpp$hasLastPos = true;
 
 		double d = Math.sqrt(dx * dx + dz * dz);
 		int count = (int) (d * 10);
@@ -49,9 +53,7 @@ public abstract class AbstractBoatMixin extends Entity {
 		if (minecraft.player != null && this.distanceToSqr(minecraft.player) > Client.CONFIG.getGenDistSqr())
 			return;
 
-		//~ if < 1.20.1 'this.level()' -> 'this.level'
-		Level level = this.level();
-		boolean inWater = this.checkInWater();	// hoisted: the boat does not move while this burst spawns.
+		boolean inWater = this.checkInWater();
 		//~ if 1.16.5 'this.getYRot()' -> 'this.yRot'
 		float yaw = this.getYRot();
 		while (Math.random() < count-- / 5f) {
