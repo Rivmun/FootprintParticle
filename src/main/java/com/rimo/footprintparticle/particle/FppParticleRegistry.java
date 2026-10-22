@@ -1,5 +1,6 @@
 package com.rimo.footprintparticle.particle;
 
+import com.rimo.footprintparticle.Client;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.core.particles.ParticleType;
@@ -21,11 +22,18 @@ import java.util.function.Function;
  *  {@code ParticleEngine.makeParticle} and creates the particle with our provider on a hit.<br>
  * <br>
  * Providers and sprite sets are built once during class initialization, so loader/init order does not matter:
- *  the first lookup from the mixin triggers this class.<br>
+ *  the first lookup from the mixin or stitcher will trigger the static registration.<br>
  */
 public final class FppParticleRegistry {
 	private static final Map<ParticleType<?>, ParticleProvider<?>> PROVIDERS = new IdentityHashMap<>();
 	private static final List<FppSpriteSet> SPRITE_SETS = new ArrayList<>();
+
+	static {
+		register(Client.FOOTPRINT, "footprint", FootprintParticle.DefaultFactory::new);
+		register(Client.WATERMARK, "watermark", WatermarkParticle.DefaultFactory::new);
+		register(Client.SNOWDUST, "snowdust", SnowDustParticle.DefaultFactory::new);
+		register(Client.WATERSPLASH, "watersplash", WaterSplashParticle.DefaultFactory::new);
+	}
 
 	private FppParticleRegistry() {
 	}

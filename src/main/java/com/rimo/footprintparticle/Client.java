@@ -31,15 +31,10 @@ public class Client {
 
 	public static void init() {
 		/*
-		 * Register to our own particle provider.
-		 * Why? The official particle register of Fabric / Neoforge still use vanilla particleSheet.
-		 * Though their register only run in client, but the client will be a server in LAN game.
-		 * The particleSheet will sync to client which trying to connect the host, that's make a conflict and connect will be fail.
-		 * Completely self-hold entire particle provider is the only way to fix it.
+		 * The registration is moved to FppParticleRegistry static block,
+		 * to ensure register runs before stitch and first reload, prevent registry order issues, especially on forge.
+		 *
+		 * @see com.rimo.footprintparticle.loaders.forge.Platform$ClientEvents.<clinit>()
 		 */
-		FppParticleRegistry.register(Client.FOOTPRINT, "footprint", FootprintParticle.DefaultFactory::new);
-		FppParticleRegistry.register(Client.WATERMARK, "watermark", WatermarkParticle.DefaultFactory::new);
-		FppParticleRegistry.register(Client.SNOWDUST, "snowdust", SnowDustParticle.DefaultFactory::new);
-		FppParticleRegistry.register(Client.WATERSPLASH, "watersplash", WaterSplashParticle.DefaultFactory::new);
 	}
 }
