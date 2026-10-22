@@ -316,8 +316,9 @@ public class Config {
 	}
 
 	/**
-	 * Parse "key,value" lines into a map. A bare "key" keeps the key with a null value (consumer default), and an
-	 *  unparsable value is stored as null. The editor rejects blank lines before saving.
+	 * Parse "key,value" lines into a map. A bare "key" keeps the key with a null value (consumer default), which is
+	 *  only accepted by the offset lists {@code horseLikeMobs / spiderLikeMobs}; other lists require a value and the
+	 *  editor rejects a value-less line. The editor rejects blank lines before saving.
 	 */
 	private static Map<String, Float> toFloatMap(List<String> list) {
 		Map<String, Float> map = new LinkedHashMap<>();
@@ -450,12 +451,19 @@ public class Config {
 	}
 
 	/**
-	 * Drop values that cannot be represented in JSON or used by consumers: empty keys, non-finite floats, empty
+	 * Drop values that cannot be represented in JSON or used by consumers: empty keys, value-less entries of
+	 *  {@code blockHeight / mobInterval / sizePerMob} (their consumers have no fallback), non-finite floats, empty
 	 *  customPrint entries, and null/empty set entries. Otherwise an entry the editor flags (e.g. a blank sprite
-	 *  name loaded from JSON) would keep the save button disabled until the user removed it manually.
+	 *  name loaded from JSON) would keep the save button disabled until the user removed it manually.<br>
+	 * <br>
+	 * {@code horseLikeMobs / spiderLikeMobs} keep a null value as a marker for their default offset.
 	 */
 	private void sanitize() {
-		for (Map<String, Float> map : Arrays.asList(blockHeight, mobInterval, sizePerMob, horseLikeMobs, spiderLikeMobs)) {
+		for (Map<String, Float> map : Arrays.asList(blockHeight, mobInterval, sizePerMob)) {
+			map.keySet().removeIf(String::isEmpty);
+			map.values().removeIf(value -> value == null || !Float.isFinite(value));
+		}
+		for (Map<String, Float> map : Arrays.asList(horseLikeMobs, spiderLikeMobs)) {
 			map.keySet().removeIf(String::isEmpty);
 			map.replaceAll((key, value) -> value == null || Float.isFinite(value) ? value : null);
 		}

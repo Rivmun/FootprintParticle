@@ -74,6 +74,7 @@ public class ConfigScreen {
 						,1
 						,16)
 				.setDefaultValue(Config.DEF_GEN_DIST_CHUNK)
+				.setTextGetter(value -> t("block", value * 16))
 				.setTooltip(t("option.genDistChunk.@Tooltip"))
 				.setSaveConsumer(CONFIG::setGenDistChunk)
 				.build()
@@ -169,7 +170,7 @@ public class ConfigScreen {
 						, CONFIG.getExcludedMobs())
 				.setDefaultValue(Config.DEF_MODS)
 				.setTooltip(t("option.excludedMobs.@Tooltip"))
-				.setCellErrorSupplier(this::setLineError)
+				.setCellErrorSupplier(ConfigScreen::setLineError)
 				.setSaveConsumer(CONFIG::setExcludedMobs)
 				.build()
 		);
@@ -185,7 +186,7 @@ public class ConfigScreen {
 						, CONFIG.getApplyBlocks())
 				.setDefaultValue(Config.DEF_APPLYBLOCKS)
 				.setTooltip(t("option.applyBlocks.@Tooltip"))
-				.setCellErrorSupplier(this::setLineError)
+				.setCellErrorSupplier(ConfigScreen::setLineError)
 				.setSaveConsumer(CONFIG::setApplyBlocks)
 				.build()
 		);
@@ -202,7 +203,7 @@ public class ConfigScreen {
 						, CONFIG.getExcludedBlocks())
 				.setDefaultValue(Config.DEF_EXCLUDEDBLOCKS)
 				.setTooltip(t("option.excludedBlocks.@Tooltip"))
-				.setCellErrorSupplier(this::setLineError)
+				.setCellErrorSupplier(ConfigScreen::setLineError)
 				.setSaveConsumer(CONFIG::setExcludedBlocks)
 				.build()
 		);
@@ -216,7 +217,7 @@ public class ConfigScreen {
 				.setTooltip(t("option.blockHeight.@Tooltip"))
 				.setSaveConsumer(CONFIG::setBlockHeight)
 				.build();
-		blockHeight.setCellErrorSupplier(line -> floatLineError(line, blockHeight.getValue()));
+		blockHeight.setCellErrorSupplier(line -> floatLineError(line, blockHeight.getValue(), true));
 		category.addEntry(blockHeight);
 		StringListListEntry mobInterval = entryBuilder
 				.startStrList(t("option.mobInterval")
@@ -225,7 +226,7 @@ public class ConfigScreen {
 				.setTooltip(t("option.mobInterval.@Tooltip"))
 				.setSaveConsumer(CONFIG::setMobInterval)
 				.build();
-		mobInterval.setCellErrorSupplier(line -> floatLineError(line, mobInterval.getValue()));
+		mobInterval.setCellErrorSupplier(line -> floatLineError(line, mobInterval.getValue(), true));
 		category.addEntry(mobInterval);
 		StringListListEntry sizePerMob = entryBuilder
 				.startStrList(t("option.sizePerMob")
@@ -234,7 +235,7 @@ public class ConfigScreen {
 				.setTooltip(t("option.sizePerMob.@Tooltip"))
 				.setSaveConsumer(CONFIG::setSizePerMob)
 				.build();
-		sizePerMob.setCellErrorSupplier(line -> floatLineError(line, sizePerMob.getValue()));
+		sizePerMob.setCellErrorSupplier(line -> floatLineError(line, sizePerMob.getValue(), true));
 		category.addEntry(sizePerMob);
 		StringListListEntry horseLikeMobs = entryBuilder
 				.startStrList(t("option.horseLikeMobs")
@@ -326,29 +327,54 @@ public class ConfigScreen {
 		);
 	}
 
+	//? if > 1.18.2 {
+	private static Component t(String key, Object... args) {
+		return Component.translatable("text.footprintparticle." + key, args);
+	}
+	//? } else {
+	/*private static TranslatableComponent t(String key, Object... args) {
+		return new TranslatableComponent("text.footprintparticle." + key, args);
+	}
+	*///? }
+
+	private static Component p(String text) {
+		return Component.nullToEmpty(text);
+	}
+
+	// List value validator
+
 	/** Shown on a float-list cell while its line is blank, malformed or repeats a key used by another line. */
-	private Optional<Component> floatLineError(String line, List<String> lines) {
+	private static Optional<Component> floatLineError(String line, List<String> lines) {
+		return floatLineError(line, lines, false);
+	}
+
+	/**
+	 * @param valueRequired true for lists whose value has no fallback, so a bare "key" or an empty value is invalid.
+	 */
+	private static Optional<Component> floatLineError(String line, List<String> lines, boolean valueRequired) {
 		if (line.trim().isEmpty()) return Optional.of(t("error.empty"));
-		String key = floatKey(line);
-		if (key == null) return Optional.of(t("error.float"));
+		String key = floatKey(line, valueRequired);
+		if (key == null) return Optional.of(t(valueRequired ? "error.valueRequired" : "error.float"));
 		int count = 0;
 		for (String other : lines) {
-			if (key.equals(floatKey(other))) count++;
+			if (key.equals(floatKey(other, valueRequired))) count++;
 		}
 		return count > 1 ? Optional.of(t("error.duplicate", key)) : Optional.empty();
 	}
 
-	/** @return the key of a well-formed float line, or null if the line is blank or malformed. */
-	private static String floatKey(String line) {
+	/**
+	 * @param valueRequired true to treat a bare "key" or an empty value as malformed.
+	 * @return the key of a well-formed float line, or null if the line is blank or malformed.
+	 */
+	private static String floatKey(String line, boolean valueRequired) {
 		if (line == null || line.trim().isEmpty()) return null;
 		int idx = line.indexOf(',');
 		String key = idx < 0 ? line : line.substring(0, idx);
 		if (key.isEmpty()) return null;
-		if (idx >= 0) {
-			String raw = line.substring(idx + 1).trim();
-			if (!raw.isEmpty() && !isFiniteFloat(raw)) return null;
-		}
-		return key;
+		if (idx < 0) return valueRequired ? null : key;
+		String raw = line.substring(idx + 1).trim();
+		if (raw.isEmpty()) return valueRequired ? null : key;
+		return isFiniteFloat(raw) ? key : null;
 	}
 
 	private static boolean isFiniteFloat(String raw) {
@@ -360,7 +386,7 @@ public class ConfigScreen {
 	}
 
 	/** Shown on a customPrint cell while its line is blank, malformed or repeats a key used by another line. */
-	private Optional<Component> customPrintLineError(String line, List<String> lines) {
+	private static Optional<Component> customPrintLineError(String line, List<String> lines) {
 		if (line.trim().isEmpty()) return Optional.of(t("error.empty"));
 		String key = customPrintKey(line);
 		if (key == null) return Optional.of(t("error.customPrint"));
@@ -383,21 +409,7 @@ public class ConfigScreen {
 	}
 
 	/** Shown on a set-list cell while its line is blank. */
-	private Optional<Component> setLineError(String line) {
+	private static Optional<Component> setLineError(String line) {
 		return line.trim().isEmpty() ? Optional.of(t("error.empty")) : Optional.empty();
-	}
-
-	//? if > 1.18.2 {
-	private Component t(String key, Object... args) {
-		return Component.translatable("text.footprintparticle." + key, args);
-	}
-	//? } else {
-	/*private TranslatableComponent t(String key, Object... args) {
-		return new TranslatableComponent("text.footprintparticle." + key, args);
-	}
-	*///? }
-
-	private Component p(String text) {
-		return Component.nullToEmpty(text);
 	}
 }

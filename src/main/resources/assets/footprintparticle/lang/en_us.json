@@ -6,6 +6,7 @@
 	"text.footprintparticle.block": "%s block(s)",
 
 	"text.footprintparticle.error.float": "Invalid line. Use \"modid:id\" or \"modid:id,number\".",
+	"text.footprintparticle.error.valueRequired": "Value is required. Use \"modid:id,number\".",
 	"text.footprintparticle.error.customPrint": "Invalid line. Use \"modid:id,fileName\" or \"modid:id,fileName1,fileName2,...\".",
 	"text.footprintparticle.error.duplicate": "Duplicate key: %s",
 	"text.footprintparticle.error.empty": "Empty line is not allowed.",
@@ -59,5 +60,5 @@
 	"text.footprintparticle.category.filter": "Filter",
 	"text.footprintparticle.category.custom": "Customize",
 	"text.footprintparticle.option.genDistChunk": "Generate Distance",
-	"text.footprintparticle.option.genDistChunk.@Tooltip": "Entity further than this value will be generate nothing.\nMeasure in chunk (16 blocks per chunk)."
+	"text.footprintparticle.option.genDistChunk.@Tooltip": "Entity further than this value will generate nothing from this mod."
 }

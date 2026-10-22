@@ -6,6 +6,7 @@
 	"text.footprintparticle.block": "%s 方块",
 
 	"text.footprintparticle.error.float": "格式错误，应为“modid:id”或“modid:id,数值”。",
+	"text.footprintparticle.error.valueRequired": "缺少数值，应为“modid:id,数值”。",
 	"text.footprintparticle.error.customPrint": "格式错误，应为“modid:id,文件名”或“modid:id,文件名1,文件名2,...”。",
 	"text.footprintparticle.error.duplicate": "键重复：%s",
 	"text.footprintparticle.error.empty": "空行无效。",
@@ -59,7 +60,7 @@
 	"text.footprintparticle.category.filter": "过滤",
 	"text.footprintparticle.category.custom": "自定义",
 	"text.footprintparticle.option.genDistChunk": "生成距离",
-	"text.footprintparticle.option.genDistChunk.@Tooltip": "与你的距离大于此数值的生物不会生成任何本模组的粒子。\n单位为区块（每个区块 16 个方块）。",
+	"text.footprintparticle.option.genDistChunk.@Tooltip": "与你的距离大于此数值的生物不会生成任何本模组的粒子。",
 
 	"modmenu.descriptionTranslation.footprintparticle": "一个简单地为生物和玩家添加脚印粒子的模组。"
 }
