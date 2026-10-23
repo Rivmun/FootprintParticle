@@ -200,8 +200,7 @@ public class Config {
 	static final List<String> DEF_BLOCKHEIGHT = Arrays.asList(
 			"minecraft:snow,0.125",
 			"minecraft:soul_sand,0.125",
-			"minecraft:mud,0.125",
-			"#minecraft:pressure_plates,0.0625"  // raise for water print, though it disabled in excludedList.
+			"minecraft:mud,0.125"
 	);
 	static final List<String> DEF_EXCLUDEDBLOCKS = Arrays.asList(
 			"#minecraft:beehives",

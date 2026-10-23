@@ -14,6 +14,7 @@
 #### Large internal improvements that clean up a lot of dumb code I wrote before 0.6.0...
 - Fix watermark will generate in air.
 - Fix watermark will randomize its direction.
+- Fix watermark not controlled by blockHeightOffset.
 - Fix mixin tick will run meaningless on integrated-server.
 - Refactor boat & minecart mixin, improved their performance.
 - Improved code readability and performance of generator.

@@ -202,11 +202,11 @@ public abstract class LivingEntityMixin extends Entity {
 		if (! canGen)
 			py = feetY;  // provide current feet Y to waterPrint if footPrint cannot to gen.
 		py += 0.01F;  // prevent z-fight with terrain.
+		py += CONFIG.getBlockHeight(blockName, blockTagNames);  // Fix height by blocks if in...(extra vertical offset)
 
 		// Generate
 		int wetLimit = CONFIG.getWetDuration() * 20;
 		if (canGen) {
-			py += CONFIG.getBlockHeight(blockName, blockTagNames);  // Fix height by blocks if in...(extra vertical offset)
 			// footprint
 			level.addParticle(Client.FOOTPRINT.setEntityInfo(id, tags), px, py, pz, dx, scale, dz);
 			// Snow Dust
