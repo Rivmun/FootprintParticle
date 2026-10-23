@@ -1,5 +1,6 @@
 package com.rimo.footprintparticle;
 
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 //~ if < 1.19.3 '.registries.Registries' -> '.Registry'
 import net.minecraft.core.registries.Registries;
 //~ if < 1.21.11 '.Identifier' -> '.ResourceLocation'
@@ -39,6 +40,8 @@ public final class VersionUtil {
 	//private static boolean isNoPehkui;
 	//? if < 1.21.1 && > 1.16.5
 	//private static boolean isNoRandomMobSizes;
+	//? if <= 1.19.2
+	//private static final String prefix = "particle/";
 
 	//? if > 1.21.1 {
 	public static Identifier getId(String path) {
@@ -113,6 +116,19 @@ public final class VersionUtil {
 				//~ if 1.16.5 '.location().toString()' -> '.toString()'
 				"#" + tag.location().toString()
 		).collect(Collectors.toList());
+	}
+
+	/**
+	 * Name as it appears in {@code particles/<path>.json}, i.e. the texture path without extension.
+	 *  On <=1.19.2 the sprite name carries a {@code particle/} prefix that has to be stripped.
+	 */
+	public static String getSpriteName(TextureAtlasSprite sprite) {
+		//? if <= 1.19.2 {
+		/*String path = sprite.getName().getPath();
+		return path.startsWith(prefix) ? path.substring(prefix.length()) : path;
+		*///? } else {
+		return sprite.contents().name().getPath();
+		//? }
 	}
 
 	// Don't inline this function into mixin class that mixin descriptor will resolve every reference

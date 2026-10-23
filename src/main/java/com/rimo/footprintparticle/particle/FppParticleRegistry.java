@@ -49,11 +49,14 @@ public final class FppParticleRegistry {
 
 	/**
 	 * Invoked by resource reload listener ({@code TextureAtlasMixin})
-	 * to reload all particle sprites.
+	 * to reload all particle sprites.<br>
+	 * The sprites cached per entity id still point at the old atlas, so they are dropped as well.
 	 */
 	public static void reloadSpriteSets() {
 		for (FppSpriteSet spriteSet : SPRITE_SETS)
 			FppSpriteAtlas.reload(spriteSet);
+		FootprintParticle.clearCache();
+		WatermarkParticle.clearCache();
 	}
 
 	//? if <= 1.19.2 {

@@ -1,6 +1,8 @@
 package com.rimo.footprintparticle.config;
 
 import com.rimo.footprintparticle.Client;
+import com.rimo.footprintparticle.particle.FootprintParticle;
+import com.rimo.footprintparticle.particle.WatermarkParticle;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
@@ -261,7 +263,7 @@ public class ConfigScreen {
 						, CONFIG.getCustomPrint())
 				.setDefaultValue(Config.DEF_CUSTOM_PRINT)
 				.setTooltip(t("option.customPrint.@Tooltip"))
-				.setSaveConsumer(CONFIG::setCustomPrint)
+				.setSaveConsumer(ConfigScreen::saveCustomPrint)
 				.build();
 		customPrint.setCellErrorSupplier(line -> customPrintLineError(line, customPrint.getValue()));
 		category.addEntry(customPrint);
@@ -340,6 +342,18 @@ public class ConfigScreen {
 
 	private static Component p(String text) {
 		return Component.nullToEmpty(text);
+	}
+
+	/**
+	 * Trigger the particle cache invalidation when custom print changes.
+	 */
+	private static void saveCustomPrint(List<String> customPrint) {
+		boolean changed = ! customPrint.equals(CONFIG.getCustomPrint());
+		if (! changed)
+			return;
+		CONFIG.setCustomPrint(customPrint);
+		FootprintParticle.clearCache();
+		WatermarkParticle.clearCache();
 	}
 
 	// List value validator

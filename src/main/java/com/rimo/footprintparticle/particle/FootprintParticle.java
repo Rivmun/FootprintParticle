@@ -1,6 +1,7 @@
 package com.rimo.footprintparticle.particle;
 
 import com.rimo.footprintparticle.Client;
+import com.rimo.footprintparticle.VersionUtil;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
@@ -29,11 +30,21 @@ import org.joml.Quaternionf;
 import com.mojang.math.Vector3f;
 *///? }
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 //~ if < 1.21.11 'SingleQuadParticle' -> 'TextureSheetParticle'
 public class FootprintParticle extends SingleQuadParticle {
-	private static final String[] defTexture = new String[]{Client.FOOTPRINT_PATH};
+	private static final String[] DEF_TEXTURE = new String[]{Client.FOOTPRINT_PATH};
+	/**
+	 * Entity id -> resolved sprites. One id always carries the same tags, so an entry reached through a tag match is
+	 *  still valid under the id key, and a hit needs no config or atlas lookup.<br>
+	 *
+	 * @see #getCustomSprites(String, List, FppSpriteSet)
+	 * @see #clearCache()
+	 */
+	private static final Map<String, List<TextureAtlasSprite>> ID2SPRITE_MAP = new HashMap<>();
 
 	protected float startAlpha;
 	//~ if < 1.20.1 'Quaternionf' -> 'Quaternion'
@@ -160,20 +171,52 @@ public class FootprintParticle extends SingleQuadParticle {
 	}
 	*///? }
 
+	/**
+	 * Resolve one entity's sprites, cache first. A miss takes the {@link Client#CONFIG}{@code .getCustomTextureNames()} or falling back to
+	 *  {@link #getDefTexture()}, scans the atlas once and stores the result under the entity id through
+	 *  {@link FppSpriteSet#getSpritesByName(String[])}.
+	 */
 	private List<TextureAtlasSprite> getCustomSprites(String entityId, List<String> tags, FppSpriteSet spriteProvider) {
+		Map<String, List<TextureAtlasSprite>> cache = this.getCache();
+		List<TextureAtlasSprite> cached = cache.get(entityId);
+		if (cached != null)
+			return cached;  // An id matched by tag or by name resolves to the same sprites, so a hit needs no re-lookup.
+
 		String[] spriteNames = Client.CONFIG.getCustomTextureNames(entityId, tags);
 		if (spriteNames == null || spriteNames.length == 0)
 			spriteNames = this.getDefTexture();  // A key mapped to null or an empty array must fall back to the default sprite.
-		List<TextureAtlasSprite> result = spriteProvider.getSprites(spriteNames);
+		List<TextureAtlasSprite> result = spriteProvider.getSpritesByName(spriteNames);
 		if (result.isEmpty()) {
 			Client.LOGGER.error("Wrong custom texture for {}, please check.", entityId);
-			return spriteProvider.sprites();
+			result = spriteProvider.sprites();
 		}
+		cache.put(entityId, result);
+		StringBuilder builder = new StringBuilder();
+		for (TextureAtlasSprite sprite : result)
+			builder.append(VersionUtil.getSpriteName(sprite)).append(", ");
+		builder.setLength(builder.length() - 2);
+		Client.LOGGER.info("Cached {} for {}: '{}'", this.getDefTexture(), entityId, builder);
+
 		return result;
 	}
 
 	protected String[] getDefTexture() {
-		return defTexture;
+		return DEF_TEXTURE;
+	}
+
+	/**
+	 * Cache table of {@link #getCustomSprites}; subclass must override it with its own table return.
+	 */
+	protected Map<String, List<TextureAtlasSprite>> getCache() {
+		return ID2SPRITE_MAP;
+	}
+
+	/**
+	 * Drop every cached sprite of this particle. Call sites: {@link FppParticleRegistry#reloadSpriteSets()} after
+	 *  a re-stitch and {@code ConfigScreen#saveCustomPrint()} on a customPrint change.
+	 */
+	public static void clearCache() {
+		ID2SPRITE_MAP.clear();
 	}
 
 	public static class DefaultFactory implements ParticleProvider<SimpleParticleType> {
