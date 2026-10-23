@@ -10,6 +10,7 @@
 - Changed particle direction always rely on entity facing instead of their movement direction if it has.
 - Fix '#c' tag in default list cannot be matched on older MC version by replacing them to specific block name. (i.e. composter, froglight)
 - Remove accesswidener file that no longer in use from Forge build.
+- Remove some entity and block id/tags from default list on old MC version they don't exist.
 - Improved performance of self-hosted particle system.
 #### Large internal improvements that clean up a lot of dumb code I wrote before 0.6.0...
 - Fix watermark will generate in air.

@@ -173,6 +173,8 @@ public class Config {
 	}
 
 	/* - - - Default value - - - */
+	// Version-gated entries use a leading comma: Java forbids a trailing comma in a method call, and Stonecutter
+	// removes the whole block, comma included, on versions where the entry does not exist.
 	static final WorkMode DEF_ENABLE_MOD = WorkMode.ALL;
 	static final int DEF_WET_DURATION = 10;
 	static final int DEF_SEC_PER_PRINT = 5;
@@ -193,14 +195,17 @@ public class Config {
 	static final int DEF_GEN_HEIGHT_GAP = 5;
 	static final int DEF_GEN_DIST_CHUNK = 4;
 	static final List<String> DEF_APPLYBLOCKS = Arrays.asList(
-			"#minecraft:wool",
-			"#minecraft:wool_slabs",
-			"#minecraft:wool_stairs"
+			"#minecraft:wool"
+			//? if >= 26.1 {
+			,"#minecraft:wool_slabs"
+			,"#minecraft:wool_stairs"
+			//? }
 	);
 	static final List<String> DEF_BLOCKHEIGHT = Arrays.asList(
 			"minecraft:snow,0.125",
-			"minecraft:soul_sand,0.125",
-			"minecraft:mud,0.125"
+			"minecraft:soul_sand,0.125"
+			//? if >= 1.19.2
+			,"minecraft:mud,0.125"
 	);
 	static final List<String> DEF_EXCLUDEDBLOCKS = Arrays.asList(
 			"#minecraft:beehives",
@@ -215,24 +220,30 @@ public class Config {
 			"minecraft:redstone_lamp",
 			"minecraft:sea_lantern",
 			"minecraft:glowstone",
-			"minecraft:magma_block",
-			"minecraft:big_dripleaf",
-			"minecraft:ochre_froglight",
-			"minecraft:verdant_froglight",
-			"minecraft:pearlescent_froglight"
+			"minecraft:magma_block"
+			//? if >= 1.18.2
+			,"minecraft:big_dripleaf"
+			//? if >= 1.19.2 {
+			,"minecraft:ochre_froglight"
+			,"minecraft:verdant_froglight"
+			,"minecraft:pearlescent_froglight"
+			//? }
 	);
 	static final List<String> DEF_MODS = Arrays.asList(
-			"#aquatic",
 			"minecraft:parrot",
 			"minecraft:bee",
-			"minecraft:allay",
 			"minecraft:bat",
 			"minecraft:phantom",
 			"minecraft:endermite",
 			"minecraft:blaze",
 			"minecraft:ghast",
 			"minecraft:wither",
-			"minecraft:ender_dragon"
+			"minecraft:ender_dragon",
+			"minecraft:vex"
+			//? if >= 1.19.2
+			,"minecraft:allay"
+			//? if >= 1.21.11
+			,"minecraft:happy_ghast"
 	);
 	static final List<String> DEF_SIZE = Arrays.asList(
 			"minecraft:chicken,0.6",
@@ -241,16 +252,20 @@ public class Config {
 			"minecraft:ocelot,0.5",
 			"minecraft:wolf,0.6",
 			"minecraft:rabbit,0.7",
-			"minecraft:sniffer,1.6",
 			"minecraft:enderman,0.6",
 			"minecraft:slime,2.0",
 			"minecraft:magma_cube,2.0",
 			"minecraft:creeper,0.8",
 			"minecraft:iron_golem,1.2",
-			"minecraft:ravager,2.0",
-			"minecraft:armadillo,0.7",
-			"minecraft:copper_golem,0.8",
-			"minecraft:sulfur_cube,2.0"
+			"minecraft:ravager,2.0"
+			//? if >= 1.20.1
+			,"minecraft:sniffer,1.6"
+			//? if >= 1.21.1
+			,"minecraft:armadillo,0.7"
+			//? if >= 1.21.11
+			,"minecraft:copper_golem,0.8"
+			//? if >= 26.1
+			,"minecraft:sulfur_cube,2.0"
 	);
 	static final List<String> DEF_FOUR_LEGS = Arrays.asList(
 			"minecraft:horse",
@@ -258,36 +273,49 @@ public class Config {
 			"minecraft:mule",
 			"minecraft:zombie_horse",
 			"minecraft:skeleton_horse",
-			"minecraft:camel",
-			"minecraft:sniffer,0.8",
 			"minecraft:ravager,0.5",
-			"minecraft:creeper,0.3",
-			"minecraft:camel_husk"
+			"minecraft:creeper,0.3"
+			//? if >= 1.20.1 {
+			,"minecraft:camel"
+			,"minecraft:sniffer,0.8"
+			//? }
+			//? if >= 1.21.11
+			,"minecraft:camel_husk"
 	);
 	static final List<String> DEF_EIGHT_LEGS = Arrays.asList(
 			"minecraft:spider",
 			"minecraft:cave_spider",
 			"minecraft:rabbit,0.3",
-			"minecraft:camel,0.3",
-			"minecraft:sniffer,0.3",
 			"minecraft:iron_golem,0.3",
 			"minecraft:ravager,0.3",
-			"minecraft:breeze,0.1",
-			"minecraft:camel_husk,0.3",
 			"minecraft:slime,0.3",
-			"minecraft:magma_cube,0.3",
-			"minecraft:sulfur_cube,0.3"
+			"minecraft:magma_cube,0.3"
+			//? if >= 1.20.1 {
+			,"minecraft:camel,0.3"
+			,"minecraft:sniffer,0.3"
+			//? }
+			//? if >= 1.21.1
+			,"minecraft:breeze,0.1"
+			//? if >= 1.21.11
+			,"minecraft:camel_husk,0.3"
+			//? if >= 26.1
+			,"minecraft:sulfur_cube,0.3"
 	);
 	static final List<String> DEF_MOB_INTERVAL = Arrays.asList(
 			"minecraft:spider,0.5",
 			"minecraft:cave_spider,0.5",
-			"minecraft:camel,2.0",
-			"minecraft:sniffer,3.0",
 			"minecraft:iron_golem,2.0",
-			"minecraft:creeper,0.8",
-			"minecraft:creaking,1.6",
-			"minecraft:breeze,0.3",
-			"minecraft:camel_husk,2.0"
+			"minecraft:creeper,0.8"
+			//? if >= 1.20.1 {
+			,"minecraft:camel,2.0"
+			,"minecraft:sniffer,3.0"
+			//? }
+			//? if >= 1.21.1
+			,"minecraft:breeze,0.3"
+			//? if >= 1.21.11 {
+			,"minecraft:creaking,1.6"
+			,"minecraft:camel_husk,2.0"
+			//? }
 	);
 	static final List<String> DEF_CUSTOM_PRINT = Arrays.asList(
 			"mod_id:mob_id,fileName_NoExtend"
