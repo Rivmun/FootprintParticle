@@ -7,14 +7,17 @@
 - Refactor list lookup method for better performance, readability and others.
   - Now mob list can input tags starts with '#' symbol.
 - Add an option to limited max generate distance of our particles. Default is 64 blocks.
-- Fix '#c' tag in default list cannot be matched on Forge by replace them to specific block name. (i.e. composter, froglight)
+- Changed particle direction always rely on entity facing instead of their movement direction if it has.
+- Fix '#c' tag in default list cannot be matched on older MC version by replacing them to specific block name. (i.e. composter, froglight)
 - Remove accesswidener file that no longer in use from Forge build.
 - Improved performance of self-hosted particle system.
 #### Large internal improvements that clean up a lot of dumb code I wrote before 0.6.0...
-- Refactor boat & minecart mixin, improved their performance.
-- Improved footprint generator readability and performance. 
 - Fix watermark will generate in air.
 - Fix watermark will randomize its direction.
+- Fix mixin tick will run meaningless on integrated-server.
+- Refactor boat & minecart mixin, improved their performance.
+- Improved code readability and performance of generator.
+- Improved customPrint pick up performance.
 
 # 0.7.0
 #### Refactor footprint generator to fix some reference issue. (Thanks to @Redls07)

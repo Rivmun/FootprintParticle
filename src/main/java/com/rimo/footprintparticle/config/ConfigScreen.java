@@ -210,6 +210,7 @@ public class ConfigScreen {
 	}
 
 	private void buildCustomCategory(ConfigCategory category) {
+		category.addEntry(entryBuilder.startTextDescription(t("category.custom.description")).build());
 		StringListListEntry blockHeight = entryBuilder
 				.startStrList(t("option.blockHeight")
 						, CONFIG.getBlockHeight())

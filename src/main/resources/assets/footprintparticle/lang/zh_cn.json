@@ -46,7 +46,7 @@
 	"text.footprintparticle.option.footprintSize": "总体脚印大小",
 	"text.footprintparticle.option.footprintSize.@Tooltip": "单位为像素。\n为了更好的显示效果，当你在使用自定义脚印纹理时\n需要将该值设置为实际纹理宽度。",
 	"text.footprintparticle.option.customPrint": "自定义脚印纹理",
-	"text.footprintparticle.option.customPrint.@Tooltip": "为特定生物设置特定的脚印纹理。\n格式: §9§omodid:mobid,fileName1,fileName2,...§r 或 §9§o#modid:mobtag,fileName1,fileName2,...§r\n§5file§r必须是一张PNG图片且放置于资源包中的\n§oassets/footprintparticle/textures/particle§r下。\n同时，你需要在\n§oassets/footprintparticle/particles/footprint.json§r或\n§oassets/footprintparticle/particles/watermark.json§r\n中注册你的纹理。\n更多信息请查阅wiki（WIP)。",
+	"text.footprintparticle.option.customPrint.@Tooltip": "为特定生物设置特定的脚印纹理。\n格式: §9§omodid:mobid,fileName1,fileName2,...§r\n  或 §9§o#modid:mobtag,fileName1,fileName2,...§r\n§5file§r必须是一张PNG图片且放置于资源包中的\n§oassets/footprintparticle/textures/particle§r下。\n同时，你需要在\n§oassets/footprintparticle/particles/footprint.json§r或\n§oassets/footprintparticle/particles/watermark.json§r\n中注册你的纹理。\n更多信息请查阅wiki（WIP)。",
 	"text.footprintparticle.option.hardnessGate": "方块硬度门限",
 	"text.footprintparticle.option.hardnessGate.@Tooltip": "硬度小于该值的方块将生成脚印。\n你可以将该值设为0来禁用所有方块，或者设为999来启用所有方块\n默认值为0.7",
 	"text.footprintparticle.option.genHeightGap": "生成高度间隔",
@@ -61,6 +61,7 @@
 	"text.footprintparticle.category.custom": "自定义",
 	"text.footprintparticle.option.genDistChunk": "生成距离",
 	"text.footprintparticle.option.genDistChunk.@Tooltip": "与你的距离大于此数值的生物不会生成任何本模组的粒子。",
+	"text.footprintparticle.category.custom.description": "匹配规则：id > tag。若同一实体同时匹配多个 tag，则第一个 tag 将被应用。\n此规则同样适用于过滤器。",
 
 	"modmenu.descriptionTranslation.footprintparticle": "一个简单地为生物和玩家添加脚印粒子的模组。"
 }
